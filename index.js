@@ -8,14 +8,24 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001", "http://192.168.1.85:3000"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://192.168.1.85:3000",
+    ],
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001", "http://192.168.1.85:3000"]
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://192.168.1.85:3000",
+    ],
+  })
+);
 app.get("/", (req, res) => res.send("Server running..."));
 
 const rooms = {};
@@ -187,7 +197,7 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("game_started");
 
     setTimeout(() => {
-      io.to(roomId).emit("round_leader_update", {
+      io.to(roomId).emit("round_update", {
         roundLeader: room.roundLeader,
         round: room.round,
         phase: room.phase,
@@ -286,63 +296,34 @@ io.on("connection", (socket) => {
     }
   });
 
-  /*
-  socket.on("round_leader", ({ roomId }) => {
+  socket.on("quest_vote", ({ roomId, leaderVotedPlayers }) => {
     const room = rooms[roomId];
     if (!room || !room.players[socket.id]) return;
 
-    const playerList = Object.values(room.players);
-
-    if (!room.roundLeader) {
-      // Set initial round leader (random player)
-      const randomIndex = Math.floor(Math.random() * playerList.length);
-      room.roundLeader = playerList[randomIndex].socketId;
-      room.usedLeaders = [room.roundLeader];
-      room.gameStarted = true;
-
-      room.usedLeaders.push(room.roundLeader);
-      room.round++;
-
-      console.log("Round Leader:", room.roundLeader);
-      io.to(roomId).emit("round_leader_update", {
-        roundLeaderId: room.roundLeader,
-        round: room.round,
-      });
-    } else {
-      // Select next round leader from unused players
-      const playerList = Object.values(room.players);
-      const availablePlayers = playerList.filter(
-        (p) => !room.usedLeaders.includes(p.socketId)
-      );
-
-      if (availablePlayers.length === 0) {
-        // Reset when all players have been leaders
-        room.usedLeaders = [];
-        const randomIndex = Math.floor(Math.random() * playerList.length);
-        room.roundLeader = playerList[randomIndex].socketId;
-      } else {
-        // Select random from unused players
-        const randomIndex = Math.floor(Math.random() * availablePlayers.length);
-        room.roundLeader = availablePlayers[randomIndex].socketId;
-      }
-
-      room.usedLeaders.push(room.roundLeader);
-      room.round++;
-
-      io.to(roomId).emit("round_leader_update", {
-        roundLeaderId: room.roundLeader,
-        round: room.round,
-      });
+    if (!room.votedPlayers) {
+      room.votedPlayers = [];
     }
-  }); */
+    console.log("Leader voted players:", leaderVotedPlayers);
+    if (!room.votedPlayers.includes(leaderVotedPlayers)) {
+      room.votedPlayers.push(leaderVotedPlayers);
+    }
+
+    io.to(roomId).emit("inform_players_to_vote", {
+      votedPlayers: leaderVotedPlayers,
+    });
+  });
 
   // Handle quest voting
-  socket.on("vote_quest", ({ roomId, vote }) => {
+  socket.on("vote_quest", ({ roomId, vote, leaderVotedPlayers }) => {
     const room = rooms[roomId];
     if (!room || !room.players[socket.id]) return;
 
     if (!room.questVoting) {
       room.questVoting = { votes: { success: 0, fail: 0 }, voters: [] };
+    }
+
+    if (!room.votedPlayers) {
+      room.votedPlayers = [];
     }
 
     if (vote === "success") {
@@ -364,10 +345,21 @@ io.on("connection", (socket) => {
           ? "success"
           : "fail";
 
+      console.log("Leader voted players extra:", leaderVotedPlayers);
+      if (!room.votedPlayers.includes(leaderVotedPlayers)) {
+        room.votedPlayers.push(leaderVotedPlayers);
+      }
+
       io.to(roomId).emit("quest_voted", {
         result: questResult,
         votes: room.questVoting.votes,
       });
+
+      if (questResult === "success") {
+        io.to(roomId).emit("inform_players_to_vote", {
+          votedPlayers: leaderVotedPlayers,
+        });
+      }
 
       room.questVoting = null;
     }
@@ -397,7 +389,7 @@ io.on("connection", (socket) => {
     room.usedLeaders.push(room.roundLeader);
     room.round++;
 
-    io.to(roomId).emit("round_leader_update", {
+    io.to(roomId).emit("round_update", {
       roundLeader: room.roundLeader,
       round: room.round,
       phase: room.phase || 1,
@@ -537,23 +529,6 @@ io.on("connection", (socket) => {
       }
     }
   });
-
-  /*
-  socket.on("get_character", ({ roomId }) => {
-    const room = rooms[roomId];
-    if (room && room.characters[socket.id]) {
-      const character = room.characters[socket.id];
-      const playerList = Object.values(room.players).map((p) => ({
-        name: p.name,
-        socketId: p.socketId,
-      }));
-      socket.emit("character_assigned", {
-        character,
-        players: playerList,
-      });
-    }
-  });
-  */
 
   socket.on("disconnect", () => {
     for (const roomId in rooms) {

@@ -7,8 +7,9 @@ const VoteMedal = ({
   selectedPlayers,
   setShowLeaderVoteModal,
   setShowVoteButton,
-  setShowQuestVoteButton,
+  leaderVotedPlayers,
   setShowQuestVoteModal,
+  setShowQuestVoteButton,
   setShowVoteModal,
   setShowPlayersVote,
   players,
@@ -53,6 +54,7 @@ const VoteMedal = ({
                 socket.emit("vote_team", { roomId, selectedPlayers });
                 setShowVoteModal(false);
                 setShowPlayersVote(false);
+                setSelectedPlayers([]);
               }}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
             >
@@ -71,10 +73,9 @@ const VoteMedal = ({
           </div>
         </div>
       </div>
-      //
     );
   } else if (type === "leaderVote") {
-    // Vote for the quest
+    // Leader selecting
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
@@ -112,9 +113,8 @@ const VoteMedal = ({
                 setShowLeaderVoteModal(false);
                 setShowVoteModal(false);
                 setShowVoteButton(false);
+                setSelectedPlayers([]);
                 socket.emit("leader_vote", { roomId, selectedPlayers });
-
-                //   setSelectedPlayers([]);
               }}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
             >
@@ -135,35 +135,50 @@ const VoteMedal = ({
       </div>
     );
   } else if (type === "questVote") {
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
-        <h3 className="text-xl font-bold mb-4 text-white">Proceed to Quest?</h3>
-        <div className="space-y-2 mb-4">
-          <label className="flex gap-14 items-center text-white">
-            <button
-              onClick={() => {
-                const vote = "success";
-                socket.emit("vote_quest", { roomId, vote });
-                setShowQuestVoteModal(false);
-              }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
-            >
-              Yes
-            </button>
-            <button
-              onClick={() => {
-                const vote = "fail";
-                socket.emit("vote_quest", { roomId, vote });
-                setShowQuestVoteModal(false);
-              }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
-            >
-              No
-            </button>
-          </label>
+    return (
+      // Players vote to proceed
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
+          <h3 className="text-xl font-bold mb-4 text-white">
+            Proceed to Quest?
+          </h3>
+          <div className="space-y-2 mb-4">
+            <label className="flex gap-14 items-center text-white">
+              <button
+                onClick={() => {
+                  const vote = "success";
+                  socket.emit("vote_quest", {
+                    roomId,
+                    vote,
+                    leaderVotedPlayers,
+                  });
+                  setShowQuestVoteModal(false);
+                  setShowQuestVoteButton(false);
+                }}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => {
+                  const vote = "fail";
+                  socket.emit("vote_quest", {
+                    roomId,
+                    vote,
+                    leaderVotedPlayers,
+                  });
+                  setShowQuestVoteModal(false);
+                  setShowQuestVoteButton(false);
+                }}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+              >
+                No
+              </button>
+            </label>
+          </div>
         </div>
       </div>
-    </div>;
+    );
   }
 };
 
