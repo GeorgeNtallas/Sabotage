@@ -6,7 +6,7 @@ const VoteMedal = ({
   setSelectedPlayers,
   selectedPlayers,
   setShowLeaderVoteModal,
-  setShowVoteButton,
+  showQuestVoteButton,
   leaderVotedPlayers,
   setShowQuestVoteModal,
   setShowQuestVoteButton,
@@ -108,15 +108,21 @@ const VoteMedal = ({
           </div>
           <div className="flex gap-2 justify-center">
             <button
+              disabled={selectedPlayers.length !== 2}
               onClick={() => {
                 // Send vote to server
                 setShowLeaderVoteModal(false);
                 setShowVoteModal(false);
-                setShowVoteButton(false);
+                setShowQuestVoteButton(false);
                 setSelectedPlayers([]);
                 socket.emit("leader_vote", { roomId, selectedPlayers });
               }}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
+              className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded 
+                ${
+                  selectedPlayers.length !== 2
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
               Submit Vote
             </button>

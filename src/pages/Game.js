@@ -4,6 +4,7 @@ import socket from "../socket";
 import QuestPopup from "../components/QuestPopup";
 import VoteMedal from "../components/VoteMedal";
 import QuestVote from "../components/QuestVote";
+import PhaseResult from "../components/PhaseResult";
 
 function Game() {
   // Loc, roomId
@@ -13,10 +14,11 @@ function Game() {
   const [showVoteModal, setShowVoteModal] = useState(false);
   const [showLeaderVoteModal, setShowLeaderVoteModal] = useState(false);
   const [showQuestVoteModal, setShowQuestVoteModal] = useState(false);
-  const [showVoteButton, setShowVoteButton] = useState(false);
+  const [showLeaderVoteButton, setShowLeaderVoteButton] = useState(false);
   const [showQuestVoteButton, setShowQuestVoteButton] = useState(false);
   const [showPlayersVote, setShowPlayersVote] = useState(true);
   const [showQuestVoting, setShowQuestVoting] = useState(false);
+  const [showResultScreen, setShowResultScreen] = useState(false);
   // Arrays
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -24,9 +26,9 @@ function Game() {
   const [character, setCharacter] = useState(null);
   const [leaderVotedPlayers, setLeaderVotedPlayers] = useState([]);
   const [finalTeamSuggestions, setFinalTeamSuggestions] = useState([]);
+  const [finalPhaseResults, setFinalPhaseResult] = useState([]);
   // Others
   const [roundLeaderId, setRoundLeaderId] = useState();
-
   const [round, setRound] = useState(1);
   const [phase, setPhase] = useState(1);
 
@@ -42,6 +44,7 @@ function Game() {
     socket.on("leader_voted", ({ votedPlayers }) => {
       setLeaderVotedPlayers(votedPlayers);
       setShowQuestVoteButton(true);
+      setShowLeaderVoteButton(false);
     });
     return () => socket.off("leader_voted");
   }, []);
@@ -49,11 +52,21 @@ function Game() {
   useEffect(() => {
     socket.on("team_voted", ({ success, team, votes }) => {
       setSelectedPlayers([]);
-      setShowVoteButton(true);
+      setShowLeaderVoteButton(true);
       setFinalTeamSuggestions(team);
     });
     return () => socket.off("team_voted");
   }, []);
+
+  useEffect(() => {
+    socket.on("inform_result", ({ result }) => {
+      setPhaseResults((prev) => [...prev, result]);
+      setFinalPhaseResult((prev) => [...prev, result]);
+      setShowResultScreen(true);
+    });
+
+    return () => socket.off("inform_result");
+  }, [finalPhaseResults, phase]);
 
   useEffect(() => {
     socket.on("round_update", ({ roundLeader, round, phase }) => {
@@ -67,6 +80,10 @@ function Game() {
 
   useEffect(() => {
     socket.on("inform_players_to_vote", ({ votedPlayers }) => {
+      setShowPlayersVote(false);
+      setShowQuestVoteButton(false);
+      setShowPlayersVote(true);
+
       if (votedPlayers.includes(playerId)) {
         setShowQuestVoting(true);
       }
@@ -74,20 +91,11 @@ function Game() {
     return () => socket.off("inform_players_to_vote");
   }, [playerId]);
 
-  useEffect(() => {});
-
   useEffect(() => {
     socket.on("quest_voted", ({ result, votes }) => {
-      setShowPlayersVote(false);
-      setShowQuestVoteButton(false);
-      setShowPlayersVote(true);
-
-      if (result === "success") {
-        setPhaseResults((prev) => [...prev, result]);
-      }
-
       setTimeout(() => {
         if (result !== "success") {
+          setShowPlayersVote(true);
           socket.emit("next_round", { roomId });
         }
       }, 1000);
@@ -333,7 +341,7 @@ function Game() {
             Proceed to Quest?
           </button>
         )}
-        {isLeader && showVoteButton && (
+        {isLeader && showLeaderVoteButton && (
           <button
             onClick={() => setShowLeaderVoteModal(true)}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-3"
@@ -349,7 +357,7 @@ function Game() {
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
           setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowVoteButton={setShowVoteButton}
+          setShowLeaderVoteButton={setShowLeaderVoteButton}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
           setShowQuestVoteModal={setShowQuestVoteModal}
@@ -366,7 +374,7 @@ function Game() {
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
           setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowVoteButton={setShowVoteButton}
+          setShowLeaderVoteButton={setShowLeaderVoteButton}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
           setShowQuestVoteModal={setShowQuestVoteModal}
@@ -382,7 +390,7 @@ function Game() {
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
           setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowVoteButton={setShowVoteButton}
+          setShowLeaderVoteButton={setShowLeaderVoteButton}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
           setShowQuestVoteModal={setShowQuestVoteModal}
@@ -392,7 +400,21 @@ function Game() {
           type="questVote"
         />
       )}
-      {showQuestVoting && <QuestVote setShowQuestVoting={setShowQuestVoting} />}
+      {showQuestVoting && (
+        <QuestVote
+          setShowQuestVoting={setShowQuestVoting}
+          roomId={roomId}
+          phase={phase}
+        />
+      )}
+      {showResultScreen && (
+        <PhaseResult
+          result={finalPhaseResults}
+          setShowResultScreen={setShowResultScreen}
+          roomId={roomId}
+          phase={phase}
+        />
+      )}
     </div>
   );
 }
