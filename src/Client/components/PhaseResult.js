@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import socket from "../socket";
+import ReactCardFlip from "react-card-flip";
+import socket from "../../socket";
 
 const VoteResult = ({ result, setShowResultScreen, roomId, phase }) => {
   const [currentColor, setCurrentColor] = useState("red");

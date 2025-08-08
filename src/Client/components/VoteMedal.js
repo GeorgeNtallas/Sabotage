@@ -1,5 +1,5 @@
 import React from "react";
-import socket from "../socket";
+import socket from "../../socket";
 
 const VoteMedal = ({
   roomId,
@@ -14,15 +14,22 @@ const VoteMedal = ({
   setShowPlayersVote,
   players,
   type,
+  missionTeamSizes,
 }) => {
   if (type === "voteAll") {
     // Vote Medal
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
-          <h3 className="text-xl font-bold mb-4 text-white text-center ">
-            Select Quest Team
-          </h3>
+          <div className="mb-5">
+            <h3 className="text-xl font-bold text-white text-center ">
+              Select Quest Team
+            </h3>
+            <div className="font-semibold text-white text-center">
+              Choose {missionTeamSizes}
+            </div>
+          </div>
+
           <div className="space-y-2 mb-4 flex flex-col items-center">
             {players.map((player) => (
               <label
@@ -49,6 +56,7 @@ const VoteMedal = ({
           </div>
           <div className="flex gap-2 justify-center">
             <button
+              disabled={selectedPlayers.length !== missionTeamSizes}
               onClick={() => {
                 // Send vote to server
                 socket.emit("vote_team", { roomId, selectedPlayers });
@@ -56,7 +64,12 @@ const VoteMedal = ({
                 setShowPlayersVote(false);
                 setSelectedPlayers([]);
               }}
-              className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
+              className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded 
+                ${
+                  selectedPlayers.length !== missionTeamSizes
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700"
+                }`}
             >
               Submit Vote
             </button>
@@ -108,7 +121,7 @@ const VoteMedal = ({
           </div>
           <div className="flex gap-2 justify-center">
             <button
-              disabled={selectedPlayers.length !== 2}
+              disabled={selectedPlayers.length !== missionTeamSizes}
               onClick={() => {
                 // Send vote to server
                 setShowLeaderVoteModal(false);
@@ -119,7 +132,7 @@ const VoteMedal = ({
               }}
               className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded 
                 ${
-                  selectedPlayers.length !== 2
+                  selectedPlayers.length !== missionTeamSizes
                     ? "bg-gray-500 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}

@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import socket from "../socket";
+import socket from "../../socket";
 
 function Home() {
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState("");
   const navigate = useNavigate();
-  
+
   // Auto-play functionality
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const playerName = urlParams.get('player');
-    const isAuto = urlParams.get('auto');
-    
+    const playerName = urlParams.get("player");
+    const isAuto = urlParams.get("auto");
+
     if (playerName && isAuto) {
       setName(playerName);
-      
-      if (playerName === 'Alice') {
+
+      if (playerName === "Alice") {
         // Alice creates game after 2 seconds
         setTimeout(() => {
           handleCreate();
@@ -24,7 +24,7 @@ function Home() {
       } else {
         // Other players wait for room ID and join
         const checkForRoom = setInterval(() => {
-          const storedRoomId = localStorage.getItem('avalon-room-id');
+          const storedRoomId = localStorage.getItem("avalon-room-id");
           if (storedRoomId) {
             clearInterval(checkForRoom);
             setRoomId(storedRoomId);

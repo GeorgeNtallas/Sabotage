@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import socket from "../socket";
+import socket from "../../socket";
 import QuestPopup from "../components/QuestPopup";
 import VoteMedal from "../components/VoteMedal";
 import QuestVote from "../components/QuestVote";
 import PhaseResult from "../components/PhaseResult";
+import FlippingCard from "../components/FlippingCard";
+import GameOver from "../components/GameOver";
 
 function Game() {
   // Loc, roomId
@@ -19,6 +21,7 @@ function Game() {
   const [showPlayersVote, setShowPlayersVote] = useState(true);
   const [showQuestVoting, setShowQuestVoting] = useState(false);
   const [showResultScreen, setShowResultScreen] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
   // Arrays
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -27,10 +30,13 @@ function Game() {
   const [leaderVotedPlayers, setLeaderVotedPlayers] = useState([]);
   const [finalTeamSuggestions, setFinalTeamSuggestions] = useState([]);
   const [finalPhaseResults, setFinalPhaseResult] = useState([]);
+  const [finalVoteResults, setFinalVoteResults] = useState({});
   // Others
   const [roundLeaderId, setRoundLeaderId] = useState();
   const [round, setRound] = useState(1);
   const [phase, setPhase] = useState(1);
+  const [missionTeamSizes, setMissionTeamSizes] = useState(1);
+  const [gameResult, setGameResult] = useState("");
 
   useEffect(() => {
     socket.on("character_assigned", ({ character, players }) => {
@@ -38,6 +44,14 @@ function Game() {
       setPlayers(players);
     });
     return () => socket.off("character_assigned");
+  }, []);
+
+  useEffect(() => {
+    socket.on("game_over", ({ result, goodWins, evilWins }) => {
+      setShowGameOver(true);
+      setGameResult(result);
+    });
+    return () => socket.off("game_over");
   }, []);
 
   useEffect(() => {
@@ -59,22 +73,35 @@ function Game() {
   }, []);
 
   useEffect(() => {
-    socket.on("inform_result", ({ result }) => {
+    socket.on("inform_result", ({ result, success, fail }) => {
       setPhaseResults((prev) => [...prev, result]);
       setFinalPhaseResult((prev) => [...prev, result]);
+      setFinalVoteResults({ success: success, fail: fail });
       setShowResultScreen(true);
     });
 
     return () => socket.off("inform_result");
-  }, [finalPhaseResults, phase]);
+  }, [
+    finalPhaseResults,
+    finalVoteResults.fail,
+    finalVoteResults.success,
+    phase,
+  ]);
 
   useEffect(() => {
-    socket.on("round_update", ({ roundLeader, round, phase }) => {
-      setRoundLeaderId(roundLeader);
-      setRound(round);
-      setSelectedPlayers([]);
-      if (phase) setPhase(phase);
-    });
+    socket.on(
+      "round_update",
+      ({ roundLeader, round, phase, missionTeamSizes }) => {
+        setRoundLeaderId(roundLeader);
+        setRound(round);
+        setSelectedPlayers([]);
+        setFinalTeamSuggestions([]);
+        setLeaderVotedPlayers([]);
+        setMissionTeamSizes(missionTeamSizes);
+        setShowPlayersVote(true);
+        if (phase) setPhase(phase);
+      }
+    );
     return () => socket.off("round_update");
   }, []);
 
@@ -82,7 +109,6 @@ function Game() {
     socket.on("inform_players_to_vote", ({ votedPlayers }) => {
       setShowPlayersVote(false);
       setShowQuestVoteButton(false);
-      setShowPlayersVote(true);
 
       if (votedPlayers.includes(playerId)) {
         setShowQuestVoting(true);
@@ -116,7 +142,7 @@ function Game() {
   return (
     <div className="min-h-screen bg-gray-900 text-white p-2 sm:p-4">
       <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">
-        Avalon Game
+        Sabotage
       </h1>
 
       {/* Mobile Layout */}
@@ -216,6 +242,34 @@ function Game() {
               </React.Fragment>
             ))}
           </div>
+        </div>
+
+        {/* Action Buttons - Mobile */}
+        <div className="px-4">
+          {showPlayersVote && (
+            <button
+              onClick={() => setShowVoteModal(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-3 mb-2"
+            >
+              Vote for Quest Team
+            </button>
+          )}
+          {showQuestVoteButton && (
+            <button
+              onClick={() => setShowQuestVoteModal(true)}
+              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 mb-2"
+            >
+              Proceed to Quest?
+            </button>
+          )}
+          {isLeader && showLeaderVoteButton && (
+            <button
+              onClick={() => setShowLeaderVoteModal(true)}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-3"
+            >
+              Leader Vote
+            </button>
+          )}
         </div>
       </div>
 
@@ -323,8 +377,8 @@ function Game() {
         isLeader={isLeader}
       />
 
-      {/* Action Buttons */}
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
+      {/* Action Buttons - Desktop Only */}
+      <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
         {showPlayersVote && (
           <button
             onClick={() => setShowVoteModal(true)}
@@ -365,6 +419,7 @@ function Game() {
           setShowPlayersVote={setShowPlayersVote}
           players={players}
           type="voteAll"
+          missionTeamSizes={missionTeamSizes}
         />
       )}
       {/* Voting Modal For Leader */}
@@ -382,6 +437,7 @@ function Game() {
           setShowPlayersVote={setShowPlayersVote}
           players={players}
           type="leaderVote"
+          missionTeamSizes={missionTeamSizes}
         />
       )}
       {showQuestVoteModal && (
@@ -398,6 +454,7 @@ function Game() {
           setShowPlayersVote={setShowPlayersVote}
           players={players}
           type="questVote"
+          missionTeamSizes={missionTeamSizes}
         />
       )}
       {showQuestVoting && (
@@ -408,13 +465,13 @@ function Game() {
         />
       )}
       {showResultScreen && (
-        <PhaseResult
-          result={finalPhaseResults}
+        <FlippingCard
+          votes={finalVoteResults}
           setShowResultScreen={setShowResultScreen}
           roomId={roomId}
-          phase={phase}
         />
       )}
+      {showGameOver && <GameOver roomId={roomId} winner={gameResult} />}
     </div>
   );
 }

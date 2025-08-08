@@ -38,6 +38,32 @@ const generateRoomId = () => {
   ).join("");
 };
 
+const missionTeamSizes = {
+  1: [1, 1, 1, 1, 1],
+  2: [2, 2, 2, 2, 2],
+  3: [2, 2, 2, 2, 2],
+  4: [2, 2, 2, 2, 2],
+  5: [2, 3, 2, 3, 3],
+  6: [2, 3, 4, 3, 4],
+  7: [2, 3, 3, 4, 4],
+  8: [3, 4, 4, 5, 5],
+  9: [3, 4, 4, 5, 5],
+  10: [3, 4, 4, 5, 5],
+};
+
+const getRoleBalance = () => ({
+  1: { good: 1, evil: 0 },
+  2: { good: 1, evil: 1 },
+  3: { good: 2, evil: 1 },
+  4: { good: 2, evil: 2 },
+  5: { good: 3, evil: 2 },
+  6: { good: 4, evil: 2 },
+  7: { good: 4, evil: 3 },
+  8: { good: 5, evil: 3 },
+  9: { good: 6, evil: 3 },
+  10: { good: 6, evil: 4 },
+});
+
 const initializeRoom = (roomId) => {
   if (!rooms[roomId]) {
     rooms[roomId] = {
@@ -126,19 +152,6 @@ io.on("connection", (socket) => {
     },
   });
 
-  const getRoleBalance = () => ({
-    1: { good: 1, evil: 0 },
-    2: { good: 1, evil: 1 },
-    3: { good: 2, evil: 1 },
-    4: { good: 2, evil: 2 },
-    5: { good: 3, evil: 2 },
-    6: { good: 4, evil: 2 },
-    7: { good: 4, evil: 3 },
-    8: { good: 5, evil: 3 },
-    9: { good: 6, evil: 3 },
-    10: { good: 6, evil: 4 },
-  });
-
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -221,6 +234,10 @@ io.on("connection", (socket) => {
     room.phase = 1;
 
     console.log("Round Leader:", room.roundLeader);
+    console.log(
+      "Round missionTeamSizes:",
+      missionTeamSizes[playerList.length][0]
+    );
     io.to(roomId).emit("game_started");
 
     setTimeout(() => {
@@ -228,6 +245,7 @@ io.on("connection", (socket) => {
         roundLeader: room.roundLeader,
         round: room.round,
         phase: room.phase,
+        missionTeamSizes: missionTeamSizes[playerList.length][0],
       });
     }, 1000);
   };
@@ -342,71 +360,53 @@ io.on("connection", (socket) => {
 
   socket.on("result_votes", ({ roomId, vote, phase }) => {
     const room = rooms[roomId];
-    const missionTeamSizes = {
-      1: [1, 1, 1, 1, 1],
-      2: [2, 2, 2, 2, 2],
-      3: [2, 2, 2, 2, 2],
-      4: [2, 2, 2, 2, 2],
-      5: [2, 3, 2, 3, 3],
-      6: [2, 3, 4, 3, 4],
-      7: [2, 3, 3, 4, 4],
-      8: [3, 4, 4, 5, 5],
-      9: [3, 4, 4, 5, 5],
-      10: [3, 4, 4, 5, 5],
-    };
 
     if (!room || !room.players[socket.id]) return;
-
-    if (!room.final_result) {
-      room.final_result = [{ votes: { success: 0, fail: 0 }, result: [] }];
-    }
 
     if (vote === "success") {
       room.final_result[room.phase].votes.success++;
     } else {
       room.final_result[room.phase].votes.fail++;
     }
-    console.log(
-      "Vote:",
-      vote,
-      "Phase:",
-      phase,
-      "room.final_result[room.phase].votes.success:",
-      room.final_result[room.phase].votes.success
-    );
 
     const votesSum =
       room.final_result[room.phase].votes.success +
       room.final_result[room.phase].votes.fail;
+
     const totalPlayers = Object.keys(room.players).length;
+
     setTimeout(() => {
       if (votesSum === missionTeamSizes[totalPlayers][room.phase]) {
         if (totalPlayers >= 7 && totalPlayers <= 10 && phase === 4) {
           if (room.final_result[room.phase].votes.fail >= 2) {
-            console.log("Game over");
             room.final_result[room.phase].result.push("fail");
             io.to(roomId).emit("inform_result", {
               result: "fail",
+              success: room.final_result[room.phase].votes.success,
+              fail: room.final_result[room.phase].votes.fail,
             });
           } else {
-            console.log("NICE");
             room.final_result[room.phase].result.push("success");
             io.to(roomId).emit("inform_result", {
               result: "success",
+              success: room.final_result[room.phase].votes.success,
+              fail: room.final_result[room.phase].votes.fail,
             });
           }
         } else {
           if (room.final_result[room.phase].votes.fail >= 1) {
-            console.log("Game over");
             room.final_result[room.phase].result.push("fail");
             io.to(roomId).emit("inform_result", {
               result: "fail",
+              success: room.final_result[room.phase].votes.success,
+              fail: room.final_result[room.phase].votes.fail,
             });
           } else {
             room.final_result[room.phase].result.push("success");
-            console.log("NICE");
             io.to(roomId).emit("inform_result", {
               result: "success",
+              success: room.final_result[room.phase].votes.success,
+              fail: room.final_result[room.phase].votes.fail,
             });
           }
         }
@@ -445,8 +445,6 @@ io.on("connection", (socket) => {
         room.questVoting.votes.success > room.questVoting.votes.fail
           ? "success"
           : "fail";
-
-      console.log("Leader voted players extra:", leaderVotedPlayers);
 
       if (!room.votedPlayers.includes(leaderVotedPlayers)) {
         room.votedPlayers.push(leaderVotedPlayers);
@@ -511,17 +509,50 @@ io.on("connection", (socket) => {
     room.transitioning = true;
     room.phase = (room.phase || 1) + 1;
     room.round = 1;
-    room.usedLeaders = [];
+
+    const allResults = Object.values(room.final_result)
+      .map((phase) => phase.result)
+      .flat();
+    const goodWins = allResults.filter((r) => r === "success").length;
+    const evilWins = allResults.filter((r) => r === "fail").length;
+
+    console.log(
+      "Phase",
+      room.phase,
+      "goodWins = ",
+      goodWins,
+      "evilWins = ",
+      evilWins
+    );
+    if (goodWins >= 3 || evilWins >= 3) {
+      io.to(roomId).emit("game_over", {
+        result: goodWins >= 3 ? "good" : "evil",
+        goodWins,
+        evilWins,
+      });
+      return;
+    }
 
     const playerList = Object.values(room.players);
-    const randomIndex = Math.floor(Math.random() * playerList.length);
-    room.roundLeader = playerList[randomIndex].socketId;
+    const availablePlayers = playerList.filter(
+      (p) => !room.usedLeaders.includes(p.socketId)
+    );
+    if (availablePlayers.length === 0) {
+      room.usedLeaders = [];
+      const randomIndex = Math.floor(Math.random() * playerList.length);
+      room.roundLeader = playerList[randomIndex].socketId;
+    } else {
+      const randomIndex = Math.floor(Math.random() * availablePlayers.length);
+      room.roundLeader = availablePlayers[randomIndex].socketId;
+    }
+
     room.usedLeaders.push(room.roundLeader);
 
     io.to(roomId).emit("round_update", {
       roundLeader: room.roundLeader,
       round: room.round,
       phase: room.phase,
+      missionTeamSizes: missionTeamSizes[playerList.length][room.phase - 1],
     });
 
     setTimeout(() => {

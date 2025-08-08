@@ -1,5 +1,5 @@
 import React from "react";
-import socket from "../socket";
+import socket from "../../socket";
 
 const QuestVote = ({ setShowQuestVoting, roomId, phase }) => {
   return (

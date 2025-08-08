@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import socket from "../socket";
+import socket from "../../socket";
 import Settings from "../components/Settings";
 
 function Lobby() {
@@ -25,8 +25,8 @@ function Lobby() {
   useEffect(() => {
     // Auto-ready for automation
     const urlParams = new URLSearchParams(window.location.search);
-    const isAuto = urlParams.get('auto');
-    
+    const isAuto = urlParams.get("auto");
+
     // Join room
     socket.emit("join-room", { name, roomId, sessionKey });
 
@@ -38,15 +38,23 @@ function Lobby() {
     // Update ready players list
     socket.on("ready_update", (readyList) => {
       setReadyPlayers(readyList);
-      
+
       // Auto-start game when all ready (Alice only)
       const urlParams = new URLSearchParams(window.location.search);
-      const playerName = urlParams.get('player');
-      const isAuto = urlParams.get('auto');
-      
-      if (isAuto && playerName === 'Alice' && readyList.length === players.length && players.length >= 6) {
+      const playerName = urlParams.get("player");
+      const isAuto = urlParams.get("auto");
+
+      if (
+        isAuto &&
+        playerName === "Alice" &&
+        readyList.length === players.length &&
+        players.length >= 6
+      ) {
         setTimeout(() => {
-          socket.emit("start_game", { roomId, selectedRoles: Array.from(selectedRoles) });
+          socket.emit("start_game", {
+            roomId,
+            selectedRoles: Array.from(selectedRoles),
+          });
         }, 3000);
       }
     });
@@ -55,10 +63,10 @@ function Lobby() {
     socket.on("password_update", ({ players, lobbyLeaderId }) => {
       setPlayers(players);
       setLobbyLeaderId(lobbyLeaderId);
-      
+
       // Auto-ready after joining
       const urlParams = new URLSearchParams(window.location.search);
-      const isAuto = urlParams.get('auto');
+      const isAuto = urlParams.get("auto");
       if (isAuto && !readyPlayers.includes(playerId)) {
         setTimeout(() => {
           socket.emit("player_ready", playerId);
@@ -162,7 +170,10 @@ function Lobby() {
             } text-white font-semibold`}
             disabled={!canStart}
             onClick={() => {
-              socket.emit("start_game", { roomId, selectedRoles: Array.from(selectedRoles) });
+              socket.emit("start_game", {
+                roomId,
+                selectedRoles: Array.from(selectedRoles),
+              });
             }}
           >
             Start Game
