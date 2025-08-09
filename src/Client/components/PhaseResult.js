@@ -2,48 +2,99 @@ import React, { useState, useEffect } from "react";
 import ReactCardFlip from "react-card-flip";
 import socket from "../../socket";
 
-const VoteResult = ({ result, setShowResultScreen, roomId, phase }) => {
-  const [currentColor, setCurrentColor] = useState("red");
-  const [showText, setShowText] = useState(false);
-  const lastResult = Array.isArray(result) ? result[result.length - 1] : result;
+const PhaseResult = ({ votes, setShowResultScreen, roomId }) => {
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [currentFlipping, setCurrentFlipping] = useState(0);
 
   useEffect(() => {
-    // Start with red, then animate to blue, then to final result
-    const timer1 = setTimeout(() => setCurrentColor("blue"), 1000);
-    const timer2 = setTimeout(() => setCurrentColor("red"), 2000);
-    const timer3 = setTimeout(() => setCurrentColor("blue"), 3000);
-    const timer4 = setTimeout(() => {
-      setCurrentColor(lastResult === "success" ? "blue" : "red");
-      setShowText(true);
-    }, 4000);
-    const timer5 = setTimeout(() => {
+    if (!votes) return;
+
+    const totalVotes = votes.success + votes.fail;
+    const cards = [];
+
+    // Create success cards
+    for (let i = 0; i < votes.success; i++) {
+      cards.push({ id: i, type: "success" });
+    }
+
+    // Create fail cards
+    for (let i = 0; i < votes.fail; i++) {
+      cards.push({ id: votes.success + i, type: "fail" });
+    }
+
+    // Success votes first, then shuffle
+    const shuffled = cards;
+
+    // Reveal cards one by one from left to right
+    shuffled.forEach((card, index) => {
+      setTimeout(
+        () => {
+          setCurrentFlipping(index);
+          setTimeout(() => {
+            setFlippedCards((prev) => [...prev, card.id]);
+            if (index === shuffled.length - 1) {
+              setCurrentFlipping(-1); // Stop flipping when last card is revealed
+            }
+          }, 5000); // Flip for 2 seconds then reveal
+        },
+        index === shuffled.length - 1 ? index * 7000 : index * 6500
+      ); // Last card starts after double time
+    });
+
+    setFlippedCards([]);
+
+    setCurrentFlipping(-1);
+    const time = (cards.length - 1) * 5000 + 7000 + 1000;
+    setTimeout(() => socket.emit("next_phase", { roomId }), time);
+
+    setTimeout(() => {
       setShowResultScreen(false);
-    }, 6000);
+    }, time);
+  }, [roomId, setShowResultScreen, votes]);
 
-    setTimeout(() => socket.emit("next_phase", { roomId }));
+  if (!votes) return null;
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-      clearTimeout(timer5);
-    };
-  }, [lastResult, result, roomId, setShowResultScreen]);
+  const cards = [];
 
-  const bgColor = currentColor === "blue" ? "bg-blue-600" : "bg-red-600";
+  for (let i = 0; i < votes.success; i++) {
+    cards.push({ id: i, type: "success" });
+  }
+  for (let i = 0; i < votes.fail; i++) {
+    cards.push({ id: votes.success + i, type: "fail" });
+  }
+
+  const shuffled = cards;
 
   return (
-    <div
-      className={`fixed inset-0 ${bgColor} transition-colors duration-1000 flex items-center justify-center z-50`}
-    >
-      {showText && (
-        <div className="text-white text-6xl font-bold">
-          {lastResult === "success" ? "SUCCESS" : "FAILED"}
-        </div>
-      )}
+    <div className="fixed inset-0 bg-black bg-opacity-100 flex items-center justify-center z-50">
+      <div className="flex gap-4">
+        {shuffled.map((card) => (
+          <ReactCardFlip
+            key={card.id}
+            isFlipped={flippedCards.includes(card.id)}
+            flipDirection="horizontal"
+          >
+            <div
+              className={`w-48 h-72 bg-purple-700 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
+                currentFlipping === shuffled.findIndex((c) => c.id === card.id)
+                  ? "animate-pulse"
+                  : ""
+              }`}
+            >
+              ?
+            </div>
+            <div
+              className={`w-48 h-72 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
+                card.type === "success" ? "bg-amber-600" : "bg-red-600"
+              }`}
+            >
+              {card.type === "success" ? "✓" : "✗"}
+            </div>
+          </ReactCardFlip>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default VoteResult;
+export default PhaseResult;

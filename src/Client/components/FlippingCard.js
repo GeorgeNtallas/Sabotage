@@ -47,14 +47,13 @@ const FlippingCard = ({ votes, setShowResultScreen, roomId }) => {
     const time = (cards.length - 1) * 5000 + 7000 + 1000;
     setTimeout(() => socket.emit("next_phase", { roomId }), time);
 
-    const timer5 = setTimeout(() => {
+    setTimeout(() => {
       setShowResultScreen(false);
     }, time);
   }, [roomId, setShowResultScreen, votes]);
 
   if (!votes) return null;
 
-  const totalVotes = votes.success + votes.fail;
   const cards = [];
 
   for (let i = 0; i < votes.success; i++) {
@@ -76,7 +75,7 @@ const FlippingCard = ({ votes, setShowResultScreen, roomId }) => {
             flipDirection="horizontal"
           >
             <div
-              className={`w-48 h-72 bg-purple-950 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
+              className={`w-48 h-72 bg-purple-700 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
                 currentFlipping === shuffled.findIndex((c) => c.id === card.id)
                   ? "animate-pulse"
                   : ""
@@ -86,7 +85,7 @@ const FlippingCard = ({ votes, setShowResultScreen, roomId }) => {
             </div>
             <div
               className={`w-48 h-72 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
-                card.type === "success" ? "bg-blue-600" : "bg-red-600"
+                card.type === "success" ? "bg-amber-600" : "bg-red-600"
               }`}
             >
               {card.type === "success" ? "✓" : "✗"}

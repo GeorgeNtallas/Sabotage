@@ -5,7 +5,6 @@ import QuestPopup from "../components/QuestPopup";
 import VoteMedal from "../components/VoteMedal";
 import QuestVote from "../components/QuestVote";
 import PhaseResult from "../components/PhaseResult";
-import FlippingCard from "../components/FlippingCard";
 import GameOver from "../components/GameOver";
 
 function Game() {
@@ -38,6 +37,7 @@ function Game() {
   const [missionTeamSizes, setMissionTeamSizes] = useState(1);
   const [gameResult, setGameResult] = useState("");
 
+  // Assigne Roles to players
   useEffect(() => {
     socket.on("character_assigned", ({ character, players }) => {
       setCharacter(character);
@@ -46,48 +46,7 @@ function Game() {
     return () => socket.off("character_assigned");
   }, []);
 
-  useEffect(() => {
-    socket.on("game_over", ({ result, goodWins, evilWins }) => {
-      setShowGameOver(true);
-      setGameResult(result);
-    });
-    return () => socket.off("game_over");
-  }, []);
-
-  useEffect(() => {
-    socket.on("leader_voted", ({ votedPlayers }) => {
-      setLeaderVotedPlayers(votedPlayers);
-      setShowQuestVoteButton(true);
-      setShowLeaderVoteButton(false);
-    });
-    return () => socket.off("leader_voted");
-  }, []);
-
-  useEffect(() => {
-    socket.on("team_voted", ({ success, team, votes }) => {
-      setSelectedPlayers([]);
-      setShowLeaderVoteButton(true);
-      setFinalTeamSuggestions(team);
-    });
-    return () => socket.off("team_voted");
-  }, []);
-
-  useEffect(() => {
-    socket.on("inform_result", ({ result, success, fail }) => {
-      setPhaseResults((prev) => [...prev, result]);
-      setFinalPhaseResult((prev) => [...prev, result]);
-      setFinalVoteResults({ success: success, fail: fail });
-      setShowResultScreen(true);
-    });
-
-    return () => socket.off("inform_result");
-  }, [
-    finalPhaseResults,
-    finalVoteResults.fail,
-    finalVoteResults.success,
-    phase,
-  ]);
-
+  // Update the room parameters
   useEffect(() => {
     socket.on(
       "round_update",
@@ -105,18 +64,27 @@ function Game() {
     return () => socket.off("round_update");
   }, []);
 
+  // Players voted the players for next quest
   useEffect(() => {
-    socket.on("inform_players_to_vote", ({ votedPlayers }) => {
-      setShowPlayersVote(false);
-      setShowQuestVoteButton(false);
-
-      if (votedPlayers.includes(playerId)) {
-        setShowQuestVoting(true);
-      }
+    socket.on("team_voted", ({ success, team, votes }) => {
+      setSelectedPlayers([]);
+      setShowLeaderVoteButton(true);
+      setFinalTeamSuggestions(team);
     });
-    return () => socket.off("inform_players_to_vote");
-  }, [playerId]);
+    return () => socket.off("team_voted");
+  }, []);
 
+  // Leader selected players for next quest
+  useEffect(() => {
+    socket.on("leader_voted", ({ votedPlayers }) => {
+      setLeaderVotedPlayers(votedPlayers);
+      setShowQuestVoteButton(true);
+      setShowLeaderVoteButton(false);
+    });
+    return () => socket.off("leader_voted");
+  }, []);
+
+  // Players voted to procceed to quest
   useEffect(() => {
     socket.on("quest_voted", ({ result, votes }) => {
       setTimeout(() => {
@@ -129,9 +97,55 @@ function Game() {
     return () => socket.off("quest_voted");
   }, [roomId, leaderVotedPlayers]);
 
+  // Selected Players on the quest
+  useEffect(() => {
+    socket.on("inform_players_to_vote", ({ votedPlayers }) => {
+      setShowPlayersVote(false);
+      setShowQuestVoteButton(false);
+
+      if (votedPlayers.includes(playerId)) {
+        setShowQuestVoting(true);
+      }
+    });
+    return () => socket.off("inform_players_to_vote");
+  }, [playerId]);
+
+  // Announce the quest result
+  useEffect(() => {
+    socket.on("inform_result", ({ result, success, fail }) => {
+      setPhaseResults((prev) => [...prev, result]);
+      setFinalPhaseResult((prev) => [...prev, result]);
+      setFinalVoteResults({ success: success, fail: fail });
+      setShowResultScreen(true);
+    });
+
+    return () => socket.off("inform_result");
+  }, [
+    finalPhaseResults,
+    finalVoteResults.fail,
+    finalVoteResults.success,
+    phase,
+  ]);
+
+  // Game over
+  useEffect(() => {
+    socket.on("game_over", ({ result, goodWins, evilWins }) => {
+      setShowGameOver(true);
+      setGameResult(result);
+    });
+    return () => socket.off("game_over");
+  }, []);
+
   if (!character) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-900 text-white">
+      <div
+        className="flex items-center justify-center h-screen bg-gray-900 text-white"
+        style={{
+          backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <h2 className="text-2xl">Waiting for character assignment...</h2>
       </div>
     );
@@ -140,110 +154,136 @@ function Game() {
   const isLeader = playerId === roundLeaderId;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-2 sm:p-4">
-      <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">
+    <div
+      className="relative min-h-screen w-full bg-gray-900 text-white p-2 sm:p-4"
+      style={{
+        backgroundImage: "url(/images/mythical.jpg      )",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/60 z-0"></div>
+      <h1 className="relative text-3xl font-extrabold text-center mb-8">
         Sabotage
       </h1>
 
       {/* Mobile Layout */}
-      <div className="block md:hidden space-y-4">
-        {/* Phase/Round Info */}
-        <div className="bg-gray-800 rounded-lg p-3">
-          <h3 className="text-center font-semibold mb-2">
-            Phase {phase} - Round {round}
-          </h3>
-          <div className="flex justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((phaseNum) => {
-              let circleColor = "bg-gray-600";
-              if (phaseNum === phase) {
-                circleColor = "bg-yellow-500";
-              } else if (phaseNum < phase) {
-                const result = phaseResults[phaseNum - 1];
-                circleColor =
-                  result === "success" ? "bg-blue-500" : "bg-red-500";
-              }
-              return (
-                <div
-                  key={phaseNum}
-                  className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
-                >
-                  {phaseNum}
-                </div>
-              );
-            })}
+      <div className="relative z-10 block md:hidden space-y-4 ">
+        {/* Phase/Round/Exit */}
+        <div className="relative flex justify-start items-center h-16 w-full px-4">
+          {/* Exit Button */}
+          <div className="absolute left-2 ">
+            <button
+              className={`px-4 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-500 hover:to-gray-600 transition rounded-md font-bold`}
+            >
+              Exit
+            </button>
+          </div>
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
+              <h3 className="text-center font-semibold mb-2">
+                Phase {phase} - Round {round}
+              </h3>
+              <div className="flex justify-center gap-2">
+                {[1, 2, 3, 4, 5].map((phaseNum) => {
+                  let circleColor = "bg-gray-600";
+                  if (phaseNum === phase) {
+                    circleColor = "bg-yellow-500";
+                  } else if (phaseNum < phase) {
+                    const result = phaseResults[phaseNum - 1];
+                    circleColor =
+                      result === "success" ? "bg-blue-500" : "bg-red-500";
+                  }
+                  return (
+                    <div
+                      key={phaseNum}
+                      className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
+                    >
+                      {phaseNum}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Character Card */}
-        <div className="bg-gray-800 rounded-lg p-4 text-center">
-          <div className="flex items-center justify-center mb-2">
-            <h2 className="text-lg font-semibold">{location.state?.name}</h2>
-            {isLeader && (
-              <img
-                src="/images/Crown.jpg"
-                alt="Leader"
-                className="w-6 h-6 ml-2"
-                onError={(e) => (e.target.src = "/images/default.jpg")}
-              />
-            )}
+        <div className="grid place-items-center">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
+            <div className="flex items-center justify-center mb-2">
+              <h2 className="text-lg font-semibold pt-2">
+                {location.state?.name}
+              </h2>
+              {isLeader && (
+                <img
+                  src="/images/Crown.jpg"
+                  alt="Leader"
+                  className="w-6 h-6 ml-2 pl-2"
+                  onError={(e) => (e.target.src = "/images/default.jpg")}
+                />
+              )}
+            </div>
+            <img
+              src={`/images/${character.name
+                .toLowerCase()
+                .replace(/\s+/g, "-")}.jpg`}
+              alt={character.name}
+              className="max-w-40 mx-auto mb-2 ml-7 mr-7"
+              onError={(e) => (e.target.src = "/images/default.jpg")}
+            />
+            <h3 className="text-lg font-bold text-yellow-400">
+              {character.name}
+            </h3>
+            <p className="text-sm text-gray-300 mb-1">
+              {character.description}
+            </p>
+            <p className="text-xs pb-2">
+              Team:{" "}
+              <span
+                className={
+                  character.team === "good" ? "text-blue-400" : "text-red-400"
+                }
+              >
+                {character.team.toUpperCase()}
+              </span>
+            </p>
           </div>
-          <img
-            src={`/images/${character.name
-              .toLowerCase()
-              .replace(/\s+/g, "-")}.jpg`}
-            alt={character.name}
-            className="max-w-40 mx-auto mb-2"
-            onError={(e) => (e.target.src = "/images/default.jpg")}
-          />
-          <h3 className="text-lg font-bold text-yellow-400">
-            {character.name}
-          </h3>
-          <p className="text-sm text-gray-300 mb-1">{character.description}</p>
-          <p className="text-xs">
-            Team:{" "}
-            <span
-              className={
-                character.team === "good" ? "text-blue-400" : "text-red-400"
-              }
-            >
-              {character.team.toUpperCase()}
-            </span>
-          </p>
         </div>
-
         {/* Players List */}
-        <div className="bg-gray-800 rounded-lg p-3">
-          <div className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm">
-            <h3 className="text-center">Players</h3>
-            <h3 className="text-center">Role</h3>
-            <h3 className="text-center">Leader</h3>
-          </div>
-          <div className="grid grid-cols-3 gap-y-2 text-xs text-gray-300">
-            {players.map((player) => (
-              <React.Fragment key={player.socketId}>
-                <div className="text-center">{player.name}</div>
-                <div className="text-center">
-                  {player.visibleRole === "evil"
-                    ? "Evil"
-                    : player.visibleRole === "Merlin/Morgana"
-                    ? "M/M"
-                    : ""}
-                </div>
-                <div className="text-center">
-                  {player.socketId === roundLeaderId && (
-                    <img
-                      src="/images/Crown.jpg"
-                      alt="Leader"
-                      className="w-4 h-4 mx-auto"
-                      onError={(e) => (e.target.src = "/images/default.jpg")}
-                    />
-                  )}
-                </div>
-              </React.Fragment>
-            ))}
+        <div className="grid place-items-center">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto">
+            <div className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm">
+              <h3 className="text-center">Players</h3>
+              <h3 className="text-center">Role</h3>
+              <h3 className="text-center">Leader</h3>
+            </div>
+            <div className="grid grid-cols-3 gap-y-2 text-xs text-gray-300">
+              {players.map((player) => (
+                <React.Fragment key={player.socketId}>
+                  <div className="text-center">{player.name}</div>
+                  <div className="text-center">
+                    {player.visibleRole === "evil"
+                      ? "Evil"
+                      : player.visibleRole === "Merlin/Morgana"
+                      ? "M/M"
+                      : ""}
+                  </div>
+                  <div className="text-center">
+                    {player.socketId === roundLeaderId && (
+                      <img
+                        src="/images/Crown.jpg"
+                        alt="Leader"
+                        className="w-4 h-4 mx-auto"
+                        onError={(e) => (e.target.src = "/images/default.jpg")}
+                      />
+                    )}
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
-
         {/* Action Buttons - Mobile */}
         <div className="px-4">
           {showPlayersVote && (
@@ -275,7 +315,8 @@ function Game() {
 
       {/* Desktop Layout */}
       <div className="hidden md:block relative h-[70vh]">
-        <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
+        {/* Phases - Rounds */}
+        <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900  rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
           <h3 className="text-lg font-semibold mb-3">
             Phase {phase} - Round {round}
           </h3>
@@ -301,6 +342,7 @@ function Game() {
           </div>
         </div>
 
+        {/* Character card */}
         <div className="bg-gray-800 rounded-lg p-6 text-center absolute left-[41%] w-[18%] max-w-sm top-1/2 transform -translate-y-1/2">
           <div className="flex items-center justify-center mb-4">
             <h2 className="text-xl">{location.state?.name}</h2>
@@ -337,6 +379,7 @@ function Game() {
           </p>
         </div>
 
+        {/* Player List */}
         <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[70%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
           <div className="grid grid-cols-3 text-white font-bold mb-4 border-b border-gray-600 pb-2">
             <h3>Players</h3>
@@ -370,6 +413,7 @@ function Game() {
         </div>
       </div>
 
+      {/* Player and Leader Votes */}
       <QuestPopup
         players={players}
         finalTeamSuggestions={finalTeamSuggestions}
@@ -377,7 +421,7 @@ function Game() {
         isLeader={isLeader}
       />
 
-      {/* Action Buttons - Desktop Only */}
+      {/* Action Buttons */}
       <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
         {showPlayersVote && (
           <button
@@ -410,11 +454,6 @@ function Game() {
           roomId={roomId}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowLeaderVoteButton={setShowLeaderVoteButton}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          setShowQuestVoteModal={setShowQuestVoteModal}
           setShowVoteModal={setShowVoteModal}
           setShowPlayersVote={setShowPlayersVote}
           players={players}
@@ -428,35 +467,26 @@ function Game() {
           roomId={roomId}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowLeaderVoteButton={setShowLeaderVoteButton}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          setShowQuestVoteModal={setShowQuestVoteModal}
           setShowVoteModal={setShowVoteModal}
           setShowPlayersVote={setShowPlayersVote}
+          setShowLeaderVoteModal={setShowLeaderVoteModal}
+          setShowQuestVoteButton={setShowQuestVoteButton}
           players={players}
           type="leaderVote"
           missionTeamSizes={missionTeamSizes}
         />
       )}
+      {/* Voting Modal Selected Players */}
       {showQuestVoteModal && (
         <VoteMedal
           roomId={roomId}
-          setSelectedPlayers={setSelectedPlayers}
-          selectedPlayers={selectedPlayers}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowLeaderVoteButton={setShowLeaderVoteButton}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
           setShowQuestVoteModal={setShowQuestVoteModal}
-          setShowVoteModal={setShowVoteModal}
-          setShowPlayersVote={setShowPlayersVote}
-          players={players}
           type="questVote"
-          missionTeamSizes={missionTeamSizes}
         />
       )}
+      {/* Selected Players Vote */}
       {showQuestVoting && (
         <QuestVote
           setShowQuestVoting={setShowQuestVoting}
@@ -464,8 +494,9 @@ function Game() {
           phase={phase}
         />
       )}
+      {/* Phase Result */}
       {showResultScreen && (
-        <FlippingCard
+        <PhaseResult
           votes={finalVoteResults}
           setShowResultScreen={setShowResultScreen}
           roomId={roomId}

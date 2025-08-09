@@ -6,6 +6,10 @@ function Home() {
   const [name, setName] = useState("");
   const [roomId, setRoomId] = useState("");
   const navigate = useNavigate();
+  const medievalFontStyle = {
+    fontFamily: "MedievalSharp",
+    fontWeight: 400,
+  };
 
   // Auto-play functionality
   useEffect(() => {
@@ -40,7 +44,7 @@ function Home() {
   const handleCreate = () => {
     // Clean up all existing listeners
     socket.off("room-created");
-    socket.off("room-joined");
+    socket.off("room_joined");
     socket.off("join-error");
     socket.off("room-exists");
     socket.off("check-room");
@@ -55,9 +59,9 @@ function Home() {
     socket.on("room-created", (createdRoomId) => {
       setRoomId(createdRoomId);
       // Join the created room
-      socket.emit("join-room", { name, roomId: createdRoomId });
+      socket.emit("join_room", { name, roomId: createdRoomId });
 
-      socket.on("room-joined", ({ sessionKey }) => {
+      socket.on("room_joined", ({ sessionKey }) => {
         sessionStorage.setItem("sessionKey", sessionKey);
         navigate(`/lobby?session=${createdRoomId}`, {
           state: { name, roomId: createdRoomId, sessionKey },
@@ -75,7 +79,7 @@ function Home() {
     }
     // Clean up all existing listeners
     socket.off("room-created");
-    socket.off("room-joined");
+    socket.off("room_joined");
     socket.off("join-error");
     socket.off("room-exists");
     socket.off("check-room");
@@ -85,11 +89,11 @@ function Home() {
       if (!exist) {
         return;
       } else {
-        socket.emit("join-room", { name, roomId, sessionKey });
+        socket.emit("join_room", { name, roomId, sessionKey });
       }
     });
 
-    socket.on("room-joined", ({ sessionKey }) => {
+    socket.on("room_joined", ({ sessionKey }) => {
       sessionStorage.setItem("sessionKey", sessionKey);
       navigate(`/lobby?session=${roomId}`, {
         state: { name, roomId, sessionKey },
@@ -103,39 +107,64 @@ function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-blue-900 to-indigo-800 text-white">
-      <h1 className="text-4xl font-bold mb-8">Avalon</h1>
-
-      <div className="bg-white text-black rounded-xl p-6 shadow-lg w-80">
-        <input
-          type="text"
-          placeholder="Your name"
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Password"
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
-          value={roomId}
-          onChange={(e) => setRoomId(e.target.value)}
-        />
-        <button
-          onClick={handleJoin}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded"
-          style={{ marginTop: "10px" }}
+    <div
+      className="relative min-h-screen bg-cover bg-center flex items-center justify-center "
+      style={{
+        backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40 z-0"></div>
+      <div className="bg-white/1 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-8 w-full max-w-sm text-white">
+        <h1
+          className="text-4xl font-extrabold text-center mb-8"
+          style={medievalFontStyle}
         >
-          Join Game
-        </button>
+          Sabotage
+        </h1>
 
-        <button
-          onClick={handleCreate}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded"
-          style={{ marginTop: "50px" }}
-        >
-          Create Game
-        </button>
+        <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80">
+          <input
+            type="text"
+            placeholder="Your name"
+            className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            style={medievalFontStyle}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Password"
+            className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+            style={medievalFontStyle}
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          />
+          <button
+            onClick={handleJoin}
+            className="w-full py-3 mb-4 bg-red-500 hover:bg-red-600 transition rounded-md font-bold"
+            style={{
+              marginTop: "10px",
+              fontFamily: "MedievalSharp",
+              fontWeight: 1000,
+            }}
+          >
+            Join Game
+          </button>
+
+          <button
+            onClick={handleCreate}
+            className="w-full py-3 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold"
+            style={{
+              marginTop: "50px",
+              fontFamily: "MedievalSharp",
+              fontWeight: 1000,
+            }}
+          >
+            Create Game
+          </button>
+        </div>
       </div>
     </div>
   );

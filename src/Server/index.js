@@ -202,6 +202,7 @@ io.on("connection", (socket) => {
     return "";
   };
 
+  // Assigne Roles to players
   const assignCharactersToPlayers = (playerList, gameCharacters, room) => {
     playerList.forEach((player, index) => {
       const character = gameCharacters[index];
@@ -225,6 +226,7 @@ io.on("connection", (socket) => {
     });
   };
 
+  // Initialaze the room parameters
   const initializeGameState = (room, playerList, roomId) => {
     const randomIndex = Math.floor(Math.random() * playerList.length);
     room.roundLeader = playerList[randomIndex].socketId;
@@ -250,6 +252,70 @@ io.on("connection", (socket) => {
     }, 1000);
   };
 
+  // Show the players who are ready
+  socket.on("player_ready", (id) => {
+    const playerRoom = Object.keys(rooms).find(
+      (roomId) => rooms[roomId].players[socket.id]
+    );
+
+    if (playerRoom && !rooms[playerRoom].ready.includes(socket.id)) {
+      rooms[playerRoom].ready.push(socket.id);
+      io.to(playerRoom).emit("player_ready", socket.id);
+      io.to(playerRoom).emit("ready_update", rooms[playerRoom].ready);
+    }
+  });
+
+  // Join room
+  socket.on("join_room", ({ name, roomId, sessionKey }) => {
+    if (!name || !roomId) {
+      socket.emit("join-error", { message: "Name and room ID are required" });
+      return;
+    }
+
+    const newSessionKey = crypto.randomUUID();
+
+    // Initialize room if it doesn't exist
+    initializeRoom(roomId);
+
+    // Check for duplicate names in THIS room only (excluding current socket)
+    const existingNames = Object.values(rooms[roomId].players)
+      .filter((p) => p.socketId !== socket.id)
+      .map((p) => p.name);
+    if (existingNames.includes(name)) {
+      socket.emit("join-error", { message: "Name already taken in this room" });
+      return;
+    }
+
+    // Add or update player
+    rooms[roomId].players[socket.id] = {
+      name,
+      sessionKey: sessionKey || newSessionKey,
+      socketId: socket.id,
+    };
+
+    socket.join(roomId);
+    socket.emit("room_joined", {
+      sessionKey: rooms[roomId].players[socket.id].sessionKey,
+    });
+    socket.emit("your_id", socket.id);
+
+    // Send full updated list
+    const playerList = Object.values(rooms[roomId].players).map((player) => ({
+      name: player.name,
+      socketId: player.socketId,
+    }));
+    io.to(roomId).emit("room_update", playerList);
+
+    const lobbyLeaderId = playerList[0]?.socketId || null;
+    io.to(roomId).emit("password_update", {
+      players: playerList,
+      lobbyLeaderId,
+    });
+
+    console.log(`User ${socket.id} joined room ${roomId}`);
+    socket.emit("ready_update", rooms[roomId].ready);
+  });
+
   // Handle game creation
   socket.on("start_game", ({ roomId, selectedRoles }) => {
     console.log("Received selectedRoles:", selectedRoles, typeof selectedRoles);
@@ -271,25 +337,6 @@ io.on("connection", (socket) => {
       assignCharactersToPlayers(playerList, gameCharacters, room);
       initializeGameState(room, playerList, roomId);
     }
-  });
-
-  // Handle leaders votes
-  socket.on("leader_vote", ({ roomId, selectedPlayers }) => {
-    const room = rooms[roomId];
-    if (!room || !room.players[socket.id]) return;
-    if (!room.gameStarted || socket.id !== room.roundLeader) return;
-
-    console.log("Leader selected players:", selectedPlayers);
-
-    // Broadcast leader selection to all players
-    io.to(roomId).emit("leader_selection_update", {
-      selectedPlayers: selectedPlayers,
-      leaderId: socket.id,
-    });
-
-    io.to(roomId).emit("leader_voted", {
-      votedPlayers: selectedPlayers,
-    });
   });
 
   // Handle team voting
@@ -341,21 +388,75 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("quest_vote", ({ roomId, leaderVotedPlayers }) => {
+  // Handle leaders votes
+  socket.on("leader_vote", ({ roomId, selectedPlayers }) => {
     const room = rooms[roomId];
     if (!room || !room.players[socket.id]) return;
+    if (!room.gameStarted || socket.id !== room.roundLeader) return;
+
+    console.log("Leader selected players:", selectedPlayers);
+
+    // Broadcast leader selection to all players
+    io.to(roomId).emit("leader_selection_update", {
+      selectedPlayers: selectedPlayers,
+      leaderId: socket.id,
+    });
+
+    io.to(roomId).emit("leader_voted", {
+      votedPlayers: selectedPlayers,
+    });
+  });
+
+  // Handle quest voting
+  socket.on("vote_quest", ({ roomId, vote, leaderVotedPlayers }) => {
+    const room = rooms[roomId];
+    if (!room || !room.players[socket.id]) return;
+
+    if (!room.questVoting) {
+      room.questVoting = { votes: { success: 0, fail: 0 }, voters: [] };
+    }
 
     if (!room.votedPlayers) {
       room.votedPlayers = [];
     }
-    console.log("Leader voted players:", leaderVotedPlayers);
-    if (!room.votedPlayers.includes(leaderVotedPlayers)) {
-      room.votedPlayers.push(leaderVotedPlayers);
+
+    if (vote === "success") {
+      room.questVoting.votes.success++;
+    } else {
+      room.questVoting.votes.fail++;
     }
 
-    io.to(roomId).emit("inform_players_to_vote", {
-      votedPlayers: leaderVotedPlayers,
-    });
+    if (!room.questVoting.voters.includes(socket.id)) {
+      room.questVoting.voters.push(socket.id);
+    }
+
+    const totalPlayers = Object.keys(room.players).length;
+    const votedCount = room.questVoting.voters.length;
+
+    if (votedCount === totalPlayers) {
+      const questResult =
+        room.questVoting.votes.success > room.questVoting.votes.fail
+          ? "success"
+          : "fail";
+
+      if (!room.votedPlayers.includes(leaderVotedPlayers)) {
+        room.votedPlayers.push(leaderVotedPlayers);
+      }
+
+      io.to(roomId).emit("quest_voted", {
+        result: questResult,
+        votes: room.questVoting.votes,
+      });
+
+      if (questResult === "success") {
+        io.to(roomId).emit("inform_players_to_vote", {
+          votedPlayers: leaderVotedPlayers,
+          result: questResult,
+        });
+      }
+
+      room.questVoting = null;
+    }
   });
 
   socket.on("result_votes", ({ roomId, vote, phase }) => {
@@ -414,58 +515,6 @@ io.on("connection", (socket) => {
     }, 2000);
   });
 
-  // Handle quest voting
-  socket.on("vote_quest", ({ roomId, vote, leaderVotedPlayers }) => {
-    const room = rooms[roomId];
-    if (!room || !room.players[socket.id]) return;
-
-    if (!room.questVoting) {
-      room.questVoting = { votes: { success: 0, fail: 0 }, voters: [] };
-    }
-
-    if (!room.votedPlayers) {
-      room.votedPlayers = [];
-    }
-
-    if (vote === "success") {
-      room.questVoting.votes.success++;
-    } else {
-      room.questVoting.votes.fail++;
-    }
-
-    if (!room.questVoting.voters.includes(socket.id)) {
-      room.questVoting.voters.push(socket.id);
-    }
-
-    const totalPlayers = Object.keys(room.players).length;
-    const votedCount = room.questVoting.voters.length;
-
-    if (votedCount === totalPlayers) {
-      const questResult =
-        room.questVoting.votes.success > room.questVoting.votes.fail
-          ? "success"
-          : "fail";
-
-      if (!room.votedPlayers.includes(leaderVotedPlayers)) {
-        room.votedPlayers.push(leaderVotedPlayers);
-      }
-
-      io.to(roomId).emit("quest_voted", {
-        result: questResult,
-        votes: room.questVoting.votes,
-      });
-
-      if (questResult === "success") {
-        io.to(roomId).emit("inform_players_to_vote", {
-          votedPlayers: leaderVotedPlayers,
-          result: questResult,
-        });
-      }
-
-      room.questVoting = null;
-    }
-  });
-
   // Handle round transitions (failed quests)
   socket.on("next_round", ({ roomId }) => {
     const room = rooms[roomId];
@@ -494,6 +543,7 @@ io.on("connection", (socket) => {
       roundLeader: room.roundLeader,
       round: room.round,
       phase: room.phase || 1,
+      missionTeamSizes: missionTeamSizes[playerList.length][room.phase - 1],
     });
 
     setTimeout(() => {
@@ -558,69 +608,6 @@ io.on("connection", (socket) => {
     setTimeout(() => {
       room.transitioning = false;
     }, 1000);
-  });
-
-  // Join room
-  socket.on("join-room", ({ name, roomId, sessionKey }) => {
-    if (!name || !roomId) {
-      socket.emit("join-error", { message: "Name and room ID are required" });
-      return;
-    }
-
-    const newSessionKey = crypto.randomUUID();
-
-    // Initialize room if it doesn't exist
-    initializeRoom(roomId);
-
-    // Check for duplicate names in THIS room only (excluding current socket)
-    const existingNames = Object.values(rooms[roomId].players)
-      .filter((p) => p.socketId !== socket.id)
-      .map((p) => p.name);
-    if (existingNames.includes(name)) {
-      socket.emit("join-error", { message: "Name already taken in this room" });
-      return;
-    }
-
-    // Add or update player
-    rooms[roomId].players[socket.id] = {
-      name,
-      sessionKey: sessionKey || newSessionKey,
-      socketId: socket.id,
-    };
-
-    socket.join(roomId);
-    socket.emit("room-joined", {
-      sessionKey: rooms[roomId].players[socket.id].sessionKey,
-    });
-    socket.emit("your_id", socket.id);
-
-    // Send full updated list
-    const playerList = Object.values(rooms[roomId].players).map((player) => ({
-      name: player.name,
-      socketId: player.socketId,
-    }));
-    io.to(roomId).emit("room_update", playerList);
-
-    const lobbyLeaderId = playerList[0]?.socketId || null;
-    io.to(roomId).emit("password_update", {
-      players: playerList,
-      lobbyLeaderId,
-    });
-
-    console.log(`User ${socket.id} joined room ${roomId}`);
-    socket.emit("ready_update", rooms[roomId].ready);
-  });
-
-  socket.on("player_ready", (id) => {
-    const playerRoom = Object.keys(rooms).find(
-      (roomId) => rooms[roomId].players[socket.id]
-    );
-
-    if (playerRoom && !rooms[playerRoom].ready.includes(socket.id)) {
-      rooms[playerRoom].ready.push(socket.id);
-      io.to(playerRoom).emit("player_ready", socket.id);
-      io.to(playerRoom).emit("ready_update", rooms[playerRoom].ready);
-    }
   });
 
   socket.on("exit", ({ roomId }) => {
