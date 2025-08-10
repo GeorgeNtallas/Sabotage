@@ -12,15 +12,51 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
           </h3>
 
           <div className="flex flex-col items-center">
-            {readyPlayers.length >= 1 && (
+            {readyPlayers.length >= 5 && (
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Merlin")}
-                  onChange={() => toggleRole("Merlin")}
+                  checked={isChecked("Seer")}
+                  onChange={() => toggleRole("Seer")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
                 />
-                Merlin
+                Seer
+              </label>
+            )}
+
+            {readyPlayers.length >= 5 && (
+              <label className="flex items-center gap-2 text-white">
+                <input
+                  type="checkbox"
+                  checked={isChecked("Recluse")}
+                  onChange={() => toggleRole("Recluse")}
+                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
+                />
+                Recluse
+              </label>
+            )}
+
+            {readyPlayers.length >= 5 && (
+              <label className="flex items-center gap-2 text-white">
+                <input
+                  type="checkbox"
+                  checked={isChecked("Shade")}
+                  onChange={() => toggleRole("Shade")}
+                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
+                />
+                Shade
+              </label>
+            )}
+
+            {readyPlayers.length >= 10 && (
+              <label className="flex items-center gap-2 text-white">
+                <input
+                  type="checkbox"
+                  checked={isChecked("Usurper")}
+                  onChange={() => toggleRole("Usurper")}
+                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500  transition"
+                />
+                Usurper
               </label>
             )}
 
@@ -28,35 +64,11 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Mordred")}
-                  onChange={() => toggleRole("Mordred")}
-                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
-                />
-                Mordred
-              </label>
-            )}
-
-            {readyPlayers.length >= 1 && (
-              <label className="flex items-center gap-2 text-white">
-                <input
-                  type="checkbox"
-                  checked={isChecked("Assassin")}
-                  onChange={() => toggleRole("Assassin")}
-                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
-                />
-                Assassin
-              </label>
-            )}
-
-            {readyPlayers.length >= 8 && (
-              <label className="flex items-center gap-2 text-white">
-                <input
-                  type="checkbox"
-                  checked={isChecked("Oberon")}
-                  onChange={() => toggleRole("Oberon")}
+                  checked={isChecked("Enchantress")}
+                  onChange={() => toggleRole("Enchantress")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500  transition"
                 />
-                Oberon
+                Enchantress
               </label>
             )}
 
@@ -64,23 +76,11 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Morgana")}
-                  onChange={() => toggleRole("Morgana")}
-                  className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500  transition"
-                />
-                Morgana
-              </label>
-            )}
-
-            {readyPlayers.length >= 6 && (
-              <label className="flex items-center gap-2 text-white">
-                <input
-                  type="checkbox"
-                  checked={isChecked("Percival")}
-                  onChange={() => toggleRole("Percival")}
+                  checked={isChecked("Guardian")}
+                  onChange={() => toggleRole("Guardian")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500 transition"
                 />
-                Percival
+                Guardian
               </label>
             )}
           </div>

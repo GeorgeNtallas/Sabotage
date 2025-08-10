@@ -114,39 +114,43 @@ io.on("connection", (socket) => {
 
   // Helper functions for game creation
   const getAllCharacters = () => ({
-    Merlin: {
-      name: "Merlin",
+    Seer: {
+      name: "Seer",
       team: "good",
       description: "Knows who the evil players are",
     },
-    Percival: {
-      name: "Percival",
+    Guardian: {
+      name: "Guardian",
       team: "good",
       description: "Knows who Merlin and Morgana are",
     },
-    Servant: {
-      name: "Servant",
+    Knight: {
+      name: "Knight",
       team: "good",
       description: "A loyal servant of Arthur",
     },
-    Morgana: {
-      name: "Morgana",
+    Enchantress: {
+      name: "Enchantress",
       team: "evil",
       description: "Appears as Merlin to Percival",
     },
-    Assassin: {
-      name: "Assassin",
+    Shade: {
+      name: "Shade",
       team: "evil",
       description: "Can kill Merlin at the end",
     },
-    Minion: { name: "Minion", team: "evil", description: "A servant of evil" },
-    Mordred: {
-      name: "Mordred",
+    Thrall: {
+      name: "Thrall",
+      team: "evil",
+      description: "A servant of evil",
+    },
+    Recluse: {
+      name: "Recluse",
       team: "evil",
       description: "Unknown for Merlin",
     },
-    Oberon: {
-      name: "Oberon",
+    Usurper: {
+      name: "Usurper",
       team: "evil",
       description: "Unknown to evil. Does not know Evil",
     },
@@ -176,9 +180,9 @@ io.on("connection", (socket) => {
     const neededEvil = Math.max(0, balance.evil - currentEvil);
 
     for (let i = 0; i < neededEvil; i++)
-      gameCharacters.push(allCharacters["Minion"]);
+      gameCharacters.push(allCharacters["Thrall"]);
     for (let i = 0; i < neededGood; i++)
-      gameCharacters.push(allCharacters["Servant"]);
+      gameCharacters.push(allCharacters["Knight"]);
 
     return shuffleArray(gameCharacters);
   };
@@ -188,17 +192,20 @@ io.on("connection", (socket) => {
     const target = targetCharacter.name;
     const targetTeam = targetCharacter.team;
 
-    if (viewer === "Merlin" && targetTeam === "evil" && target !== "Mordred")
+    if (viewer === "Seer" && targetTeam === "evil" && target !== "Recluse")
       return "evil";
-    if (viewer === "Percival" && (target === "Merlin" || target === "Morgana"))
-      return "Merlin/Morgana";
     if (
-      ["Morgana", "Assassin", "Minion", "Mordred"].includes(viewer) &&
-      target !== "Oberon" &&
+      viewer === "Guardian" &&
+      (target === "Seer" || target === "Enchantress")
+    )
+      return "Seer/Enchantress";
+    if (
+      ["Enchantress", "Shade", "Thrall", "Recluse"].includes(viewer) &&
+      target !== "Usurper" &&
       targetTeam === "evil"
     )
       return "evil";
-    if (viewer === "Oberon" && targetTeam === "good") return "good";
+    if (viewer === "Usurper" && targetTeam === "good") return "good";
     return "";
   };
 
@@ -375,7 +382,10 @@ io.on("connection", (socket) => {
         ([, a], [, b]) => b - a
       );
 
-      const questTeam = sortedVotes.slice(0, 3).map(([playerId]) => playerId); // Top 3 players
+      const voteSize = missionTeamSizes[totalPlayers][room.phase];
+      const questTeam = sortedVotes
+        .slice(0, voteSize)
+        .map(([playerId]) => playerId);
 
       io.to(roomId).emit("team_voted", {
         success: true,
@@ -448,10 +458,17 @@ io.on("connection", (socket) => {
         votes: room.questVoting.votes,
       });
 
+      const playerIds = Object.keys(room.players);
+
+      const waitPlayers = playerIds.filter(
+        (num) => !leaderVotedPlayers.includes(num)
+      );
+
       if (questResult === "success") {
         io.to(roomId).emit("inform_players_to_vote", {
           votedPlayers: leaderVotedPlayers,
           result: questResult,
+          waitPlayers: waitPlayers,
         });
       }
 

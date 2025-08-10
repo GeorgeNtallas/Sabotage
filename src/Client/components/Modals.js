@@ -1,12 +1,12 @@
 import React from "react";
 import socket from "../../socket";
+import { useNavigate } from "react-router-dom";
 
-const VoteMedal = ({
+const Modals = ({
   roomId,
   setSelectedPlayers,
   selectedPlayers,
   setShowLeaderVoteModal,
-  showQuestVoteButton,
   leaderVotedPlayers,
   setShowQuestVoteModal,
   setShowQuestVoteButton,
@@ -15,7 +15,10 @@ const VoteMedal = ({
   players,
   type,
   missionTeamSizes,
+  setShowExit,
 }) => {
+  const navigate = useNavigate();
+
   if (type === "voteAll") {
     // Vote Medal
     return (
@@ -64,11 +67,11 @@ const VoteMedal = ({
                 setShowPlayersVote(false);
                 setSelectedPlayers([]);
               }}
-              className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded 
+              className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
+                    : "bg-amber-600  hover:bg-amber-700"
                 }`}
             >
               Submit Vote
@@ -79,7 +82,7 @@ const VoteMedal = ({
                 setShowVoteModal(false);
                 setSelectedPlayers([]);
               }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
             >
               Cancel
             </button>
@@ -130,11 +133,11 @@ const VoteMedal = ({
                 setSelectedPlayers([]);
                 socket.emit("leader_vote", { roomId, selectedPlayers });
               }}
-              className={`px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded 
+              className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
+                    : "bg-amber-600  hover:bg-amber-700"
                 }`}
             >
               Submit Vote
@@ -145,7 +148,7 @@ const VoteMedal = ({
                 setShowLeaderVoteModal(false);
                 setSelectedPlayers([]);
               }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
             >
               Cancel
             </button>
@@ -158,11 +161,11 @@ const VoteMedal = ({
       // Players vote to proceed
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
-          <h3 className="text-xl font-bold mb-4 text-white">
+          <h3 className="text-xl text-center font-bold mb-4 text-white">
             Proceed to Quest?
           </h3>
           <div className="space-y-2 mb-4">
-            <label className="flex gap-14 items-center text-white">
+            <label className="flex gap-14 items-between text-white">
               <button
                 onClick={() => {
                   const vote = "success";
@@ -174,7 +177,7 @@ const VoteMedal = ({
                   setShowQuestVoteModal(false);
                   setShowQuestVoteButton(false);
                 }}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg"
               >
                 Yes
               </button>
@@ -189,6 +192,38 @@ const VoteMedal = ({
                   setShowQuestVoteModal(false);
                   setShowQuestVoteButton(false);
                 }}
+                className="px-5 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+              >
+                No
+              </button>
+            </label>
+          </div>
+        </div>
+      </div>
+    );
+  } else if (type === "exit") {
+    return (
+      // Player exiting game
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
+          <h3 className="text-xl text-center font-bold mb-4 text-white">
+            Exit Game?
+          </h3>
+          <div className="space-y-2 mb-4">
+            <label className="flex gap-14 items-center text-white">
+              <button
+                onClick={() => {
+                  socket.emit("exit", { roomId });
+                  navigate(`/`);
+                }}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => {
+                  setShowExit(false);
+                }}
                 className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"
               >
                 No
@@ -201,4 +236,4 @@ const VoteMedal = ({
   }
 };
 
-export default VoteMedal;
+export default Modals;

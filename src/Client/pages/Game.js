@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+
 import socket from "../../socket";
 import QuestPopup from "../components/QuestPopup";
-import VoteMedal from "../components/VoteMedal";
+import Modals from "../components/Modals";
 import QuestVote from "../components/QuestVote";
 import PhaseResult from "../components/PhaseResult";
 import GameOver from "../components/GameOver";
+import WaitScreen from "../components/WaitScreen";
 
 function Game() {
   // Loc, roomId
@@ -21,6 +23,8 @@ function Game() {
   const [showQuestVoting, setShowQuestVoting] = useState(false);
   const [showResultScreen, setShowResultScreen] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [showExit, setShowExit] = useState(false);
+  const [showWaitScreen, setShowWaitScreen] = useState(false);
   // Arrays
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -99,16 +103,20 @@ function Game() {
 
   // Selected Players on the quest
   useEffect(() => {
-    socket.on("inform_players_to_vote", ({ votedPlayers }) => {
+    socket.on("inform_players_to_vote", ({ votedPlayers, waitPlayers }) => {
       setShowPlayersVote(false);
       setShowQuestVoteButton(false);
 
       if (votedPlayers.includes(playerId)) {
         setShowQuestVoting(true);
       }
+
+      if (waitPlayers.includes(playerId)) {
+        setShowWaitScreen(true);
+      }
     });
     return () => socket.off("inform_players_to_vote");
-  }, [playerId]);
+  }, [playerId, players]);
 
   // Announce the quest result
   useEffect(() => {
@@ -117,6 +125,7 @@ function Game() {
       setFinalPhaseResult((prev) => [...prev, result]);
       setFinalVoteResults({ success: success, fail: fail });
       setShowResultScreen(true);
+      setShowWaitScreen(false);
     });
 
     return () => socket.off("inform_result");
@@ -162,10 +171,14 @@ function Game() {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-black/60 z-0"></div>
-      <h1 className="relative text-3xl font-extrabold text-center mb-8">
-        Sabotage
-      </h1>
+      <div className="flex justify-center">
+        <img
+          src="/images/Sabotage3.png"
+          alt="Leader"
+          className="w-[30%] mb-10"
+          onError={(e) => (e.target.src = "/images/default.jpg")}
+        />
+      </div>
 
       {/* Mobile Layout */}
       <div className="relative z-10 block md:hidden space-y-4 ">
@@ -174,7 +187,8 @@ function Game() {
           {/* Exit Button */}
           <div className="absolute left-2 ">
             <button
-              className={`px-4 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-500 hover:to-gray-600 transition rounded-md font-bold`}
+              onClick={() => setShowExit(true)}
+              className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
             >
               Exit
             </button>
@@ -188,11 +202,11 @@ function Game() {
                 {[1, 2, 3, 4, 5].map((phaseNum) => {
                   let circleColor = "bg-gray-600";
                   if (phaseNum === phase) {
-                    circleColor = "bg-yellow-500";
+                    circleColor = "bg-purple-700";
                   } else if (phaseNum < phase) {
                     const result = phaseResults[phaseNum - 1];
                     circleColor =
-                      result === "success" ? "bg-blue-500" : "bg-red-500";
+                      result === "success" ? "bg-amber-500" : "bg-red-500";
                   }
                   return (
                     <div
@@ -209,7 +223,7 @@ function Game() {
         </div>
 
         {/* Character Card */}
-        <div className="grid place-items-center">
+        <div className="flex flex-row space-x-5">
           <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
             <div className="flex items-center justify-center mb-2">
               <h2 className="text-lg font-semibold pt-2">
@@ -219,7 +233,7 @@ function Game() {
                 <img
                   src="/images/Crown.jpg"
                   alt="Leader"
-                  className="w-6 h-6 ml-2 pl-2"
+                  className="w-6 h-5 mt-1 ml-2"
                   onError={(e) => (e.target.src = "/images/default.jpg")}
                 />
               )}
@@ -227,7 +241,7 @@ function Game() {
             <img
               src={`/images/${character.name
                 .toLowerCase()
-                .replace(/\s+/g, "-")}.jpg`}
+                .replace(/\s+/g, "_")}.png`}
               alt={character.name}
               className="max-w-40 mx-auto mb-2 ml-7 mr-7"
               onError={(e) => (e.target.src = "/images/default.jpg")}
@@ -249,20 +263,27 @@ function Game() {
               </span>
             </p>
           </div>
-        </div>
-        {/* Players List */}
-        <div className="grid place-items-center">
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto">
-            <div className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm">
+          {/* Players List */}
+          <div
+            className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto text-center"
+            style={{ gridTemplateColumns: "1fr 1fr auto" }}
+          >
+            <div
+              className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
+              style={{ gridTemplateColumns: "1fr 1fr auto" }}
+            >
               <h3 className="text-center">Players</h3>
-              <h3 className="text-center">Role</h3>
-              <h3 className="text-center">Leader</h3>
+              <h3 className="text-center mr-3">Role</h3>
+              <h3 className="text-center mr-1">L</h3>
             </div>
-            <div className="grid grid-cols-3 gap-y-2 text-xs text-gray-300">
+            <div
+              className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
+              style={{ gridTemplateColumns: "1fr 1fr auto" }}
+            >
               {players.map((player) => (
                 <React.Fragment key={player.socketId}>
                   <div className="text-center">{player.name}</div>
-                  <div className="text-center">
+                  <div className="text-center mr-2">
                     {player.visibleRole === "evil"
                       ? "Evil"
                       : player.visibleRole === "Merlin/Morgana"
@@ -284,12 +305,13 @@ function Game() {
             </div>
           </div>
         </div>
+
         {/* Action Buttons - Mobile */}
         <div className="px-4">
           {showPlayersVote && (
             <button
               onClick={() => setShowVoteModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-3 mb-2"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
             >
               Vote for Quest Team
             </button>
@@ -297,7 +319,7 @@ function Game() {
           {showQuestVoteButton && (
             <button
               onClick={() => setShowQuestVoteModal(true)}
-              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 mb-2"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
             >
               Proceed to Quest?
             </button>
@@ -305,7 +327,7 @@ function Game() {
           {isLeader && showLeaderVoteButton && (
             <button
               onClick={() => setShowLeaderVoteModal(true)}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-3"
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
             >
               Leader Vote
             </button>
@@ -358,7 +380,7 @@ function Game() {
           <img
             src={`/images/${character.name
               .toLowerCase()
-              .replace(/\s+/g, "-")}.jpg`}
+              .replace(/\s+/g, "_")}.png`}
             alt={character.name}
             className="w-full max-w-[200px] mx-auto"
             onError={(e) => (e.target.src = "/images/default.jpg")}
@@ -421,12 +443,12 @@ function Game() {
         isLeader={isLeader}
       />
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Desktop*/}
       <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
         {showPlayersVote && (
           <button
             onClick={() => setShowVoteModal(true)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-3 mb-2"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
           >
             Vote for Quest Team
           </button>
@@ -434,7 +456,7 @@ function Game() {
         {showQuestVoteButton && (
           <button
             onClick={() => setShowQuestVoteModal(true)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 mb-2"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
           >
             Proceed to Quest?
           </button>
@@ -442,7 +464,7 @@ function Game() {
         {isLeader && showLeaderVoteButton && (
           <button
             onClick={() => setShowLeaderVoteModal(true)}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-3"
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
           >
             Leader Vote
           </button>
@@ -450,7 +472,7 @@ function Game() {
       </div>
       {/* Voting Modal For All */}
       {showVoteModal && (
-        <VoteMedal
+        <Modals
           roomId={roomId}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
@@ -463,7 +485,7 @@ function Game() {
       )}
       {/* Voting Modal For Leader */}
       {showLeaderVoteModal && (
-        <VoteMedal
+        <Modals
           roomId={roomId}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
@@ -478,7 +500,7 @@ function Game() {
       )}
       {/* Voting Modal Selected Players */}
       {showQuestVoteModal && (
-        <VoteMedal
+        <Modals
           roomId={roomId}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
@@ -503,6 +525,16 @@ function Game() {
         />
       )}
       {showGameOver && <GameOver roomId={roomId} winner={gameResult} />}
+      {showExit && (
+        <Modals roomId={roomId} setShowExit={setShowExit} type="exit" />
+      )}
+      {showWaitScreen && (
+        <WaitScreen
+          roomId={roomId}
+          leaderVotedPlayers={leaderVotedPlayers}
+          setShowWaitScreen={setShowWaitScreen}
+        />
+      )}
     </div>
   );
 }

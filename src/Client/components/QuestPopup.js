@@ -12,7 +12,7 @@ export default function QuestPopup({
 
   return (
     <div
-      className={`bg-gray-700 rounded-lg p-3 mb-4 text-center 
+      className={`relative bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg p-3 mb-4 text-center 
       md:absolute md:left-[69%] md:w-[25%] md:max-w-sm md:top-[20%] md:transform md:-translate-y-1/2
       mt-4
       transition-all duration-500 ease-out

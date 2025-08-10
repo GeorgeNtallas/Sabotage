@@ -50,12 +50,13 @@ function Lobby() {
         readyList.length === players.length &&
         players.length >= 6
       ) {
+        alert(Array.from(selectedRoles));
         setTimeout(() => {
           socket.emit("start_game", {
             roomId,
             selectedRoles: Array.from(selectedRoles),
           });
-        }, 3000);
+        }, 2000);
       }
     });
 

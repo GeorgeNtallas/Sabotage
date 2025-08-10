@@ -117,12 +117,14 @@ function Home() {
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
       <div className="bg-white/1 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-8 w-full max-w-sm text-white">
-        <h1
-          className="text-4xl font-extrabold text-center mb-8"
-          style={medievalFontStyle}
-        >
-          Sabotage
-        </h1>
+        <div className="flex justify-center">
+          <img
+            src="/images/Sabotage3.png"
+            alt="Leader"
+            className="w-[45%] mb-2"
+            onError={(e) => (e.target.src = "/images/default.jpg")}
+          />
+        </div>
 
         <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80">
           <input
