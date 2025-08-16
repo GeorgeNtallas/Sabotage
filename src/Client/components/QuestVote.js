@@ -1,7 +1,12 @@
 import React from "react";
 import socket from "../../socket";
 
-const QuestVote = ({ setShowQuestVoting, roomId, phase }) => {
+const QuestVote = ({
+  setShowQuestVoting,
+  roomSessionKey,
+  playerSessionKey,
+  phase,
+}) => {
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50"
@@ -18,7 +23,12 @@ const QuestVote = ({ setShowQuestVoting, roomId, phase }) => {
           onClick={() => {
             const vote = "success";
             setShowQuestVoting(false);
-            socket.emit("result_votes", { roomId, vote, phase });
+            socket.emit("result_votes", {
+              roomSessionKey,
+              playerSessionKey,
+              vote,
+              phase,
+            });
           }}
           className="w-48 h-20 text-2xl font-extrabold rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition"
           style={{
@@ -36,7 +46,12 @@ const QuestVote = ({ setShowQuestVoting, roomId, phase }) => {
           onClick={() => {
             const vote = "fail";
             setShowQuestVoting(false);
-            socket.emit("result_votes", { roomId, vote, phase });
+            socket.emit("result_votes", {
+              roomSessionKey,
+              playerSessionKey,
+              vote,
+              phase,
+            });
           }}
           className="w-48 h-20 text-2xl font-extrabold rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition"
           style={{

@@ -4,106 +4,54 @@ import socket from "../../socket";
 
 function Home() {
   const [name, setName] = useState("");
-  const [roomId, setRoomId] = useState("");
+  const [password, setpassword] = useState("");
   const navigate = useNavigate();
   const medievalFontStyle = {
     fontFamily: "MedievalSharp",
     fontWeight: 400,
   };
 
-  // Auto-play functionality
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const playerName = urlParams.get("player");
-    const isAuto = urlParams.get("auto");
-
-    if (playerName && isAuto) {
-      setName(playerName);
-
-      if (playerName === "Alice") {
-        // Alice creates game after 2 seconds
-        setTimeout(() => {
-          handleCreate();
-        }, 2000);
-      } else {
-        // Other players wait for room ID and join
-        const checkForRoom = setInterval(() => {
-          const storedRoomId = localStorage.getItem("avalon-room-id");
-          if (storedRoomId) {
-            clearInterval(checkForRoom);
-            setRoomId(storedRoomId);
-            setTimeout(() => {
-              handleJoin();
-            }, 1000);
-          }
-        }, 1000);
-      }
-    }
-  }, []);
-
   const handleCreate = () => {
-    // Clean up all existing listeners
-    socket.off("room-created");
-    socket.off("room_joined");
-    socket.off("join-error");
-    socket.off("room-exists");
-    socket.off("check-room");
-
-    if (!name) {
-      alert("Please enter your name");
+    if (!name.trim()) {
+      alert("Please enter a name.");
       return;
     }
 
-    socket.emit("create-room");
+    socket.emit(
+      "create_room",
+      name,
+      ({ password, roomSessionKey, playerSessionKey, isLeader, error }) => {
+        if (error) {
+          alert(error);
+          return;
+        } else {
+          sessionStorage.setItem("roomSessionKey", roomSessionKey);
+          sessionStorage.setItem("playerSessionKey", playerSessionKey);
+        }
 
-    socket.on("room-created", (createdRoomId) => {
-      setRoomId(createdRoomId);
-      // Join the created room
-      socket.emit("join_room", { name, roomId: createdRoomId });
-
-      socket.on("room_joined", ({ sessionKey }) => {
-        sessionStorage.setItem("sessionKey", sessionKey);
-        navigate(`/lobby?session=${createdRoomId}`, {
-          state: { name, roomId: createdRoomId, sessionKey },
+        navigate(`/lobby?${roomSessionKey}`, {
+          state: { name, isLeader, password },
         });
-      });
-    });
+      }
+    );
   };
 
   const handleJoin = () => {
-    const sessionKey = sessionStorage.getItem("sessionKey");
-
-    if (!name) {
-      alert("Please enter your name");
-      return;
-    }
-    // Clean up all existing listeners
-    socket.off("room-created");
-    socket.off("room_joined");
-    socket.off("join-error");
-    socket.off("room-exists");
-    socket.off("check-room");
-
-    socket.emit("check-room", roomId);
-    socket.on("room-exists", (exist) => {
-      if (!exist) {
-        return;
-      } else {
-        socket.emit("join_room", { name, roomId, sessionKey });
+    socket.emit(
+      "join_room",
+      { name: name, password: password },
+      ({ roomSessionKey, playerSessionKey, isLeader, error }) => {
+        if (error) {
+          alert(error);
+          return;
+        }
+        sessionStorage.setItem("roomSessionKey", roomSessionKey);
+        sessionStorage.setItem("playerSessionKey", playerSessionKey);
+        navigate(`/lobby?${roomSessionKey}`, {
+          state: { name, isLeader, password },
+        });
       }
-    });
-
-    socket.on("room_joined", ({ sessionKey }) => {
-      sessionStorage.setItem("sessionKey", sessionKey);
-      navigate(`/lobby?session=${roomId}`, {
-        state: { name, roomId, sessionKey },
-      });
-    });
-
-    socket.on("join-error", ({ message }) => {
-      alert(message);
-      return;
-    });
+    );
   };
 
   return (
@@ -140,8 +88,8 @@ function Home() {
             placeholder="Password"
             className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             style={medievalFontStyle}
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
+            value={password}
+            onChange={(e) => setpassword(e.target.value)}
           />
           <button
             onClick={handleJoin}

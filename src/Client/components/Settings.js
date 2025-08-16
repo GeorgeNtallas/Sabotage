@@ -12,7 +12,7 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
           </h3>
 
           <div className="flex flex-col items-center">
-            {readyPlayers.length >= 5 && (
+            {readyPlayers.length >= 1 && (
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"

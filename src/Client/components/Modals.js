@@ -3,7 +3,8 @@ import socket from "../../socket";
 import { useNavigate } from "react-router-dom";
 
 const Modals = ({
-  roomId,
+  roomSessionKey,
+  playerSessionKey,
   setSelectedPlayers,
   selectedPlayers,
   setShowLeaderVoteModal,
@@ -36,18 +37,23 @@ const Modals = ({
           <div className="space-y-2 mb-4 flex flex-col items-center">
             {players.map((player) => (
               <label
-                key={player.socketId}
+                key={player.playerSessionKey}
                 className="gap-x-3 flex flex-row items-center text-white"
               >
                 <input
                   type="checkbox"
-                  checked={selectedPlayers.includes(player.socketId)}
+                  checked={selectedPlayers.includes(player.playerSessionKey)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedPlayers([...selectedPlayers, player.socketId]);
+                      setSelectedPlayers([
+                        ...selectedPlayers,
+                        player.playerSessionKey,
+                      ]);
                     } else {
                       setSelectedPlayers(
-                        selectedPlayers.filter((id) => id !== player.socketId)
+                        selectedPlayers.filter(
+                          (id) => id !== player.playerSessionKey
+                        )
                       );
                     }
                   }}
@@ -62,7 +68,11 @@ const Modals = ({
               disabled={selectedPlayers.length !== missionTeamSizes}
               onClick={() => {
                 // Send vote to server
-                socket.emit("vote_team", { roomId, selectedPlayers });
+                socket.emit("vote_team", {
+                  roomSessionKey,
+                  playerSessionKey,
+                  selectedPlayers,
+                });
                 setShowVoteModal(false);
                 setShowPlayersVote(false);
                 setSelectedPlayers([]);
@@ -101,18 +111,23 @@ const Modals = ({
           <div className="space-y-2 mb-4 flex flex-col items-center">
             {players.map((player) => (
               <label
-                key={player.socketId}
+                key={player.playerSessionKey}
                 className="gap-x-3 flex flex-row items-center text-white"
               >
                 <input
                   type="checkbox"
-                  checked={selectedPlayers.includes(player.socketId)}
+                  checked={selectedPlayers.includes(player.playerSessionKey)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedPlayers([...selectedPlayers, player.socketId]);
+                      setSelectedPlayers([
+                        ...selectedPlayers,
+                        player.playerSessionKey,
+                      ]);
                     } else {
                       setSelectedPlayers(
-                        selectedPlayers.filter((id) => id !== player.socketId)
+                        selectedPlayers.filter(
+                          (id) => id !== player.playerSessionKey
+                        )
                       );
                     }
                   }}
@@ -131,7 +146,11 @@ const Modals = ({
                 setShowVoteModal(false);
                 setShowQuestVoteButton(false);
                 setSelectedPlayers([]);
-                socket.emit("leader_vote", { roomId, selectedPlayers });
+                socket.emit("leader_vote", {
+                  roomSessionKey,
+                  playerSessionKey,
+                  selectedPlayers,
+                });
               }}
               className={`px-4 py-2  text-white rounded-lg
                 ${
@@ -170,7 +189,8 @@ const Modals = ({
                 onClick={() => {
                   const vote = "success";
                   socket.emit("vote_quest", {
-                    roomId,
+                    roomSessionKey,
+                    playerSessionKey,
                     vote,
                     leaderVotedPlayers,
                   });
@@ -185,7 +205,8 @@ const Modals = ({
                 onClick={() => {
                   const vote = "fail";
                   socket.emit("vote_quest", {
-                    roomId,
+                    roomSessionKey,
+                    playerSessionKey,
                     vote,
                     leaderVotedPlayers,
                   });
@@ -213,7 +234,10 @@ const Modals = ({
             <label className="flex gap-14 items-center text-white">
               <button
                 onClick={() => {
-                  socket.emit("exit", { roomId });
+                  socket.emit("exit", { roomSessionKey, playerSessionKey });
+                  sessionStorage.removeItem("playerSessionKey");
+                  if (players.length === 1)
+                    sessionStorage.removeItem("roomSessionKey");
                   navigate(`/`);
                 }}
                 className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded"

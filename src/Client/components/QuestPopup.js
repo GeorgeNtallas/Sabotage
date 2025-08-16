@@ -29,9 +29,11 @@ export default function QuestPopup({
           {finalTeamSuggestions.length > 0 ? (
             <div className="space-y-1">
               {players
-                .filter((p) => finalTeamSuggestions.includes(p.socketId))
+                .filter((p) =>
+                  finalTeamSuggestions.includes(p.playerSessionKey)
+                )
                 .map((p) => (
-                  <div key={p.socketId} className="text-center">
+                  <div key={p.playerSessionKey} className="text-center">
                     {p.name}
                   </div>
                 ))}
@@ -45,9 +47,9 @@ export default function QuestPopup({
           {leaderVotedPlayers.length > 0 ? (
             <div className="space-y-1">
               {players
-                .filter((p) => leaderVotedPlayers.includes(p.socketId))
+                .filter((p) => leaderVotedPlayers.includes(p.playerSessionKey))
                 .map((p) => (
-                  <div key={p.socketId} className="text-center  ">
+                  <div key={p.playerSessionKey} className="text-center  ">
                     {p.name}
                   </div>
                 ))}

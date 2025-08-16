@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import socket from "../../socket";
 
-const GameOver = ({ winner }) => {
+const GameOver = ({ winner, roomSessionKey }) => {
   const [showGameOver, setShowGameOver] = useState(false);
   const [showWinner, setShowWinner] = useState(false);
 
@@ -10,13 +11,17 @@ const GameOver = ({ winner }) => {
 
     // Fade out "Game Over" after 5 seconds
     const timer1 = setTimeout(() => {
-      setShowGameOver(false);
-    }, 5000);
+      setShowGameOver(true);
+    }, 2000);
 
     // Fade in winner after 7 seconds
     const timer2 = setTimeout(() => {
       setShowWinner(true);
-    }, 7000);
+    }, 5000);
+
+    setTimeout(() => {
+      socket.emit("exit_game", { roomSessionKey });
+    }, 12000);
 
     return () => {
       clearTimeout(timer1);
@@ -28,7 +33,7 @@ const GameOver = ({ winner }) => {
     <div className="fixed inset-0 bg-black flex flex-col items-center justify-center z-50 space-y-12 px-6">
       {/* Game Over Text */}
       <div
-        className={`text-white text-8xl font-bold transform transition-all duration-1000 ease-in-out ${
+        className={`text-white text-6xl font-bold transform transition-all duration-1000 ease-in ${
           showGameOver
             ? "opacity-100 translate-x-0"
             : "opacity-0 -translate-x-20"
@@ -39,7 +44,7 @@ const GameOver = ({ winner }) => {
 
       {/* Winner Text */}
       <div
-        className={`text-white text-6xl font-bold transform transition-all duration-1000 ease-in-out delay-500 ${
+        className={`text-white text-6xl font-bold transform transition-all duration-1000 ease-in delay-500 ${
           showWinner ? "opacity-100 translate-x-0" : "opacity-0 translate-x-20"
         }`}
       >

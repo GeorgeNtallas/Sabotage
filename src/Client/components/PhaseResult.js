@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import ReactCardFlip from "react-card-flip";
 import socket from "../../socket";
 
-const PhaseResult = ({ votes, setShowResultScreen, roomId }) => {
+const PhaseResult = ({
+  votes,
+  setShowResultScreen,
+  roomSessionKey,
+  playerSessionKey,
+}) => {
   const [flippedCards, setFlippedCards] = useState([]);
   const [currentFlipping, setCurrentFlipping] = useState(0);
 
@@ -45,12 +50,15 @@ const PhaseResult = ({ votes, setShowResultScreen, roomId }) => {
 
     setCurrentFlipping(-1);
     const time = (cards.length - 1) * 5000 + 7000 + 1000;
-    setTimeout(() => socket.emit("next_phase", { roomId }), time);
+    setTimeout(
+      () => socket.emit("next_phase", { roomSessionKey, playerSessionKey }),
+      time
+    );
 
     setTimeout(() => {
       setShowResultScreen(false);
     }, time);
-  }, [roomId, setShowResultScreen, votes]);
+  }, [playerSessionKey, roomSessionKey, setShowResultScreen, votes]);
 
   if (!votes) return null;
 

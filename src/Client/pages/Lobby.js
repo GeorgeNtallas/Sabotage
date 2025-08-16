@@ -1,18 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import socket from "../../socket";
 import Settings from "../components/Settings";
 
 function Lobby() {
-  const location = useLocation();
-  const { name, roomId, sessionKey } = location.state || {};
   const [players, setPlayers] = useState([]);
   const [readyPlayers, setReadyPlayers] = useState([]);
   const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
-  const [playerId, setPlayerId] = useState(null);
   const navigate = useNavigate();
   const [selectedRoles, setSelectedRoles] = useState(new Set());
+  // Loc, roomId
+  const location = useLocation();
+  const { name, isLeader, password } = location.state || {};
+
+  const playerSessionKey = sessionStorage.getItem("playerSessionKey");
+  const roomSessionKey = sessionStorage.getItem("roomSessionKey");
 
   const toggleRole = (role) => {
     setSelectedRoles((prev) => {
@@ -23,98 +26,84 @@ function Lobby() {
   };
 
   useEffect(() => {
-    // Auto-ready for automation
-    const urlParams = new URLSearchParams(window.location.search);
-    const isAuto = urlParams.get("auto");
+    socket.emit(
+      "getRoomPlayers",
+      { roomSessionKey },
+      ({ roomPlayers, roomLeader }) => {
+        setPlayers(roomPlayers);
+        setLobbyLeaderId(roomLeader);
+      }
+    );
+  }, [roomSessionKey, players]);
 
-    // Join room
-    socket.emit("join_room", { name, roomId, sessionKey });
-
-    // Identify this player
-    socket.on("your_id", (id) => {
-      setPlayerId(id);
-    });
-
+  useEffect(() => {
     // Update ready players list
     socket.on("ready_update", (readyList) => {
       setReadyPlayers(readyList);
-
-      // Auto-start game when all ready (Alice only)
-      const urlParams = new URLSearchParams(window.location.search);
-      const playerName = urlParams.get("player");
-      const isAuto = urlParams.get("auto");
-
-      if (
-        isAuto &&
-        playerName === "Alice" &&
-        readyList.length === players.length &&
-        players.length >= 6
-      ) {
-        alert(Array.from(selectedRoles));
-        setTimeout(() => {
-          socket.emit("start_game", {
-            roomId,
-            selectedRoles: Array.from(selectedRoles),
-          });
-        }, 2000);
-      }
+      setTimeout(() => {
+        socket.emit("start_game", {
+          roomSessionKey,
+          selectedRoles: Array.from(selectedRoles),
+        });
+      }, 2000);
     });
+    return () => {
+      socket.off("ready_update");
+    };
+  }, [roomSessionKey, selectedRoles]);
 
+  useEffect(() => {
     // Update player list
-    socket.on("password_update", ({ players, lobbyLeaderId }) => {
-      setPlayers(players);
-      setLobbyLeaderId(lobbyLeaderId);
+    socket.on("password_update", ({ roomPlayers, roomLeader }) => {
+      setPlayers(roomPlayers);
+      setLobbyLeaderId(roomLeader);
 
-      // Auto-ready after joining
-      const urlParams = new URLSearchParams(window.location.search);
-      const isAuto = urlParams.get("auto");
-      if (isAuto && !readyPlayers.includes(playerId)) {
+      if (!readyPlayers.includes(playerSessionKey)) {
         setTimeout(() => {
-          socket.emit("player_ready", playerId);
+          socket.emit("player_ready", playerSessionKey, roomSessionKey);
         }, 2000);
       }
-    });
-
-    socket.on("room_update", (updatedPlayers) => {
-      setPlayers(updatedPlayers);
-    });
-
-    // Update ready status
-    socket.on("player_ready", (id) => {
-      setReadyPlayers((prev) => [...new Set([...prev, id])]);
     });
 
     return () => {
-      socket.off("your_id");
       socket.off("password_update");
-      socket.off("player_ready");
-      socket.off("ready_update");
-      socket.off("room_update");
     };
-  }, [name, roomId, sessionKey]);
+  }, [name, navigate, playerSessionKey, readyPlayers, roomSessionKey]);
+
+  useEffect(() => {
+    // Update ready status
+    socket.on("player_informReady", (playerSessionKey) => {
+      setReadyPlayers((prev) => [...new Set([...prev, playerSessionKey])]);
+    });
+
+    return () => {
+      socket.off("player_ready");
+    };
+  }, [name, playerSessionKey, readyPlayers, roomSessionKey, selectedRoles]);
 
   useEffect(() => {
     socket.on("game_started", () => {
-      navigate("/game", { state: { name, roomId, playerId } });
+      navigate("/game", { state: { name } });
     });
 
     return () => {
       socket.off("game_started");
     };
-  }, [navigate, name, roomId, playerId]);
+  }, [name, navigate, playerSessionKey]);
 
   const handleReadyClick = () => {
-    if (!readyPlayers.includes(playerId)) {
-      socket.emit("player_ready", playerId);
+    if (!readyPlayers.includes(playerSessionKey)) {
+      socket.emit("player_pressReady", playerSessionKey, roomSessionKey);
     }
   };
 
   const handleExitClick = () => {
-    socket.emit("exit", { roomId });
+    socket.emit("exit", { roomSessionKey, playerSessionKey });
+    sessionStorage.removeItem("playerSessionKey");
+    if (players.length === 1) sessionStorage.removeItem("roomSessionKey");
     navigate(`/`);
   };
 
-  const isLeader = playerId === lobbyLeaderId;
   const canStart = readyPlayers.length >= 1;
   // --------------------------------------
   // 👇 Lobby UI
@@ -134,7 +123,7 @@ function Lobby() {
           <span className="text-indigo-300">{name}</span>
         </h2>
         <p className="mb-5 text-xl font-extrabold text-center">
-          Room: <span className="font-mono">{roomId}</span>
+          Room: <span className="font-mono">{password}</span>
         </p>
 
         <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80 text">
@@ -142,10 +131,10 @@ function Lobby() {
             <h3 className="font-semibold mb-2 text-lg">Players:</h3>
             <ul className="list-disc ml-5 text-sm">
               {players.map((player) => (
-                <li key={player.socketId}>
+                <li key={player.playerSessionKey}>
                   {player.name}{" "}
-                  {player.socketId === lobbyLeaderId && "(Leader)"}
-                  {readyPlayers.includes(player.socketId) && (
+                  {player.playerSessionKey === lobbyLeaderId && "(Leader)"}
+                  {readyPlayers.includes(player.playerSessionKey) && (
                     <span className="text-green-600 ml-2">✓ Ready</span>
                   )}
                 </li>
@@ -156,14 +145,16 @@ function Lobby() {
             <div>
               <button
                 onClick={handleReadyClick}
-                disabled={readyPlayers.includes(playerId)}
+                disabled={readyPlayers.includes(playerSessionKey)}
                 className={`text-md px-10 py-3 mb-4 bg-red-500 hover:bg-red-600 rounded-md font-bold transition ${
-                  readyPlayers.includes(playerId)
+                  readyPlayers.includes(playerSessionKey)
                     ? "bg-gray-600 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
-                {readyPlayers.includes(playerId) ? "Waiting..." : "Ready"}
+                {readyPlayers.includes(playerSessionKey)
+                  ? "Waiting..."
+                  : "Ready"}
               </button>
             </div>
             <div>
@@ -185,7 +176,7 @@ function Lobby() {
                   disabled={!canStart}
                   onClick={() => {
                     socket.emit("start_game", {
-                      roomId,
+                      roomSessionKey,
                       selectedRoles: Array.from(selectedRoles),
                     });
                   }}

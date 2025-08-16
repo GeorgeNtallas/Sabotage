@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import socket from "../../socket";
 import QuestPopup from "../components/QuestPopup";
@@ -10,9 +11,12 @@ import GameOver from "../components/GameOver";
 import WaitScreen from "../components/WaitScreen";
 
 function Game() {
-  // Loc, roomId
+  // Loc, roomSessionKey
   const location = useLocation();
-  const { roomId, playerId } = location.state || {};
+  const navigate = useNavigate();
+  const { name } = location.state || {};
+  const roomSessionKey = sessionStorage.getItem("roomSessionKey");
+  const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   // Show elements
   const [showVoteModal, setShowVoteModal] = useState(false);
   const [showLeaderVoteModal, setShowLeaderVoteModal] = useState(false);
@@ -94,12 +98,12 @@ function Game() {
       setTimeout(() => {
         if (result !== "success") {
           setShowPlayersVote(true);
-          socket.emit("next_round", { roomId });
+          socket.emit("next_round", { roomSessionKey, playerSessionKey });
         }
       }, 1000);
     });
     return () => socket.off("quest_voted");
-  }, [roomId, leaderVotedPlayers]);
+  }, [roomSessionKey, leaderVotedPlayers, playerSessionKey]);
 
   // Selected Players on the quest
   useEffect(() => {
@@ -107,16 +111,16 @@ function Game() {
       setShowPlayersVote(false);
       setShowQuestVoteButton(false);
 
-      if (votedPlayers.includes(playerId)) {
+      if (votedPlayers.includes(playerSessionKey)) {
         setShowQuestVoting(true);
       }
 
-      if (waitPlayers.includes(playerId)) {
+      if (waitPlayers.includes(playerSessionKey)) {
         setShowWaitScreen(true);
       }
     });
     return () => socket.off("inform_players_to_vote");
-  }, [playerId, players]);
+  }, [playerSessionKey, players]);
 
   // Announce the quest result
   useEffect(() => {
@@ -145,6 +149,16 @@ function Game() {
     return () => socket.off("game_over");
   }, []);
 
+  // Game over
+  useEffect(() => {
+    socket.on("exit_to_home", () => {
+      sessionStorage.removeItem("roomSessionKey");
+      sessionStorage.removeItem("playerSessionKey");
+      navigate("/", { state: { name } });
+    });
+    return () => socket.off("exit_to_home");
+  }, [name, navigate]);
+
   if (!character) {
     return (
       <div
@@ -160,7 +174,7 @@ function Game() {
     );
   }
 
-  const isLeader = playerId === roundLeaderId;
+  const isLeader = playerSessionKey === roundLeaderId;
 
   return (
     <div
@@ -226,9 +240,7 @@ function Game() {
         <div className="flex flex-row space-x-5">
           <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
             <div className="flex items-center justify-center mb-2">
-              <h2 className="text-lg font-semibold pt-2">
-                {location.state?.name}
-              </h2>
+              <h2 className="text-lg font-semibold pt-2">{name}</h2>
               {isLeader && (
                 <img
                   src="/images/Crown.jpg"
@@ -281,7 +293,7 @@ function Game() {
               style={{ gridTemplateColumns: "1fr 1fr auto" }}
             >
               {players.map((player) => (
-                <React.Fragment key={player.socketId}>
+                <React.Fragment key={player.playerSessionKey}>
                   <div className="text-center">{player.name}</div>
                   <div className="text-center mr-2">
                     {player.visibleRole === "evil"
@@ -291,7 +303,7 @@ function Game() {
                       : ""}
                   </div>
                   <div className="text-center">
-                    {player.socketId === roundLeaderId && (
+                    {player.playerSessionKey === roundLeaderId && (
                       <img
                         src="/images/Crown.jpg"
                         alt="Leader"
@@ -410,7 +422,7 @@ function Game() {
           </div>
           <div className="grid grid-cols-3 gap-y-3 text-sm text-gray-300">
             {players.map((player) => (
-              <React.Fragment key={player.socketId}>
+              <React.Fragment key={player.playerSessionKey}>
                 <div className="text-center">{player.name}</div>
                 <div className="text-center">
                   {player.visibleRole === "evil"
@@ -420,7 +432,7 @@ function Game() {
                     : ""}
                 </div>
                 <div className="text-center">
-                  {player.socketId === roundLeaderId && (
+                  {player.playerSessionKey === roundLeaderId && (
                     <img
                       src="/images/Crown.jpg"
                       alt="Leader"
@@ -473,7 +485,8 @@ function Game() {
       {/* Voting Modal For All */}
       {showVoteModal && (
         <Modals
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
           setShowVoteModal={setShowVoteModal}
@@ -486,7 +499,8 @@ function Game() {
       {/* Voting Modal For Leader */}
       {showLeaderVoteModal && (
         <Modals
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
           setSelectedPlayers={setSelectedPlayers}
           selectedPlayers={selectedPlayers}
           setShowVoteModal={setShowVoteModal}
@@ -501,7 +515,8 @@ function Game() {
       {/* Voting Modal Selected Players */}
       {showQuestVoteModal && (
         <Modals
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowQuestVoteButton={setShowQuestVoteButton}
           setShowQuestVoteModal={setShowQuestVoteModal}
@@ -512,7 +527,8 @@ function Game() {
       {showQuestVoting && (
         <QuestVote
           setShowQuestVoting={setShowQuestVoting}
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
           phase={phase}
         />
       )}
@@ -521,16 +537,25 @@ function Game() {
         <PhaseResult
           votes={finalVoteResults}
           setShowResultScreen={setShowResultScreen}
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
         />
       )}
-      {showGameOver && <GameOver roomId={roomId} winner={gameResult} />}
+      {showGameOver && (
+        <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
+      )}
       {showExit && (
-        <Modals roomId={roomId} setShowExit={setShowExit} type="exit" />
+        <Modals
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          players={players}
+          setShowExit={setShowExit}
+          type="exit"
+        />
       )}
       {showWaitScreen && (
         <WaitScreen
-          roomId={roomId}
+          roomSessionKey={roomSessionKey}
           leaderVotedPlayers={leaderVotedPlayers}
           setShowWaitScreen={setShowWaitScreen}
         />
