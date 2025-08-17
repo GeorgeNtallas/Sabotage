@@ -240,7 +240,7 @@ io.on("connection", (socket) => {
           character,
           players: playersWithRoles,
         });
-      }, 2000);
+      }, 4000);
     });
   };
 

@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 import socket from "../../socket";
-import QuestPopup from "../components/QuestPopup";
-import Modals from "../components/Modals";
-import QuestVote from "../components/QuestVote";
-import PhaseResult from "../components/PhaseResult";
-import GameOver from "../components/GameOver";
-import WaitScreen from "../components/WaitScreen";
+import QuestPopup from "../components/ui/QuestPopup";
+import Modals from "../components/ui/Modals";
+import QuestVote from "../components/ui/QuestVote";
+import PhaseResult from "../components/ui/PhaseResult";
+import GameOver from "../components/ui/GameOver";
+import WaitScreen from "../components/ui/WaitScreen";
+import AnimatedWindow from "../components/ui/Info";
 
 function Game() {
   // Loc, roomSessionKey
@@ -29,6 +31,7 @@ function Game() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [showExit, setShowExit] = useState(false);
   const [showWaitScreen, setShowWaitScreen] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
   // Arrays
   const [players, setPlayers] = useState([]);
   const [selectedPlayers, setSelectedPlayers] = useState([]);
@@ -66,6 +69,7 @@ function Game() {
         setLeaderVotedPlayers([]);
         setMissionTeamSizes(missionTeamSizes);
         setShowPlayersVote(true);
+        setHasVoted(false);
         if (phase) setPhase(phase);
       }
     );
@@ -78,6 +82,7 @@ function Game() {
       setSelectedPlayers([]);
       setShowLeaderVoteButton(true);
       setFinalTeamSuggestions(team);
+      setHasVoted(false);
     });
     return () => socket.off("team_voted");
   }, []);
@@ -161,91 +166,252 @@ function Game() {
 
   if (!character) {
     return (
-      <div
-        className="flex items-center justify-center h-screen bg-gray-900 text-white"
-        style={{
-          backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <h2 className="text-2xl">Waiting for character assignment...</h2>
-      </div>
+      <AnimatePresence>
+        <motion.div
+          className="flex items-center justify-center h-screen bg-gray-900 text-white"
+          style={{
+            backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2 className="text-2xl">Waiting for character assignment...</h2>
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
   const isLeader = playerSessionKey === roundLeaderId;
 
   return (
-    <div
-      className="relative min-h-screen w-full bg-gray-900 text-white p-2 sm:p-4"
-      style={{
-        backgroundImage: "url(/images/mythical.jpg      )",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
-      <div className="flex justify-center">
-        <img
-          src="/images/Sabotage3.png"
-          alt="Leader"
-          className="w-[30%] mb-10"
-          onError={(e) => (e.target.src = "/images/default.jpg")}
-        />
-      </div>
+    <AnimatePresence>
+      <motion.div
+        className="relative min-h-screen w-full bg-gray-900 text-white p-2 sm:p-4"
+        style={{
+          backgroundImage: "url(/images/mythical.jpg      )",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+      >
+        <div className="flex justify-center">
+          <img
+            src="/images/Sabotage3.png"
+            alt="Leader"
+            className="w-[30%] mb-10"
+            onError={(e) => (e.target.src = "/images/default.jpg")}
+          />
+        </div>
 
-      {/* Mobile Layout */}
-      <div className="relative z-10 block md:hidden space-y-4 ">
-        {/* Phase/Round/Exit */}
-        <div className="relative flex justify-start items-center h-16 w-full px-4">
-          {/* Exit Button */}
-          <div className="absolute left-2 ">
-            <button
-              onClick={() => setShowExit(true)}
-              className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
-            >
-              Exit
-            </button>
+        {/* Mobile Layout */}
+        <div className="relative z-10 block md:hidden space-y-4 ">
+          {/* Phase/Round/Exit */}
+          <div className="relative flex justify-start items-center h-16 w-full px-4">
+            {/* Exit Button */}
+            <div className="absolute left-2 ">
+              <button
+                onClick={() => setShowExit(true)}
+                className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
+              >
+                Exit
+              </button>
+            </div>
+            <div className="absolute left-1/2 transform -translate-x-1/2">
+              <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
+                <h3 className="text-center font-semibold mb-2">
+                  Phase {phase} - Round {round}
+                </h3>
+                <div className="flex justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((phaseNum) => {
+                    let circleColor = "bg-gray-600";
+                    if (phaseNum === phase) {
+                      circleColor = "bg-purple-700";
+                    } else if (phaseNum < phase) {
+                      const result = phaseResults[phaseNum - 1];
+                      circleColor =
+                        result === "success" ? "bg-amber-500" : "bg-red-500";
+                    }
+                    return (
+                      <div
+                        key={phaseNum}
+                        className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
+                      >
+                        {phaseNum}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="absolute right-2">
+              <AnimatedWindow triggerLabel="Menu" />
+            </div>
           </div>
-          <div className="absolute left-1/2 transform -translate-x-1/2">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
-              <h3 className="text-center font-semibold mb-2">
-                Phase {phase} - Round {round}
+
+          {/* Character Card */}
+          <div className="flex flex-row space-x-4">
+            <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
+              <div className="flex items-center justify-center mb-2">
+                <h2 className="text-lg font-semibold pt-2">{name}</h2>
+                {isLeader && (
+                  <img
+                    src="/images/Crown.jpg"
+                    alt="Leader"
+                    className="w-6 h-5 mt-1 ml-2"
+                    onError={(e) => (e.target.src = "/images/default.jpg")}
+                  />
+                )}
+              </div>
+              <img
+                src={`/images/${character.name
+                  .toLowerCase()
+                  .replace(/\s+/g, "_")}.png`}
+                alt={character.name}
+                className="max-w-40 mx-auto mb-2 ml-3 mr-3"
+                onError={(e) => (e.target.src = "/images/default.jpg")}
+              />
+              <h3 className="text-lg font-bold text-yellow-400">
+                {character.name}
               </h3>
-              <div className="flex justify-center gap-2">
-                {[1, 2, 3, 4, 5].map((phaseNum) => {
-                  let circleColor = "bg-gray-600";
-                  if (phaseNum === phase) {
-                    circleColor = "bg-purple-700";
-                  } else if (phaseNum < phase) {
-                    const result = phaseResults[phaseNum - 1];
-                    circleColor =
-                      result === "success" ? "bg-amber-500" : "bg-red-500";
+              <p className="text-sm text-gray-300 mb-1">
+                {character.description}
+              </p>
+              <p className="text-xs pb-2">
+                Team:{" "}
+                <span
+                  className={
+                    character.team === "good" ? "text-blue-400" : "text-red-400"
                   }
-                  return (
-                    <div
-                      key={phaseNum}
-                      className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
-                    >
-                      {phaseNum}
+                >
+                  {character.team.toUpperCase()}
+                </span>
+              </p>
+            </div>
+
+            {/* Players List */}
+            <div
+              className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto text-center"
+              style={{ gridTemplateColumns: "1fr 1fr auto" }}
+            >
+              <div
+                className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
+                style={{ gridTemplateColumns: "1fr 1fr auto" }}
+              >
+                <h3 className="text-center">Players</h3>
+                <h3 className="text-center mr-3">Role</h3>
+                <h3 className="text-center mr-1">L</h3>
+              </div>
+              <div
+                className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
+                style={{ gridTemplateColumns: "1fr 1fr auto" }}
+              >
+                {players.map((player) => (
+                  <React.Fragment key={player.playerSessionKey}>
+                    <div className="text-center">{player.name}</div>
+                    <div className="text-center mr-2">
+                      {player.visibleRole === "evil"
+                        ? "Evil"
+                        : player.visibleRole === "Merlin/Morgana"
+                        ? "M/M"
+                        : ""}
                     </div>
-                  );
-                })}
+                    <div className="text-center">
+                      {player.playerSessionKey === roundLeaderId && (
+                        <img
+                          src="/images/Crown.jpg"
+                          alt="Leader"
+                          className="w-4 h-4 mx-auto"
+                          onError={(e) =>
+                            (e.target.src = "/images/default.jpg")
+                          }
+                        />
+                      )}
+                    </div>
+                  </React.Fragment>
+                ))}
               </div>
             </div>
           </div>
+
+          {/* Action Buttons - Mobile */}
+          <div className="px-4">
+            {showPlayersVote && (
+              <button
+                onClick={() => setShowVoteModal(true)}
+                disabled={hasVoted}
+                className={`w-full rounded-lg p-3 mb-2 text-white ${
+                  hasVoted
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-amber-600 hover:bg-amber-700"
+                }`}
+              >
+                {hasVoted ? "Wait for other players" : "Vote for Quest Team"}
+              </button>
+            )}
+            {showQuestVoteButton && (
+              <button
+                onClick={() => setShowQuestVoteModal(true)}
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
+              >
+                Proceed to Quest?
+              </button>
+            )}
+            {isLeader && showLeaderVoteButton && (
+              <button
+                onClick={() => setShowLeaderVoteModal(true)}
+                className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
+              >
+                Leader Vote
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Character Card */}
-        <div className="flex flex-row space-x-5">
-          <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
-            <div className="flex items-center justify-center mb-2">
-              <h2 className="text-lg font-semibold pt-2">{name}</h2>
+        {/* Desktop Layout */}
+        <div className="hidden md:block relative h-[70vh]">
+          {/* Phases - Rounds */}
+          <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900  rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
+            <h3 className="text-lg font-semibold mb-3">
+              Phase {phase} - Round {round}
+            </h3>
+            <div className="flex justify-center gap-2">
+              {[1, 2, 3, 4, 5].map((phaseNum) => {
+                let circleColor = "bg-gray-600";
+                if (phaseNum === phase) {
+                  circleColor = "bg-yellow-500";
+                } else if (phaseNum < phase) {
+                  const result = phaseResults[phaseNum - 1];
+                  circleColor =
+                    result === "success" ? "bg-blue-500" : "bg-red-500";
+                }
+                return (
+                  <div
+                    key={phaseNum}
+                    className={`w-8 h-8 rounded-full ${circleColor} flex items-center justify-center text-white text-sm font-bold`}
+                  >
+                    {phaseNum}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Character card */}
+          <div className="bg-gray-800 rounded-lg p-6 text-center absolute left-[41%] w-[18%] max-w-sm top-1/2 transform -translate-y-1/2">
+            <div className="flex items-center justify-center mb-4">
+              <h2 className="text-xl">{location.state?.name}</h2>
               {isLeader && (
                 <img
                   src="/images/Crown.jpg"
                   alt="Leader"
-                  className="w-6 h-5 mt-1 ml-2"
+                  className="w-6 h-6 ml-2"
                   onError={(e) => (e.target.src = "/images/default.jpg")}
                 />
               )}
@@ -255,16 +421,14 @@ function Game() {
                 .toLowerCase()
                 .replace(/\s+/g, "_")}.png`}
               alt={character.name}
-              className="max-w-40 mx-auto mb-2 ml-7 mr-7"
+              className="w-full max-w-[200px] mx-auto"
               onError={(e) => (e.target.src = "/images/default.jpg")}
             />
-            <h3 className="text-lg font-bold text-yellow-400">
+            <h3 className="text-2xl font-bold text-yellow-400">
               {character.name}
             </h3>
-            <p className="text-sm text-gray-300 mb-1">
-              {character.description}
-            </p>
-            <p className="text-xs pb-2">
+            <p className="text-gray-300 mt-2">{character.description}</p>
+            <p className="text-sm mt-2">
               Team:{" "}
               <span
                 className={
@@ -275,31 +439,23 @@ function Game() {
               </span>
             </p>
           </div>
-          {/* Players List */}
-          <div
-            className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto text-center"
-            style={{ gridTemplateColumns: "1fr 1fr auto" }}
-          >
-            <div
-              className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
-              style={{ gridTemplateColumns: "1fr 1fr auto" }}
-            >
-              <h3 className="text-center">Players</h3>
-              <h3 className="text-center mr-3">Role</h3>
-              <h3 className="text-center mr-1">L</h3>
+
+          {/* Player List */}
+          <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[70%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
+            <div className="grid grid-cols-3 text-white font-bold mb-4 border-b border-gray-600 pb-2">
+              <h3>Players</h3>
+              <h3>Role</h3>
+              <h3>Leader</h3>
             </div>
-            <div
-              className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
-              style={{ gridTemplateColumns: "1fr 1fr auto" }}
-            >
+            <div className="grid grid-cols-3 gap-y-3 text-sm text-gray-300">
               {players.map((player) => (
                 <React.Fragment key={player.playerSessionKey}>
                   <div className="text-center">{player.name}</div>
-                  <div className="text-center mr-2">
+                  <div className="text-center">
                     {player.visibleRole === "evil"
                       ? "Evil"
                       : player.visibleRole === "Merlin/Morgana"
-                      ? "M/M"
+                      ? "Merlin/Morgana"
                       : ""}
                   </div>
                   <div className="text-center">
@@ -307,7 +463,7 @@ function Game() {
                       <img
                         src="/images/Crown.jpg"
                         alt="Leader"
-                        className="w-4 h-4 mx-auto"
+                        className="w-[20px] h-auto mx-auto"
                         onError={(e) => (e.target.src = "/images/default.jpg")}
                       />
                     )}
@@ -318,14 +474,27 @@ function Game() {
           </div>
         </div>
 
-        {/* Action Buttons - Mobile */}
-        <div className="px-4">
+        {/* Player and Leader Votes */}
+        <QuestPopup
+          players={players}
+          finalTeamSuggestions={finalTeamSuggestions}
+          leaderVotedPlayers={leaderVotedPlayers}
+          isLeader={isLeader}
+        />
+
+        {/* Action Buttons - Desktop*/}
+        <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
           {showPlayersVote && (
             <button
               onClick={() => setShowVoteModal(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
+              disabled={hasVoted}
+              className={`w-full rounded-lg p-3 mb-2 text-white ${
+                hasVoted
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-amber-600 hover:bg-amber-700"
+              }`}
             >
-              Vote for Quest Team
+              {hasVoted ? "Wait for other players" : "Vote for Quest Team"}
             </button>
           )}
           {showQuestVoteButton && (
@@ -345,222 +514,92 @@ function Game() {
             </button>
           )}
         </div>
-      </div>
-
-      {/* Desktop Layout */}
-      <div className="hidden md:block relative h-[70vh]">
-        {/* Phases - Rounds */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900  rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
-          <h3 className="text-lg font-semibold mb-3">
-            Phase {phase} - Round {round}
-          </h3>
-          <div className="flex justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((phaseNum) => {
-              let circleColor = "bg-gray-600";
-              if (phaseNum === phase) {
-                circleColor = "bg-yellow-500";
-              } else if (phaseNum < phase) {
-                const result = phaseResults[phaseNum - 1];
-                circleColor =
-                  result === "success" ? "bg-blue-500" : "bg-red-500";
-              }
-              return (
-                <div
-                  key={phaseNum}
-                  className={`w-8 h-8 rounded-full ${circleColor} flex items-center justify-center text-white text-sm font-bold`}
-                >
-                  {phaseNum}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Character card */}
-        <div className="bg-gray-800 rounded-lg p-6 text-center absolute left-[41%] w-[18%] max-w-sm top-1/2 transform -translate-y-1/2">
-          <div className="flex items-center justify-center mb-4">
-            <h2 className="text-xl">{location.state?.name}</h2>
-            {isLeader && (
-              <img
-                src="/images/Crown.jpg"
-                alt="Leader"
-                className="w-6 h-6 ml-2"
-                onError={(e) => (e.target.src = "/images/default.jpg")}
-              />
-            )}
-          </div>
-          <img
-            src={`/images/${character.name
-              .toLowerCase()
-              .replace(/\s+/g, "_")}.png`}
-            alt={character.name}
-            className="w-full max-w-[200px] mx-auto"
-            onError={(e) => (e.target.src = "/images/default.jpg")}
+        {/* Voting Modal For All */}
+        {showVoteModal && (
+          <Modals
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+            setSelectedPlayers={setSelectedPlayers}
+            selectedPlayers={selectedPlayers}
+            setShowVoteModal={setShowVoteModal}
+            setShowPlayersVote={setShowPlayersVote}
+            ShowVoteModal={showVoteModal}
+            players={players}
+            type="voteAll"
+            missionTeamSizes={missionTeamSizes}
           />
-          <h3 className="text-2xl font-bold text-yellow-400">
-            {character.name}
-          </h3>
-          <p className="text-gray-300 mt-2">{character.description}</p>
-          <p className="text-sm mt-2">
-            Team:{" "}
-            <span
-              className={
-                character.team === "good" ? "text-blue-400" : "text-red-400"
-              }
-            >
-              {character.team.toUpperCase()}
-            </span>
-          </p>
-        </div>
-
-        {/* Player List */}
-        <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[70%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
-          <div className="grid grid-cols-3 text-white font-bold mb-4 border-b border-gray-600 pb-2">
-            <h3>Players</h3>
-            <h3>Role</h3>
-            <h3>Leader</h3>
-          </div>
-          <div className="grid grid-cols-3 gap-y-3 text-sm text-gray-300">
-            {players.map((player) => (
-              <React.Fragment key={player.playerSessionKey}>
-                <div className="text-center">{player.name}</div>
-                <div className="text-center">
-                  {player.visibleRole === "evil"
-                    ? "Evil"
-                    : player.visibleRole === "Merlin/Morgana"
-                    ? "Merlin/Morgana"
-                    : ""}
-                </div>
-                <div className="text-center">
-                  {player.playerSessionKey === roundLeaderId && (
-                    <img
-                      src="/images/Crown.jpg"
-                      alt="Leader"
-                      className="w-[20px] h-auto mx-auto"
-                      onError={(e) => (e.target.src = "/images/default.jpg")}
-                    />
-                  )}
-                </div>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Player and Leader Votes */}
-      <QuestPopup
-        players={players}
-        finalTeamSuggestions={finalTeamSuggestions}
-        leaderVotedPlayers={leaderVotedPlayers}
-        isLeader={isLeader}
-      />
-
-      {/* Action Buttons - Desktop*/}
-      <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
-        {showPlayersVote && (
-          <button
-            onClick={() => setShowVoteModal(true)}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
-          >
-            Vote for Quest Team
-          </button>
         )}
-        {showQuestVoteButton && (
-          <button
-            onClick={() => setShowQuestVoteModal(true)}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
-          >
-            Proceed to Quest?
-          </button>
+        {/* Voting Modal For Leader */}
+        {showLeaderVoteModal && (
+          <Modals
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+            setSelectedPlayers={setSelectedPlayers}
+            selectedPlayers={selectedPlayers}
+            setShowVoteModal={setShowVoteModal}
+            setShowPlayersVote={setShowPlayersVote}
+            setShowLeaderVoteModal={setShowLeaderVoteModal}
+            showLeaderVoteModal={showLeaderVoteModal}
+            setShowQuestVoteButton={setShowQuestVoteButton}
+            players={players}
+            type="leaderVote"
+            missionTeamSizes={missionTeamSizes}
+          />
         )}
-        {isLeader && showLeaderVoteButton && (
-          <button
-            onClick={() => setShowLeaderVoteModal(true)}
-            className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
-          >
-            Leader Vote
-          </button>
+        {/* Voting Modal Selected Players */}
+        {showQuestVoteModal && (
+          <Modals
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+            leaderVotedPlayers={leaderVotedPlayers}
+            setShowQuestVoteButton={setShowQuestVoteButton}
+            setShowQuestVoteModal={setShowQuestVoteModal}
+            showQuestVoteModal={showQuestVoteModal}
+            type="questVote"
+          />
         )}
-      </div>
-      {/* Voting Modal For All */}
-      {showVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          setSelectedPlayers={setSelectedPlayers}
-          selectedPlayers={selectedPlayers}
-          setShowVoteModal={setShowVoteModal}
-          setShowPlayersVote={setShowPlayersVote}
-          players={players}
-          type="voteAll"
-          missionTeamSizes={missionTeamSizes}
-        />
-      )}
-      {/* Voting Modal For Leader */}
-      {showLeaderVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          setSelectedPlayers={setSelectedPlayers}
-          selectedPlayers={selectedPlayers}
-          setShowVoteModal={setShowVoteModal}
-          setShowPlayersVote={setShowPlayersVote}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          players={players}
-          type="leaderVote"
-          missionTeamSizes={missionTeamSizes}
-        />
-      )}
-      {/* Voting Modal Selected Players */}
-      {showQuestVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          setShowQuestVoteModal={setShowQuestVoteModal}
-          type="questVote"
-        />
-      )}
-      {/* Selected Players Vote */}
-      {showQuestVoting && (
-        <QuestVote
-          setShowQuestVoting={setShowQuestVoting}
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          phase={phase}
-        />
-      )}
-      {/* Phase Result */}
-      {showResultScreen && (
-        <PhaseResult
-          votes={finalVoteResults}
-          setShowResultScreen={setShowResultScreen}
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-        />
-      )}
-      {showGameOver && (
-        <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
-      )}
-      {showExit && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          players={players}
-          setShowExit={setShowExit}
-          type="exit"
-        />
-      )}
-      {showWaitScreen && (
-        <WaitScreen
-          roomSessionKey={roomSessionKey}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowWaitScreen={setShowWaitScreen}
-        />
-      )}
-    </div>
+        {/* Selected Players Vote */}
+        {showQuestVoting && (
+          <QuestVote
+            setShowQuestVoting={setShowQuestVoting}
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+            show={showQuestVoting}
+            phase={phase}
+          />
+        )}
+        {/* Phase Result */}
+        {showResultScreen && (
+          <PhaseResult
+            votes={finalVoteResults}
+            setShowResultScreen={setShowResultScreen}
+            show={showResultScreen}
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+          />
+        )}
+        {showGameOver && (
+          <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
+        )}
+        {showExit && (
+          <Modals
+            roomSessionKey={roomSessionKey}
+            playerSessionKey={playerSessionKey}
+            players={players}
+            setShowExit={setShowExit}
+            showExit={showExit}
+            type="exit"
+          />
+        )}
+        {showWaitScreen && (
+          <WaitScreen
+            roomSessionKey={roomSessionKey}
+            leaderVotedPlayers={leaderVotedPlayers}
+            setShowWaitScreen={setShowWaitScreen}
+          />
+        )}
+      </motion.div>
+    </AnimatePresence>
   );
 }
 
