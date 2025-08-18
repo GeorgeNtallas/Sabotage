@@ -1,19 +1,17 @@
 {
-  "name": "sabotage",
+  "name": "sabotage-server",
   "version": "1.0.0",
+  "description": "Backend server for Sabotage game using Express and Socket.IO",
   "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "dev": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "server": "node src/Server/server.js",
-    "auto-test": "node auto-test.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "socket.io": "^4.7.4"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
