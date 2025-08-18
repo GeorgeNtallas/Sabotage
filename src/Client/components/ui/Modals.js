@@ -1,5 +1,5 @@
 import React from "react";
-import socket from "../../../socket";
+import socket from "../../socket";
 import { useNavigate } from "react-router-dom";
 import Animation from "../tools/Animation";
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import socket from "../../socket";
+import socket from "../socket";
 import Settings from "../components/ui/Settings";
 
 function Lobby() {

@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-import socket from "../../socket";
+import socket from "../socket";
 import QuestPopup from "../components/ui/QuestPopup";
 import Modals from "../components/ui/Modals";
 import QuestVote from "../components/ui/QuestVote";

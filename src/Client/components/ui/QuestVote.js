@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import socket from "../../../socket";
+import socket from "../../socket";
 
 const QuestVote = ({
   setShowQuestVoting,

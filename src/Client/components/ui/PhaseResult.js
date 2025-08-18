@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactCardFlip from "react-card-flip";
 import { AnimatePresence, motion } from "framer-motion";
-import socket from "../../../socket";
+import socket from "../../socket";
 
 const PhaseResult = ({
   votes,

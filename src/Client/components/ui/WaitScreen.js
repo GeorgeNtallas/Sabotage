@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactCardFlip from "react-card-flip";
-import socket from "../../../socket";
+import socket from "../../socket";
 
 const WaitScreen = ({
   roomSessionKey,

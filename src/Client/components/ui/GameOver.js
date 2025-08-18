@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import socket from "../../../socket";
+import socket from "../../socket";
 import { clear } from "@testing-library/user-event/dist/clear";
 
 const GameOver = ({ winner, roomSessionKey }) => {
