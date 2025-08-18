@@ -9,30 +9,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? true
-        : [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://192.168.1.85:3000",
-          ],
+    origin: "*", // later: restrict to your frontend URL
     methods: ["GET", "POST"],
   },
 });
 
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? true
-        : [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://192.168.1.85:3000",
-          ],
-  })
-);
+app.use(cors());
 
 app.get("/", (req, res) => res.send("Server running..."));
 
