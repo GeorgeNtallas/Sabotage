@@ -14,6 +14,7 @@ const io = new Server(server, {
       "https://elaborate-elf-3a21a0.netlify.app", // production Netlify
     ],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
