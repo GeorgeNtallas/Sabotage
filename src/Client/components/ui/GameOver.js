@@ -43,7 +43,7 @@ const GameOver = ({ winner, roomSessionKey }) => {
 
     const timer = setTimeout(() => {
       socket.emit("exit_game", { roomSessionKey });
-    }, 7000);
+    }, 10000);
 
     setGameOverText(""); // Reset text before typing
     setWinnerText("");

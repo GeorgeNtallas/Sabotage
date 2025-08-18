@@ -133,35 +133,35 @@ io.on("connection", (socket) => {
     Guardian: {
       name: "Guardian",
       team: "good",
-      description: "Knows who Merlin and Morgana are",
+      description: "Knows who Seer and Seraphina are",
     },
     Knight: {
       name: "Knight",
       team: "good",
-      description: "A loyal servant of Arthur",
+      description: "A Loyal Knight",
     },
-    Enchantress: {
-      name: "Enchantress",
+    Seraphina: {
+      name: "Seraphina",
       team: "evil",
-      description: "Appears as Merlin to Percival",
+      description: "Appears as Seer to Guardian",
     },
     Shade: {
       name: "Shade",
       team: "evil",
-      description: "Can kill Merlin at the end",
+      description: "Can kill Seer at the end",
     },
     Thrall: {
       name: "Thrall",
       team: "evil",
-      description: "A servant of evil",
+      description: "A Dark Knight",
     },
-    Recluse: {
-      name: "Recluse",
+    Draven: {
+      name: "Draven",
       team: "evil",
-      description: "Unknown for Merlin",
+      description: "Unknown for Seer",
     },
-    Usurper: {
-      name: "Usurper",
+    Kaelen: {
+      name: "Kaelen",
       team: "evil",
       description: "Unknown to evil. Does not know Evil",
     },
@@ -203,20 +203,17 @@ io.on("connection", (socket) => {
     const target = targetCharacter.name;
     const targetTeam = targetCharacter.team;
 
-    if (viewer === "Seer" && targetTeam === "evil" && target !== "Recluse")
+    if (viewer === "Seer" && targetTeam === "evil" && target !== "Draven")
       return "evil";
+    if (viewer === "Guardian" && (target === "Seer" || target === "Seraphina"))
+      return "Seer/Seraphina";
     if (
-      viewer === "Guardian" &&
-      (target === "Seer" || target === "Enchantress")
-    )
-      return "Seer/Enchantress";
-    if (
-      ["Enchantress", "Shade", "Thrall", "Recluse"].includes(viewer) &&
-      target !== "Usurper" &&
+      ["Seraphina", "Shade", "Thrall", "Draven"].includes(viewer) &&
+      target !== "Kaelen" &&
       targetTeam === "evil"
     )
       return "evil";
-    if (viewer === "Usurper" && targetTeam === "good") return "good";
+    if (viewer === "Kaelen" && targetTeam === "good") return "good";
     return "";
   };
 
@@ -239,6 +236,7 @@ io.on("connection", (socket) => {
         io.to(player.id).emit("character_assigned", {
           character,
           players: playersWithRoles,
+          gameCharacters: gameCharacters,
         });
       }, 4000);
     });
@@ -266,6 +264,7 @@ io.on("connection", (socket) => {
         round: room.round,
         phase: room.phase,
         missionTeamSizes: missionTeamSizes[playerList.length][0],
+        totalTeamSize: missionTeamSizes[playerList.length],
       });
     }, 2000);
     return room;
@@ -563,7 +562,7 @@ io.on("connection", (socket) => {
           ([, a], [, b]) => b - a
         );
 
-        const voteSize = missionTeamSizes[totalPlayers][room.phase];
+        const voteSize = missionTeamSizes[totalPlayers][room.phase - 1];
         const questTeam = sortedVotes
           .slice(0, voteSize)
           .map(([playerSessionKey]) => playerSessionKey);
@@ -684,7 +683,7 @@ io.on("connection", (socket) => {
       const totalPlayers = Object.keys(room.players).length;
 
       setTimeout(() => {
-        if (votesSum === missionTeamSizes[totalPlayers][room.phase]) {
+        if (votesSum === missionTeamSizes[totalPlayers][room.phase - 1]) {
           if (totalPlayers >= 7 && totalPlayers <= 10 && phase === 4) {
             if (room.final_result[room.phase].votes.fail >= 2) {
               room.final_result[room.phase].result.push("fail");
@@ -752,6 +751,7 @@ io.on("connection", (socket) => {
       round: room.round,
       phase: room.phase || 1,
       missionTeamSizes: missionTeamSizes[playerList.length][room.phase - 1],
+      totalTeamSize: missionTeamSizes[playerList.length],
     });
 
     setTimeout(() => {
@@ -776,7 +776,7 @@ io.on("connection", (socket) => {
 
     console.log(
       "Phase",
-      room.phase,
+      room.phase - 1,
       "goodWins = ",
       goodWins,
       "evilWins = ",
@@ -811,6 +811,7 @@ io.on("connection", (socket) => {
       round: room.round,
       phase: room.phase,
       missionTeamSizes: missionTeamSizes[playerList.length][room.phase - 1],
+      totalTeamSize: missionTeamSizes[playerList.length],
     });
 
     setTimeout(() => {

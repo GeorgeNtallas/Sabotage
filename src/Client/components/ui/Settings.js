@@ -28,11 +28,11 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Recluse")}
-                  onChange={() => toggleRole("Recluse")}
+                  checked={isChecked("Draven")}
+                  onChange={() => toggleRole("Draven")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600  focus:ring-green-500 transition"
                 />
-                Recluse
+                Draven
               </label>
             )}
 
@@ -64,11 +64,11 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Enchantress")}
-                  onChange={() => toggleRole("Enchantress")}
+                  checked={isChecked("Seraphina")}
+                  onChange={() => toggleRole("Seraphina")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500  transition"
                 />
-                Enchantress
+                Seraphina
               </label>
             )}
 

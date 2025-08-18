@@ -33,7 +33,7 @@ const Modals = ({
           <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-white text-center ">
-                Select Quest Team
+                Vote Quest Team
               </h3>
               <div className="font-semibold text-white text-center">
                 Choose {missionTeamSizes}
@@ -47,6 +47,11 @@ const Modals = ({
                   className="gap-x-3 flex flex-row items-center text-white"
                 >
                   <input
+                    disabled={
+                      // Disable only unchecked boxes when limit is reached
+                      !selectedPlayers.includes(player.playerSessionKey) &&
+                      selectedPlayers.length >= missionTeamSizes
+                    }
                     type="checkbox"
                     checked={selectedPlayers.includes(player.playerSessionKey)}
                     onChange={(e) => {
@@ -113,9 +118,15 @@ const Modals = ({
       <Animation show={showLeaderVoteModal}>
         <div className="flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
-            <h3 className="text-xl font-bold mb-4 text-white text-center ">
-              Select Quest Team
-            </h3>
+            <div className="mb-5">
+              <h3 className="text-xl font-bold text-white text-center ">
+                Select Quest Team
+              </h3>
+              <div className="font-semibold text-white text-center">
+                Choose {missionTeamSizes}
+              </div>
+            </div>
+
             <div className="space-y-2 mb-4 flex flex-col items-center">
               {players.map((player) => (
                 <label
@@ -123,6 +134,11 @@ const Modals = ({
                   className="gap-x-3 flex flex-row items-center text-white"
                 >
                   <input
+                    disabled={
+                      // Disable only unchecked boxes when limit is reached
+                      !selectedPlayers.includes(player.playerSessionKey) &&
+                      selectedPlayers.length >= missionTeamSizes
+                    }
                     type="checkbox"
                     checked={selectedPlayers.includes(player.playerSessionKey)}
                     onChange={(e) => {

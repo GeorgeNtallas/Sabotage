@@ -41,6 +41,8 @@ function Game() {
   const [finalTeamSuggestions, setFinalTeamSuggestions] = useState([]);
   const [finalPhaseResults, setFinalPhaseResult] = useState([]);
   const [finalVoteResults, setFinalVoteResults] = useState({});
+  const [totalTeamSize, setTotalTeamSize] = useState([]);
+  const [gameCharacters, setGameCharacters] = useState([]);
   // Others
   const [roundLeaderId, setRoundLeaderId] = useState();
   const [round, setRound] = useState(1);
@@ -50,10 +52,14 @@ function Game() {
 
   // Assigne Roles to players
   useEffect(() => {
-    socket.on("character_assigned", ({ character, players }) => {
-      setCharacter(character);
-      setPlayers(players);
-    });
+    socket.on(
+      "character_assigned",
+      ({ character, players, gameCharacters }) => {
+        setCharacter(character);
+        setPlayers(players);
+        setGameCharacters(gameCharacters);
+      }
+    );
     return () => socket.off("character_assigned");
   }, []);
 
@@ -61,12 +67,13 @@ function Game() {
   useEffect(() => {
     socket.on(
       "round_update",
-      ({ roundLeader, round, phase, missionTeamSizes }) => {
+      ({ roundLeader, round, phase, missionTeamSizes, totalTeamSize }) => {
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
         setFinalTeamSuggestions([]);
         setLeaderVotedPlayers([]);
+        setTotalTeamSize(totalTeamSize);
         setMissionTeamSizes(missionTeamSizes);
         setShowPlayersVote(true);
         setHasVoted(false);
@@ -133,8 +140,8 @@ function Game() {
       setPhaseResults((prev) => [...prev, result]);
       setFinalPhaseResult((prev) => [...prev, result]);
       setFinalVoteResults({ success: success, fail: fail });
-      setShowResultScreen(true);
       setShowWaitScreen(false);
+      setShowResultScreen(true);
     });
 
     return () => socket.off("inform_result");
@@ -251,7 +258,11 @@ function Game() {
               </div>
             </div>
             <div className="absolute right-2">
-              <AnimatedWindow triggerLabel="Menu" />
+              <AnimatedWindow
+                triggerLabel="Menu"
+                totalTeamSize={totalTeamSize}
+                gameCharacters={gameCharacters}
+              />
             </div>
           </div>
 
@@ -318,8 +329,8 @@ function Game() {
                     <div className="text-center mr-2">
                       {player.visibleRole === "evil"
                         ? "Evil"
-                        : player.visibleRole === "Merlin/Morgana"
-                        ? "M/M"
+                        : player.visibleRole === "Seer/Seraphina"
+                        ? "S/S"
                         : ""}
                     </div>
                     <div className="text-center">

@@ -11,7 +11,7 @@ const PhaseResult = ({
   show, // boolean to control visibility
 }) => {
   const [flippedCards, setFlippedCards] = useState([]);
-  const [currentFlipping, setCurrentFlipping] = useState(0);
+  const [currentFlipping, setCurrentFlipping] = useState(-1);
 
   useEffect(() => {
     if (!votes || !show) return;
@@ -26,35 +26,32 @@ const PhaseResult = ({
 
     const shuffled = cards;
 
+    // Start all cards blinking immediately
+    setCurrentFlipping(-2); // Special value to make all cards blink
+
     shuffled.forEach((card, index) => {
       setTimeout(
         () => {
-          setCurrentFlipping(index);
-          setTimeout(() => {
-            setFlippedCards((prev) => [...prev, card.id]);
-            if (index === shuffled.length - 1) setCurrentFlipping(-1);
-          }, 5000);
+          setFlippedCards((prev) => [...prev, card.id]);
+          if (index === shuffled.length - 1) {
+            setCurrentFlipping(-1);
+            // Emit next_phase after all cards are shown
+            setTimeout(() => {
+              socket.emit("next_phase", { roomSessionKey, playerSessionKey });
+              setShowResultScreen(false);
+            }, 3000);
+          }
         },
-        index === shuffled.length - 1 ? index * 7000 : index * 6500
+        index === shuffled.length - 1
+          ? index * 1500 + 5000 + 4000
+          : index * 1500 + 4000 // 4 seconds of blinking
       );
     });
 
     setFlippedCards([]);
-    setCurrentFlipping(-1);
-
-    const totalTime = (cards.length - 1) * 5000 + 7000 + 1000;
-
-    const nextPhaseTimeout = setTimeout(() => {
-      socket.emit("next_phase", { roomSessionKey, playerSessionKey });
-    }, totalTime);
-
-    const hideScreenTimeout = setTimeout(() => {
-      setShowResultScreen(false);
-    }, totalTime);
 
     return () => {
-      clearTimeout(nextPhaseTimeout);
-      clearTimeout(hideScreenTimeout);
+      // Cleanup handled by individual timeouts
     };
   }, [votes, show, playerSessionKey, roomSessionKey, setShowResultScreen]);
 
@@ -86,8 +83,9 @@ const PhaseResult = ({
               >
                 <div
                   className={`w-48 h-72 bg-purple-700 rounded-lg flex items-center justify-center text-white text-6xl font-bold ${
+                    currentFlipping === -2 ||
                     currentFlipping ===
-                    shuffled.findIndex((c) => c.id === card.id)
+                      shuffled.findIndex((c) => c.id === card.id)
                       ? "animate-pulse"
                       : ""
                   }`}
