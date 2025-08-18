@@ -9,35 +9,30 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? true
-        : [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://192.168.1.85:3000",
-          ],
+    origin: [
+      "http://localhost:3000", // local dev
+      "https://elaborate-elf-3a21a0.netlify.app", // production Netlify
+    ],
     methods: ["GET", "POST"],
   },
 });
 
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["https://elaborate-elf-3a21a0.netlify.app"]
+    : [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://192.168.1.85:3000",
+      ];
+
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? true
-        : [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "http://192.168.1.85:3000",
-          ],
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
   })
 );
-
-// Serve static files from React build
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../../build")));
-}
 
 const rooms = {};
 
