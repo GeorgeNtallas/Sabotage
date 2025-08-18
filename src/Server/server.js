@@ -9,35 +9,37 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? true 
-      : [
-          "http://localhost:3000",
-          "http://localhost:3001",
-          "http://192.168.1.85:3000",
-        ],
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true
+        : [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://192.168.1.85:3000",
+          ],
     methods: ["GET", "POST"],
   },
 });
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === 'production' 
-      ? true 
-      : [
-          "http://localhost:3000",
-          "http://localhost:3001",
-          "http://192.168.1.85:3000",
-        ],
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true
+        : [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://192.168.1.85:3000",
+          ],
   })
 );
 
 // Serve static files from React build
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../../build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../build', 'index.html'));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../../build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../../build", "index.html"));
   });
 } else {
   app.get("/", (req, res) => res.send("Server running..."));
