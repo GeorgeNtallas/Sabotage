@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import socket from "../../socket";
-import { clear } from "@testing-library/user-event/dist/clear";
 
 const GameOver = ({ winner, roomSessionKey }) => {
   const [showScroll, setShowScroll] = useState(false);
@@ -31,14 +30,9 @@ const GameOver = ({ winner, roomSessionKey }) => {
 
     // type "Game Over" first, then winner
     const typeTimer = setTimeout(() => {
-      const gameOverInterval = typeText(
-        fullGameOver,
-        setGameOverText,
-        200,
-        () => {
-          const winnerInterval = typeText(fullWinner, setWinnerText, 150);
-        }
-      );
+      typeText(fullGameOver, setGameOverText, 200, () => {
+        typeText(fullWinner, setWinnerText, 150);
+      });
     }, 900);
 
     const timer = setTimeout(() => {

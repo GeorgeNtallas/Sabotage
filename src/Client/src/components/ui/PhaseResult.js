@@ -16,7 +16,6 @@ const PhaseResult = ({
   useEffect(() => {
     if (!votes || !show) return;
 
-    const totalVotes = votes.success + votes.fail;
     const cards = [];
 
     for (let i = 0; i < votes.success; i++)
