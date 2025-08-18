@@ -20,12 +20,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "node src/Server/index.js",
+    "server": "node index.js",
     "auto-test": "node auto-test.js"
   },
   "eslintConfig": {
