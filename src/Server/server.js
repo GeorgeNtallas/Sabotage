@@ -37,12 +37,6 @@ app.use(
 // Serve static files from React build
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../build/index.html'));
-  });
-} else {
-  app.get("/", (req, res) => res.send("Server running..."));
 }
 
 const rooms = {};
@@ -898,6 +892,15 @@ io.on("connection", (socket) => {
     console.log("User disconnected:", socket.id);
   });
 });
+
+// Handle React routing - must be after all API routes
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../build/index.html'));
+  });
+} else {
+  app.get('/', (req, res) => res.send('Server running...'));
+}
 
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, '0.0.0.0', () => {
