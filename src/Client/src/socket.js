@@ -1,12 +1,8 @@
 import { io } from "socket.io-client";
 
 // Use environment variable first, fallback only for local dev
-const socket = io(
-  process.env.NODE_ENV === 'production' ? undefined : (process.env.REACT_APP_SERVER_URL || "http://localhost:10000"),
-  {
-    transports: ["websocket"], // ensures WS is used
-    withCredentials: true,
-  }
-);
+const socket = io("https://sabotage.onrender.com", {
+  transports: ["websocket"], // helps avoid CORS issues
+});
 
 export default socket;
