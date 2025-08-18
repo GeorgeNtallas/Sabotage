@@ -11,7 +11,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:3000", // local dev
-      "https://68a3a28babe13f0008675bff--elaborate-elf-3a21a0.netlify.app", // production Netlify
+      "https://68a3ab16b7a9ba00081ecd66--thesabotage.netlify.app", // production Netlify
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -20,7 +20,7 @@ const io = new Server(server, {
 
 const allowedOrigins =
   process.env.NODE_ENV === "production"
-    ? ["https://68a3a28babe13f0008675bff--elaborate-elf-3a21a0.netlify.app"]
+    ? ["https://68a3ab16b7a9ba00081ecd66--thesabotage.netlify.app"]
     : [
         "http://localhost:3000",
         "http://localhost:3001",
