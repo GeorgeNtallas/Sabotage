@@ -9,13 +9,32 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // later: restrict to your frontend URL
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true
+        : [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://192.168.1.85:3000",
+          ],
     methods: ["GET", "POST"],
   },
 });
 
-app.use(cors());
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? true
+        : [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://192.168.1.85:3000",
+          ],
+  })
+);
 
+// Serve static files from React build
 app.get("/", (req, res) => res.send("Server running..."));
 
 const rooms = {};
@@ -872,13 +891,13 @@ io.on("connection", (socket) => {
   });
 });
 
-const PORT = process.env.PORT || 10000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-// ✅ Start the server
-// const PORT = process.env.PORT || 4000;
-// server.listen(PORT, "0.0.0.0", () => {
-//   console.log(`Server is running on port ${PORT}`);
-//   console.log(`Access from network: http://192.168.1.85:${PORT}`);
+// const PORT = process.env.PORT || 10000;
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
 // });
+// ✅ Start the server
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Access from network: http://192.168.1.85:${PORT}`);
+});
