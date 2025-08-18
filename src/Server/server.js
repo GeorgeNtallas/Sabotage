@@ -35,7 +35,15 @@ app.use(
 );
 
 // Serve static files from React build
-app.get("/", (req, res) => res.send("Server running..."));
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../../build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../build/index.html'));
+  });
+} else {
+  app.get("/", (req, res) => res.send("Server running..."));
+}
 
 const rooms = {};
 
@@ -891,13 +899,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// const PORT = process.env.PORT || 10000;
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-// ✅ Start the server
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
-  console.log(`Access from network: http://192.168.1.85:${PORT}`);
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
