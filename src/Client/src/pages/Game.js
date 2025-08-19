@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 import socket from "../socket";
 import QuestPopup from "../components/ui/QuestPopup";
@@ -17,6 +18,7 @@ function Game() {
   const location = useLocation();
   const navigate = useNavigate();
   const { name } = location.state || {};
+  const { t } = useTranslation();
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   // Show elements
@@ -186,7 +188,7 @@ function Game() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-2xl">Waiting for character assignment...</h2>
+          <h2 className="text-2xl">{t("game.waitingForCharacter")}</h2>
         </motion.div>
       </AnimatePresence>
     );
@@ -227,13 +229,13 @@ function Game() {
                 onClick={() => setShowExit(true)}
                 className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
               >
-                Exit
+                {t("game.exit")}
               </button>
             </div>
             <div className="absolute left-1/2 transform -translate-x-1/2">
               <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
                 <h3 className="text-center font-semibold mb-2">
-                  Phase {phase} - Round {round}
+                  {t("game.phase")} {phase} - {t("game.round")} {round}
                 </h3>
                 <div className="flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((phaseNum) => {
@@ -259,7 +261,7 @@ function Game() {
             </div>
             <div className="absolute right-2">
               <AnimatedWindow
-                triggerLabel="Menu"
+                triggerLabel={t("game.menu")}
                 totalTeamSize={totalTeamSize}
                 gameCharacters={gameCharacters}
               />
@@ -292,16 +294,16 @@ function Game() {
                 {character.name}
               </h3>
               <p className="text-sm text-gray-300 mb-1">
-                {character.description}
+                {t(`characters.descriptions.${character.name}`)}
               </p>
               <p className="text-xs pb-2">
-                Team:{" "}
+                {t("game.team")}:{" "}
                 <span
                   className={
                     character.team === "good" ? "text-blue-400" : "text-red-400"
                   }
                 >
-                  {character.team.toUpperCase()}
+                  {character.team === "good" ? t("game.good") : t("game.evil")}
                 </span>
               </p>
             </div>
@@ -315,8 +317,8 @@ function Game() {
                 className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
                 style={{ gridTemplateColumns: "1fr 1fr auto" }}
               >
-                <h3 className="text-center">Players</h3>
-                <h3 className="text-center mr-3">Role</h3>
+                <h3 className="text-center">{t("lobby.players")}</h3>
+                <h3 className="text-center mr-3">{t("game.role")}</h3>
                 <h3 className="text-center mr-1">L</h3>
               </div>
               <div
@@ -363,7 +365,9 @@ function Game() {
                     : "bg-amber-600 hover:bg-amber-700"
                 }`}
               >
-                {hasVoted ? "Wait for other players" : "Vote for Quest Team"}
+                {hasVoted
+                  ? t("game.waitForOtherPlayers")
+                  : t("game.voteForQuestTeam")}
               </button>
             )}
             {showQuestVoteButton && (
@@ -371,7 +375,7 @@ function Game() {
                 onClick={() => setShowQuestVoteModal(true)}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
               >
-                Proceed to Quest?
+                {t("game.proceedToQuest")}
               </button>
             )}
             {isLeader && showLeaderVoteButton && (
@@ -379,7 +383,7 @@ function Game() {
                 onClick={() => setShowLeaderVoteModal(true)}
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
               >
-                Leader Vote
+                {t("game.leaderVote")}
               </button>
             )}
           </div>
@@ -390,7 +394,7 @@ function Game() {
           {/* Phases - Rounds */}
           <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900  rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
             <h3 className="text-lg font-semibold mb-3">
-              Phase {phase} - Round {round}
+              {t("game.phase")} {phase} - {t("game.round")} {round}
             </h3>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((phaseNum) => {
@@ -440,13 +444,13 @@ function Game() {
             </h3>
             <p className="text-gray-300 mt-2">{character.description}</p>
             <p className="text-sm mt-2">
-              Team:{" "}
+              {t("game.team")}:{" "}
               <span
                 className={
                   character.team === "good" ? "text-blue-400" : "text-red-400"
                 }
               >
-                {character.team.toUpperCase()}
+                {character.team === "good" ? t("game.good") : t("game.evil")}
               </span>
             </p>
           </div>
@@ -454,9 +458,9 @@ function Game() {
           {/* Player List */}
           <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[70%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
             <div className="grid grid-cols-3 text-white font-bold mb-4 border-b border-gray-600 pb-2">
-              <h3>Players</h3>
+              <h3>{t("lobby.players")}</h3>
               <h3>Role</h3>
-              <h3>Leader</h3>
+              <h3>{t("lobby.leader")}</h3>
             </div>
             <div className="grid grid-cols-3 gap-y-3 text-sm text-gray-300">
               {players.map((player) => (
@@ -505,7 +509,9 @@ function Game() {
                   : "bg-amber-600 hover:bg-amber-700"
               }`}
             >
-              {hasVoted ? "Wait for other players" : "Vote for Quest Team"}
+              {hasVoted
+                ? t("game.waitForOtherPlayers")
+                : t("game.voteForQuestTeam")}
             </button>
           )}
           {showQuestVoteButton && (
@@ -513,7 +519,7 @@ function Game() {
               onClick={() => setShowQuestVoteModal(true)}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
             >
-              Proceed to Quest?
+              {t("game.proceedToQuest")}
             </button>
           )}
           {isLeader && showLeaderVoteButton && (
@@ -521,7 +527,7 @@ function Game() {
               onClick={() => setShowLeaderVoteModal(true)}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
             >
-              Leader Vote
+              {t("game.leaderVote")}
             </button>
           )}
         </div>

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import socket from "../../socket";
 
 const GameOver = ({ winner, roomSessionKey }) => {
   const [showScroll, setShowScroll] = useState(false);
   const [gameOverText, setGameOverText] = useState("");
   const [winnerText, setWinnerText] = useState("");
+  const { t } = useTranslation();
 
-  const fullGameOver = "Game Over";
-  const fullWinner = winner === "good" ? "Good Wins" : "Evil Wins";
+  const fullGameOver = t("gameOver.gameOver");
+  const fullWinner = winner === "good" ? t("gameOver.goodWins") : t("gameOver.evilWins");
 
   // small typing helper
   const typeText = (text, setText, speed = 150, onFinish) => {

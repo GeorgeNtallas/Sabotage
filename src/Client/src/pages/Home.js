@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import socket from "../socket";
 
 function Home() {
@@ -10,10 +11,15 @@ function Home() {
     fontFamily: "MedievalSharp",
     fontWeight: 400,
   };
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
 
   const handleCreate = () => {
     if (!name.trim()) {
-      alert("Please enter a name.");
+      alert(t("home.pleaseEnterName"));
       return;
     }
 
@@ -77,7 +83,7 @@ function Home() {
         <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80">
           <input
             type="text"
-            placeholder="Your name"
+            placeholder={t("home.yourName")}
             className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             style={medievalFontStyle}
             value={name}
@@ -85,7 +91,7 @@ function Home() {
           />
           <input
             type="text"
-            placeholder="Password"
+            placeholder={t("home.password")}
             className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
             style={medievalFontStyle}
             value={password}
@@ -100,7 +106,7 @@ function Home() {
               fontWeight: 1000,
             }}
           >
-            Join Game
+            {t("home.joinGame")}
           </button>
 
           <button
@@ -112,9 +118,13 @@ function Home() {
               fontWeight: 1000,
             }}
           >
-            Create Game
+            {t("home.createGame")}
           </button>
         </div>
+      </div>
+      <div className="absolute space-x-5 bottom-4 left-1/2 transform -translate-x-1/2 text-white">
+        <button onClick={() => changeLanguage("en")}>English</button>
+        <button onClick={() => changeLanguage("gr")}>Ελληνικά</button>
       </div>
     </div>
   );

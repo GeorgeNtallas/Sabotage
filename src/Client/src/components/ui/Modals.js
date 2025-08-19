@@ -1,6 +1,7 @@
 import React from "react";
 import socket from "../../socket";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Animation from "../tools/Animation";
 
 const Modals = ({
@@ -24,6 +25,7 @@ const Modals = ({
   ShowVoteModal,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   if (type === "voteAll") {
     // Vote Medal
@@ -33,10 +35,10 @@ const Modals = ({
           <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-white text-center ">
-                Vote Quest Team
+                {t("modals.voteQuestTeam")}
               </h3>
               <div className="font-semibold text-white text-center">
-                Choose {missionTeamSizes}
+                {t("modals.choose")} {missionTeamSizes}
               </div>
             </div>
 
@@ -95,7 +97,7 @@ const Modals = ({
                     : "bg-amber-600  hover:bg-amber-700"
                 }`}
               >
-                Submit Vote
+                {t("modals.submitVote")}
               </button>
 
               <button
@@ -105,7 +107,7 @@ const Modals = ({
                 }}
                 className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
               >
-                Cancel
+                {t("modals.cancel")}
               </button>
             </div>
           </div>
@@ -120,10 +122,10 @@ const Modals = ({
           <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-white text-center ">
-                Select Quest Team
+                {t("modals.selectQuestTeam")}
               </h3>
               <div className="font-semibold text-white text-center">
-                Choose {missionTeamSizes}
+                {t("modals.choose")} {missionTeamSizes}
               </div>
             </div>
 
@@ -183,7 +185,7 @@ const Modals = ({
                     : "bg-amber-600  hover:bg-amber-700"
                 }`}
               >
-                Submit Vote
+                {t("modals.submitVote")}
               </button>
 
               <button
@@ -193,7 +195,7 @@ const Modals = ({
                 }}
                 className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
               >
-                Cancel
+                {t("modals.cancel")}
               </button>
             </div>
           </div>
@@ -207,7 +209,7 @@ const Modals = ({
         <div className="flex items-center justify-center z-50">
           <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
             <h3 className="text-xl text-center font-bold mb-4 text-white">
-              Proceed to Quest?
+              {t("modals.proceedToQuest")}
             </h3>
             <div className="space-y-2 mb-4">
               <label className="flex gap-14 items-between text-white">
@@ -225,7 +227,7 @@ const Modals = ({
                   }}
                   className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg"
                 >
-                  Yes
+                  {t("modals.yes")}
                 </button>
                 <button
                   onClick={() => {
@@ -241,7 +243,7 @@ const Modals = ({
                   }}
                   className="px-5 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
                 >
-                  No
+                  {t("modals.no")}
                 </button>
               </label>
             </div>
@@ -255,7 +257,7 @@ const Modals = ({
       <Animation show={showExit}>
         <div className="bg-gray-700 rounded-lg p-6 w-50 max-w-md">
           <h3 className="text-xl text-center font-bold mb-4 text-white">
-            Exit Game?
+            {t("modals.exitGame")}
           </h3>
           <div className="space-y-2 mb-4">
             <label className="flex gap-14 items-center text-white">
@@ -272,7 +274,7 @@ const Modals = ({
                 }}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
               >
-                Yes
+                {t("modals.yes")}
               </button>
               <button
                 onClick={() => {
@@ -280,7 +282,7 @@ const Modals = ({
                 }}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
               >
-                No
+                {t("modals.no")}
               </button>
             </label>
           </div>

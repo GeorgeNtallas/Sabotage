@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import socket from "../../socket";
 
 const QuestVote = ({
@@ -9,6 +10,7 @@ const QuestVote = ({
   phase,
   show, // boolean prop to control visibility
 }) => {
+  const { t } = useTranslation();
   const [buttonOrder] = useState(() => {
     const buttons = ["success", "fail"];
     return buttons.sort(() => Math.random() - 0.5);
@@ -56,7 +58,7 @@ const QuestVote = ({
                     paddingLeft: isSuccess ? "2.5rem" : "1rem",
                   }}
                 >
-                  {isSuccess ? "Success" : "Fail"}
+                  {isSuccess ? t("modals.success") : t("modals.fail")}
                 </button>
               );
             })}

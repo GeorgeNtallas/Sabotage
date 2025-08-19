@@ -1,0 +1,112 @@
+{
+  "home": {
+    "yourName": "Your Name",
+    "password": "Password",
+    "joinGame": "Join Game",
+    "createGame": "Create Game",
+    "pleaseEnterName": "Please enter a name."
+  },
+  "lobby": {
+    "welcome": "Welcome",
+    "room": "Room",
+    "players": "Players",
+    "leader": "(Leader)",
+    "ready": "Ready",
+    "waiting": "Waiting...",
+    "exit": "Exit",
+    "startGame": "Start Game",
+    "include": "Include"
+  },
+  "game": {
+    "waitingForCharacter": "Waiting for character assignment...",
+    "phase": "Phase",
+    "round": "Round",
+    "menu": "Menu",
+    "team": "Team",
+    "good": "GOOD",
+    "evil": "EVIL",
+    "voteForQuestTeam": "Vote for Quest Team",
+    "waitForOtherPlayers": "Wait for other players",
+    "proceedToQuest": "Proceed to Quest?",
+    "leaderVote": "Leader Vote",
+    "exit": "Exit"
+  },
+  "modals": {
+    "voteQuestTeam": "Vote Quest Team",
+    "selectQuestTeam": "Select Quest Team",
+    "choose": "Choose",
+    "submitVote": "Submit Vote",
+    "cancel": "Cancel",
+    "proceedToQuest": "Proceed to Quest?",
+    "yes": "Yes",
+    "no": "No",
+    "exitGame": "Exit Game?",
+    "success": "Success",
+    "fail": "Fail"
+  },
+  "info": {
+    "phase": "Phase",
+    "phasesInfo": "Phases Info",
+    "characters": "Characters",
+    "rulesAndTips": "Rules and Tips",
+    "numberOfPlayersInEachQuest": "Number of Players in Each Quest",
+    "players": "players",
+    "close": "Close",
+    "goal": "Goal",
+    "howToPlay": "How to Play",
+    "strategyTips": "Strategy Tips",
+    "tips": "Tips",
+    "allCharacters": "All Characters"
+  },
+  "rules": {
+    "goalText": "Players are secretly either Loyal Knights (Good) or Dark Knights of the Underworld (Evil). Good wins by successfully completing three Quests, while Evil wins if three Quests fail.",
+    "gameplayText": "Throughout the game, players can say whatever they want. Use a mix of discussion, deception, accusations, and logical reasoning to achieve victory.",
+    "teamBuildingTitle": "1. Team Building",
+    "teamBuildingText": "All players vote for the players they want on the next Quest. The Leader selects a team and all players vote to approve or reject this team.",
+    "questTitle": "2. Quest",
+    "questText": "The approved team decides whether the Quest will succeed or fail. Only one Evil player can cause failure. Choose your team carefully!",
+    "strategyTitle": "Strategy Tip: Don't Trust Anyone",
+    "strategyText1": "It's wrong to approve a team unless you're sure about every player on it. Don't be afraid to reject a proposal—this doesn't make you look Evil.",
+    "strategyText2": "Watch carefully who votes \"yes\" and ask them to explain their reasoning. Sometimes, Evil players will approve a team because they know another Evil player is on it.",
+    "goalTitle": "Goal:",
+    "howToPlayTitle": "How to Play:",
+    "strategyTipTitle": "Strategy Tip: Trust No One"
+  },
+  "characters": {
+    "goodCharacters": "Good Characters",
+    "evilCharacters": "Evil Characters",
+    "seer": "Sees the identities of some (or all) evil players, but must avoid being revealed to the Shade",
+    "guardian": "Knows who the Seer and Seraphina are, but not which is which.",
+    "knights": "These are the basic good characters",
+    "draven": "Unknown to the Seer.",
+    "seraphina": "Appears as Seer to the Guardian.",
+    "kaelen": "Unknown to other evil players",
+    "shade": "Can assassinate the Seer at the end of the game.",
+    "thrall": "These characters aim to sabotage quests and sow distrust among good players"
+  },
+  "tips": {
+    "avoidComplex": "Avoid the more complex roles at first, stick to a simple team (maybe even without a Seer).",
+    "bluffingKey": "Bluffing is a key part of the game.",
+    "evilBlendIn": "Evil players must try to blend in with the Good team and avoid drawing attention. If playing Good, try to identify Evil players based on their actions and voting patterns.",
+    "evilVoteSuccess": "Evil players can vote \"Success\" on a Quest to maintain their cover, but be careful not to overdo it.",
+    "thrallTip": "Thrall: Cooperate with the evil team and fail quests discreetly.",
+    "shadeTip": "Shade: Watch out for the Seer.",
+    "seerTip": "Seer: Play it cool, and try to use logic when accusing or you'll get caught.",
+    "guardianTip": "Guardian: Pretend to be the Seer."
+  },
+  "gameOver": {
+    "gameOver": "Game Over",
+    "goodWins": "Good Wins!",
+    "evilWins": "Evil Wins!",
+    "exitToHome": "Exit to Home"
+  },
+  "waitScreen": {
+    "waitingForPlayers": "Waiting for players to vote..."
+  },
+  "questVote": {
+    "questVoting": "Quest Voting",
+    "chooseOutcome": "Choose the quest outcome:",
+    "success": "Success",
+    "fail": "Fail"
+  }
+}

@@ -32,12 +32,7 @@
     "server": "node src/Server/server.js",
     "auto-test": "node auto-test.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
+
   "browserslist": {
     "production": [
       ">0.2%",

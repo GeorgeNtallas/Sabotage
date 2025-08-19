@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function AnimatedWindow({
   triggerLabel = "Menu",
   totalTeamSize,
   gameCharacters,
 }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [buttonRect, setButtonRect] = useState(null);
   const [activeTab, setActiveTab] = useState("option1");
@@ -72,7 +74,7 @@ export default function AnimatedWindow({
                       : "bg-slate-700 text-gray-300 hover:bg-slate-600"
                   }`}
                 >
-                  Phases Info
+                  {t("info.phasesInfo")}
                 </button>
                 <button
                   onClick={() => setActiveTab("option2")}
@@ -82,7 +84,7 @@ export default function AnimatedWindow({
                       : "bg-slate-700 text-gray-300 hover:bg-slate-600"
                   }`}
                 >
-                  Characters
+                  {t("info.characters")}
                 </button>
                 <button
                   onClick={() => setActiveTab("option3")}
@@ -92,7 +94,7 @@ export default function AnimatedWindow({
                       : "bg-slate-700 text-gray-300 hover:bg-slate-600"
                   }`}
                 >
-                  Rules and Tips
+                  {t("info.rulesAndTips")}
                 </button>
               </div>
 
@@ -101,7 +103,7 @@ export default function AnimatedWindow({
                 {activeTab === "option1" && (
                   <div>
                     <h2 className="text-lg text-center font-bold text-purple-400 mb-2">
-                      Number of Players in Each Quest
+                      {t("info.numberOfPlayersInEachQuest")}
                     </h2>
                     {totalTeamSize && (
                       <div className="space-y-2 flex flex-col items-center mt-4">
@@ -111,10 +113,10 @@ export default function AnimatedWindow({
                             className="w-[60%] flex justify-center items-center gap-5 p-1 bg-slate-700 rounded"
                           >
                             <span className="font-semibold">
-                              Phase {phase}:
+                              {t("info.phase")} {phase} :
                             </span>
                             <span className="text-amber-400">
-                              {totalTeamSize[phase - 1]} players
+                              {totalTeamSize[phase - 1]} {t("info.players")}
                             </span>
                           </div>
                         ))}
@@ -157,10 +159,13 @@ export default function AnimatedWindow({
                               : "text-red-400"
                           }`}
                         >
-                          Team: {selectedCharacter.team}
+                          {t("game.team")}:{" "}
+                          {t(`game.${selectedCharacter.team}`)}
                         </p>
                         <p className="text-gray-300">
-                          {selectedCharacter.description}
+                          {t(
+                            `characters.descriptions.${selectedCharacter.name}`
+                          )}
                         </p>
                       </div>
                     )}
@@ -169,7 +174,7 @@ export default function AnimatedWindow({
                 {activeTab === "option3" && (
                   <div>
                     {/* Rules navigation buttons */}
-                    <div className="flex gap-1 mb-3">
+                    <div className="flex gap-1 mb-2">
                       <button
                         onClick={() => setRulesSection("goal")}
                         className={`px-2 py-1 text-xs rounded transition ${
@@ -178,7 +183,7 @@ export default function AnimatedWindow({
                             : "bg-slate-600 text-gray-300 hover:bg-slate-500"
                         }`}
                       >
-                        Goal
+                        {t("info.goal")}
                       </button>
                       <button
                         onClick={() => setRulesSection("howto")}
@@ -188,7 +193,17 @@ export default function AnimatedWindow({
                             : "bg-slate-600 text-gray-300 hover:bg-slate-500"
                         }`}
                       >
-                        How to Play
+                        {t("info.howToPlay")}
+                      </button>
+                      <button
+                        onClick={() => setRulesSection("Stips")}
+                        className={`px-2 py-1 text-xs rounded transition ${
+                          rulesSection === "Stips"
+                            ? "bg-red-600 text-white"
+                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                        }`}
+                      >
+                        {t("info.strategyTips")}
                       </button>
                       <button
                         onClick={() => setRulesSection("tips")}
@@ -198,7 +213,17 @@ export default function AnimatedWindow({
                             : "bg-slate-600 text-gray-300 hover:bg-slate-500"
                         }`}
                       >
-                        Strategy Tips
+                        {t("info.tips")}
+                      </button>
+                      <button
+                        onClick={() => setRulesSection("characters")}
+                        className={`px-2 py-1 text-xs rounded transition ${
+                          rulesSection === "characters"
+                            ? "bg-red-600 text-white"
+                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                        }`}
+                      >
+                        {t("info.allCharacters")}
                       </button>
                     </div>
 
@@ -206,18 +231,13 @@ export default function AnimatedWindow({
                     {rulesSection === "goal" && (
                       <div>
                         <h2 className="text-lg font-bold text-red-400 mb-2">
-                          Goal:
+                          {t("rules.goalTitle")}
                         </h2>
                         <p className="mb-3 text-sm leading-relaxed">
-                          Players are secretly either Loyal Knights (Good) or
-                          Dark Knights of Kaelen (Evil). Good wins by
-                          successfully completing three Quests, while Evil wins
-                          if three Quests fail.
+                          {t("rules.goalText")}
                         </p>
                         <p className="text-sm leading-relaxed">
-                          Throughout the game, players can say anything they
-                          want to. Use a mix of discussion, deception,
-                          accusation, and logical deduction to achieve victory.
+                          {t("rules.gameplayText")}
                         </p>
                       </div>
                     )}
@@ -225,47 +245,126 @@ export default function AnimatedWindow({
                     {rulesSection === "howto" && (
                       <div>
                         <h2 className="text-lg font-bold text-red-400 mb-2">
-                          How to Play:
+                          {t("rules.gameplayTitle")}
                         </h2>
                         <div className="mb-3">
                           <h3 className="text-base font-semibold text-purple-400 mb-1">
-                            1. Team Building
+                            {t("rules.teamBuildingTitle")}
                           </h3>
                           <p className="text-sm leading-relaxed mb-2">
-                            All players vote for the players they want on the
-                            next Quest. The Leader chooses a group and all
-                            players vote to approve or reject this team.
+                            {t("rules.teamBuildingText")}
                           </p>
                         </div>
                         <div>
                           <h3 className="text-base font-semibold text-purple-400 mb-1">
-                            2. Quest
+                            {t("rules.questTitle")}
                           </h3>
                           <p className="text-sm leading-relaxed">
-                            The approved team decides if the Quest succeeds or
-                            fails. A single Evil player can cause failure.
-                            Choose your team carefully!
+                            {t("rules.questText")}
                           </p>
                         </div>
                       </div>
                     )}
 
+                    {rulesSection === "Stips" && (
+                      <div>
+                        <h2 className="text-lg font-bold text-red-400 mb-2">
+                          {t("rules.strategyTitle")}
+                        </h2>
+                        <p className="text-sm leading-relaxed mb-3">
+                          {t("rules.strategyText1")}
+                        </p>
+                        <p className="text-sm leading-relaxed">
+                          {t("rules.strategyText2")}
+                        </p>
+                      </div>
+                    )}
                     {rulesSection === "tips" && (
                       <div>
                         <h2 className="text-lg font-bold text-red-400 mb-2">
-                          Strategy Tip: Trust No One
+                          {t("info.tips")}
                         </h2>
-                        <p className="text-sm leading-relaxed mb-3">
-                          It's a mistake to approve a team unless you're
-                          confident about every single player on it. Don't be
-                          afraid to reject a proposal—doing so doesn't make you
-                          look Evil.
+                        <p className="text-sm leading-relaxed mb-2">
+                          {t("tips.avoidComplex")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          {t("tips.bluffingKey")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          {t("tips.evilBlendIn")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          {t("tips.evilVoteSuccess")}
                         </p>
                         <p className="text-sm leading-relaxed">
-                          Pay close attention to who votes "yes" and ask them to
-                          explain their reasoning. Sometimes, Evil players will
-                          approve a team because they know another Evil player
-                          is on it.
+                          {t("tips.thrallTip")}
+                        </p>
+                        <p className="text-sm leading-relaxed">
+                          {t("tips.shadeTip")}
+                        </p>
+                        <p className="text-sm leading-relaxed">
+                          {t("tips.seerTip")}
+                        </p>
+                        <p className="text-sm leading-relaxed">
+                          {t("tips.guardianTip")}
+                        </p>
+                      </div>
+                    )}
+                    {rulesSection === "characters" && (
+                      <div>
+                        <h2 className="text-lg font-bold text-blue-400 mb-2">
+                          {t("characters.goodCharacters")}
+                        </h2>
+                        <div className="text-sm leading-relaxed mb-2">
+                          <span className="text-blue-400 font-semibold">
+                            Seer:
+                          </span>{" "}
+                          {t("characters.seer")}
+                        </div>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-blue-400 font-semibold">
+                            Guardian:
+                          </span>{" "}
+                          {t("characters.guardian")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-blue-400 font-semibold">
+                            Knights:
+                          </span>{" "}
+                          {t("characters.knights")}
+                        </p>
+                        <h2 className="text-lg font-bold text-red-400 mb-2">
+                          {t("characters.evilCharacters")}
+                        </h2>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Draven:
+                          </span>{" "}
+                          {t("characters.draven")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Seraphina:
+                          </span>{" "}
+                          {t("characters.seraphina")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Kaelen:
+                          </span>{" "}
+                          {t("characters.kaelen")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Shade:
+                          </span>{" "}
+                          {t("characters.shade")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Thrall:
+                          </span>{" "}
+                          {t("characters.thrall")}
                         </p>
                       </div>
                     )}
@@ -279,7 +378,7 @@ export default function AnimatedWindow({
                   className="px-4 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 transition"
                   onClick={() => setOpen(false)}
                 >
-                  Close
+                  {t("info.close")}
                 </button>
               </div>
             </div>
