@@ -102,7 +102,7 @@ function Lobby() {
   const handleExitClick = () => {
     socket.emit("exit", { roomSessionKey, playerSessionKey });
     sessionStorage.removeItem("playerSessionKey");
-    if (players.length === 1) sessionStorage.removeItem("roomSessionKey");
+    sessionStorage.removeItem("roomSessionKey");
     navigate(`/`);
   };
 
@@ -130,14 +130,19 @@ function Lobby() {
 
         <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80 text">
           <div className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/20 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
-            <h3 className="font-semibold mb-2 text-lg">{t("lobby.players")}:</h3>
+            <h3 className="font-semibold mb-2 text-lg">
+              {t("lobby.players")}:
+            </h3>
             <ul className="list-disc ml-5 text-sm">
               {players.map((player) => (
                 <li key={player.playerSessionKey}>
                   {player.name}{" "}
-                  {player.playerSessionKey === lobbyLeaderId && t("lobby.leader")}
+                  {player.playerSessionKey === lobbyLeaderId &&
+                    t("lobby.leader")}
                   {readyPlayers.includes(player.playerSessionKey) && (
-                    <span className="text-green-600 ml-2">✓ {t("lobby.ready")}</span>
+                    <span className="text-green-600 ml-2">
+                      ✓ {t("lobby.ready")}
+                    </span>
                   )}
                 </li>
               ))}

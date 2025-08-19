@@ -268,8 +268,7 @@ const Modals = ({
                     playerSessionKey,
                   });
                   sessionStorage.removeItem("playerSessionKey");
-                  if (players.length === 1)
-                    sessionStorage.removeItem("roomSessionKey");
+                  sessionStorage.removeItem("roomSessionKey");
                   navigate(`/`);
                 }}
                 className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"

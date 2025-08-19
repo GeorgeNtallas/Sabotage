@@ -82,7 +82,17 @@
     "seraphina": "Appears as Seer to the Guardian.",
     "kaelen": "Unknown to other evil players",
     "shade": "Can assassinate the Seer at the end of the game.",
-    "thrall": "These characters aim to sabotage quests and sow distrust among good players"
+    "thrall": "These characters aim to sabotage quests and sow distrust among good players",
+    "descriptions": {
+      "Seer": "Knows who the evil players are",
+      "Guardian": "Knows who Seer and Seraphina are",
+      "Knight": "A Loyal Knight",
+      "Draven": "Unknown for Seer",
+      "Seraphina": "Appears as Seer to Guardian",
+      "Kaelen": "Unknown to evil. Does not know Evil",
+      "Shade": "Can kill Seer at the end",
+      "Thrall": "A Dark Knight"
+    }
   },
   "tips": {
     "avoidComplex": "Avoid the more complex roles at first, stick to a simple team (maybe even without a Seer).",
