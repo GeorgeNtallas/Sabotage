@@ -35,6 +35,24 @@ app.use(
   })
 );
 
+io.use((socket, next) => {
+  const { roomSessionKey, playerSessionKey } = socket.handshake.auth;
+
+  if (!roomSessionKey || !playerSessionKey) {
+    return next();
+  }
+
+  socket.roomSessionKey = roomSessionKey;
+  socket.playerSessionKey = playerSessionKey;
+
+  const room = rooms[roomSessionKey];
+  if (!room || !room.players[playerSessionKey]) {
+    return next(new Error("Invalid room or player session keys"));
+  }
+
+  next();
+});
+
 const rooms = {};
 
 const generateroomSessionKey = () => {
@@ -112,6 +130,35 @@ const initializeRoom = (roomSessionKey) => {
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  const { roomSessionKey, playerSessionKey } = socket.handshake.auth;
+  if (roomSessionKey && playerSessionKey) {
+    const room = rooms[roomSessionKey];
+    if (room && room.players[playerSessionKey]) {
+      const player = room.players[playerSessionKey];
+
+      // Update the socket ID
+      player.id = socket.id;
+      socket.join(roomSessionKey);
+
+      console.log(`Player ${player.name} rejoined room ${roomSessionKey}`);
+
+      socket.emit("character_assigned", {
+        character: room.characters[playerSessionKey],
+        players: Object.values(room.players),
+        gameCharacters: Object.values(room.characters),
+      });
+
+      socket.emit("round_update", {
+        roundLeader: room.roundLeader,
+        round: room.round,
+        phase: room.phase,
+        missionTeamSizes:
+          missionTeamSizes[Object.keys(room.players).length][room.phase - 1],
+        totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
+      });
+      // Emit other state updates as needed for the client
+    }
+  }
   // Handle room creation
   socket.on("create-room", () => {
     const createdroomSessionKey = generateroomSessionKey(); // e.g. short UUID
@@ -311,6 +358,7 @@ io.on("connection", (socket) => {
     });
   });
 
+  // Join Room
   socket.on("join_room", ({ name, password }, callback) => {
     if (!name?.trim()) {
       return callback({ error: "Name is required" });
@@ -351,74 +399,6 @@ io.on("connection", (socket) => {
       isLeader: false,
     });
   });
-
-  /*
-  socket.on("joinRoom", ({ password, name }, callback) => {
-    if (!name?.trim()) {
-      return callback({ error: "Name is required" });
-    }
-
-    const roomSessionKey = findRoomSessionKeyByPassword(password);
-    const playerSessionKey = crypto.randomUUID();
-    const room = rooms[roomSessionKey];
-
-    if (!room) {
-      return callback({ error: "Room not found" });
-    }
-
-    if (room.password !== password) {
-      return callback({ error: "Invalid room password" });
-    }
-    if (room.players) {
-      if (
-        Object.values(room.players).some(
-          (p) => p.name.toLowerCase() === name.toLowerCase()
-        )
-      ) {
-        return callback({ error: "Name already taken in this room" });
-      }
-    } else {
-      rooms[roomSessionKey] = { lobbyleader: playerSessionKey };
-    }
-
-    if (!rooms[roomSessionKey].players) {
-      rooms[roomSessionKey] = { players: {} };
-    }
-    rooms[roomSessionKey].players[playerSessionKey] = {
-      id: socket.id,
-      playerSessionKey: playerSessionKey,
-      name: name,
-    };
-
-    socket.join(roomSessionKey);
-
-    // Send full updated list
-    const playerList = Object.values(rooms[roomSessionKey].players).map(
-      (player) => ({
-        name: player.name,
-        playerSessionKey: player.playerSessionKey,
-      })
-    );
-
-    io.to(roomSessionKey).emit("password_update", {
-      roomPlayers: playerList,
-      roomLeader: rooms[roomSessionKey].lobbyleader,
-    });
-
-    console.log(`User ${name} joined room ${password}`);
-    if (!rooms[roomSessionKey].ready) {
-      rooms[roomSessionKey].ready = [];
-    }
-    socket.emit("ready_update", rooms[roomSessionKey].ready);
-
-    console.log(
-      "Sending to client:",
-      playerSessionKey,
-      typeof playerSessionKey
-    );
-    callback(playerSessionKey, roomSessionKey);
-  });
-  */
 
   socket.on("getRoomPlayers", ({ roomSessionKey }, callback) => {
     const room = rooms[roomSessionKey];
@@ -838,54 +818,46 @@ io.on("connection", (socket) => {
   });
 
   socket.on("exit", ({ roomSessionKey, playerSessionKey }) => {
-    // If the player is in a room, remove from that room
-    console.log(`Player ${playerSessionKey} exiting room ${roomSessionKey}`);
-    delete rooms[roomSessionKey].players[playerSessionKey];
-    rooms[roomSessionKey].ready = rooms[roomSessionKey].ready.filter(
-      (id) => id !== playerSessionKey
-    );
+    const room = rooms[roomSessionKey];
+    if (!room) return;
 
-    // Send updated list to the room the player actually left
-    const playerList = Object.values(rooms[roomSessionKey].players).map(
-      (player) => ({
-        name: player.name,
-        playerSessionKey: player.playerSessionKey,
-      })
-    );
+    console.log(`Player ${playerSessionKey} exited room ${roomSessionKey}`);
+    delete room.players[playerSessionKey];
+
+    const playerList = Object.values(room.players).map((p) => ({
+      name: p.name,
+      playerSessionKey: p.playerSessionKey,
+      online: !!p.id,
+    }));
+
     io.to(roomSessionKey).emit("room_update", playerList);
 
-    // Clean up empty room
-    if (Object.keys(rooms[roomSessionKey].players).length === 0) {
+    // Clean up if empty
+    if (Object.keys(room.players).length === 0) {
       delete rooms[roomSessionKey];
     }
   });
 
   socket.on("disconnect", () => {
     for (const roomSessionKey in rooms) {
-      const { players, ready } = rooms[roomSessionKey];
+      const room = rooms[roomSessionKey];
+      const player = Object.values(room.players).find(
+        (p) => p.id === socket.id
+      );
 
-      // Remove the player with the disconnected socket
-      if (players[socket.id]) {
-        delete players[socket.id];
-      }
+      if (player) {
+        player.id = null; // mark as offline
+        console.log(`Player ${player.name} went offline`);
 
-      //rooms[roomSessionKey].ready = ready.filter((id) => id !== socket.id);
-
-      // Send updated info
-      const playerList = Object.values(players).map((player) => ({
-        name: player.name,
-        playerSessionKey: player.playerSessionKey,
-      }));
-
-      io.to(roomSessionKey).emit("room_update", playerList);
-      io.to(roomSessionKey).emit("ready_update", rooms[roomSessionKey].ready);
-
-      if (Object.keys(players).length === 0) {
-        delete rooms[roomSessionKey];
+        // broadcast updated player list
+        const playerList = Object.values(room.players).map((p) => ({
+          name: p.name,
+          playerSessionKey: p.playerSessionKey,
+          online: !!p.id,
+        }));
+        io.to(roomSessionKey).emit("room_update", playerList);
       }
     }
-
-    console.log("User disconnected:", socket.id);
   });
 });
 

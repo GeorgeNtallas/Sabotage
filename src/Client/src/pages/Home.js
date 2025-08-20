@@ -7,6 +7,9 @@ function Home() {
   const [name, setName] = useState("");
   const [password, setpassword] = useState("");
   const navigate = useNavigate();
+  sessionStorage.removeItem("roomSessionKey");
+  sessionStorage.removeItem("playerSessionKey");
+
   const medievalFontStyle = {
     fontFamily: "MedievalSharp",
     fontWeight: 400,

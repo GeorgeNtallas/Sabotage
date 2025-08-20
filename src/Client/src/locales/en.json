@@ -29,7 +29,8 @@
     "waitForOtherPlayers": "Wait for other players",
     "proceedToQuest": "Proceed to Quest?",
     "leaderVote": "Leader Vote",
-    "exit": "Exit"
+    "exit": "Exit",
+    "role": "Role"
   },
   "modals": {
     "voteQuestTeam": "Vote Quest Team",
