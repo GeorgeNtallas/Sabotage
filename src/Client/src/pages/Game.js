@@ -405,14 +405,16 @@ function Game() {
               )}
             </div>
           </div>
+
+          {/* Player and Leader Votes */}
+          <QuestPopup
+            players={players}
+            finalTeamSuggestions={finalTeamSuggestions}
+            leaderVotedPlayers={leaderVotedPlayers}
+            isLeader={isLeader}
+          />
         </div>
-        {/* Player and Leader Votes */}
-        <QuestPopup
-          players={players}
-          finalTeamSuggestions={finalTeamSuggestions}
-          leaderVotedPlayers={leaderVotedPlayers}
-          isLeader={isLeader}
-        />
+
 
         {/* Voting Modal For All */}
         {showVoteModal && (
