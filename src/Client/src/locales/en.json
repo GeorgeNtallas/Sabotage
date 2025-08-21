@@ -60,7 +60,7 @@
     "allCharacters": "All Characters"
   },
   "rules": {
-    "goalText": "Players are secretly either Loyal Knights (Good) or Dark Knights of the Underworld (Evil). Good wins by successfully completing three Quests, while Evil wins if three Quests fail.",
+    "goalText": "Players are secretly either Loyal Knights (Good) or Dark Knights of the Underworld (Evil). Good wins by successfully completing three Quests, while Evil wins if three Quests fail (or after the 5th round).",
     "gameplayText": "Throughout the game, players can say whatever they want. Use a mix of discussion, deception, accusations, and logical reasoning to achieve victory.",
     "teamBuildingTitle": "1. Team Building",
     "teamBuildingText": "All players vote for the players they want on the next Quest. The Leader selects a team and all players vote to approve or reject this team.",

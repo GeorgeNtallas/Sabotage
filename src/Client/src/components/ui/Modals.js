@@ -32,7 +32,7 @@ const Modals = ({
     return (
       <Animation show={ShowVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
+          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-80 max-w-md">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-white text-center ">
                 {t("modals.voteQuestTeam")}
@@ -119,7 +119,7 @@ const Modals = ({
     return (
       <Animation show={showLeaderVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-80 max-w-md">
+          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-80 max-w-md">
             <div className="mb-5">
               <h3 className="text-xl font-bold text-white text-center ">
                 {t("modals.selectQuestTeam")}
@@ -207,12 +207,12 @@ const Modals = ({
       // Players vote to proceed
       <Animation show={showQuestVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gray-800 rounded-lg p-6 w-50 max-w-md">
+          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-50 max-w-md">
             <h3 className="text-xl text-center font-bold mb-4 text-white">
               {t("modals.proceedToQuest")}
             </h3>
             <div className="space-y-2 mb-4">
-              <label className="flex gap-14 items-between text-white">
+              <label className="flex justify-center gap-10 text-white">
                 <button
                   onClick={() => {
                     const vote = "success";
@@ -241,7 +241,7 @@ const Modals = ({
                     setShowQuestVoteModal(false);
                     setShowQuestVoteButton(false);
                   }}
-                  className="px-5 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
                 >
                   {t("modals.no")}
                 </button>
@@ -255,12 +255,12 @@ const Modals = ({
     return (
       // Player exiting game
       <Animation show={showExit}>
-        <div className="bg-gray-700 rounded-lg p-6 w-50 max-w-md">
+        <div className="bg-gradient-to-r from-gray-800 via-slate-700 to-slate-800 rounded-lg p-6 w-50 max-w-md">
           <h3 className="text-xl text-center font-bold mb-4 text-white">
             {t("modals.exitGame")}
           </h3>
           <div className="space-y-2 mb-4">
-            <label className="flex gap-14 items-center text-white">
+            <label className="flex gap-10 justify-center text-white">
               <button
                 onClick={() => {
                   socket.emit("exit", {

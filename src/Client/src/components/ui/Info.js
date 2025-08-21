@@ -29,7 +29,7 @@ export default function AnimatedWindow({
       {/* Trigger button */}
       <button
         onClick={handleOpen}
-        className="px-4 py-2 rounded-md bg-purple-600 text-white font-semibold shadow-md hover:bg-purple-700 transition"
+        className="px-3 py-2  bg-gradient-to-r bg-purple-600 to-purple-700 hover:from-purple-600 hover:to-purple-700 transition rounded-md font-bold"
       >
         {triggerLabel}
       </button>

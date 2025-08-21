@@ -55,6 +55,13 @@ io.use((socket, next) => {
 
 const rooms = {};
 
+function emitRoomState(roomSessionKey) {
+  const room = rooms[roomSessionKey];
+  if (room) {
+    io.to(roomSessionKey).emit("state_update", room);
+  }
+}
+
 const generateroomSessionKey = () => {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -131,12 +138,13 @@ io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
   const { roomSessionKey, playerSessionKey } = socket.handshake.auth;
+
+  // Rejoin
   if (roomSessionKey && playerSessionKey) {
     const room = rooms[roomSessionKey];
     if (room && room.players[playerSessionKey]) {
       const player = room.players[playerSessionKey];
 
-      // Update the socket ID
       player.id = socket.id;
       socket.join(roomSessionKey);
 
@@ -156,9 +164,9 @@ io.on("connection", (socket) => {
           missionTeamSizes[Object.keys(room.players).length][room.phase - 1],
         totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
       });
-      // Emit other state updates as needed for the client
     }
   }
+
   // Handle room creation
   socket.on("create-room", () => {
     const createdroomSessionKey = generateroomSessionKey(); // e.g. short UUID
@@ -429,60 +437,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  /* Join room
-  socket.on("join_room1", ({ name, roomSessionKey, sessionKey }) => {
-    if (!name || !roomSessionKey) {
-      socket.emit("join-error", { message: "Name and room ID are required" });
-      return;
-    }
-
-    const newSessionKey = crypto.randomUUID();
-
-    // Initialize room if it doesn't exist
-    if (!rooms[roomSessionKey]) {
-      rooms[roomSessionKey] = { players: {}, ready: [] };
-    }
-
-    // Check for duplicate names in THIS room only (excluding current socket)
-    const existingNames = Object.values(rooms[roomSessionKey].players)
-      .filter((p) => p.socketId !== socket.id)
-      .map((p) => p.name);
-    if (existingNames.includes(name)) {
-      socket.emit("join-error", { message: "Name already taken in this room" });
-      return;
-    }
-
-    // Add or update player
-    rooms[roomSessionKey].players[socket.id] = {
-      name,
-      sessionKey: sessionKey || newSessionKey,
-      socketId: socket.id,
-    };
-
-    socket.join(roomSessionKey);
-    socket.emit("room_joined", {
-      sessionKey: rooms[roomSessionKey].players[socket.id].sessionKey,
-    });
-
-    // Send full updated list
-    const playerList = Object.values(rooms[roomSessionKey].players).map(
-      (player) => ({
-        name: player.name,
-        socketId: player.socketId,
-      })
-    );
-    io.to(roomSessionKey).emit("room_update", playerList);
-
-    const lobbyLeaderId = playerList[0]?.socketId || null;
-    io.to(roomSessionKey).emit("password_update", {
-      players: playerList,
-      lobbyLeaderId,
-    });
-
-    console.log(`User ${socket.id} joined room ${roomSessionKey}`);
-    socket.emit("ready_update", rooms[roomSessionKey].ready);
-  });
-  */
   // Handle game creation
   socket.on("start_game", ({ roomSessionKey, selectedRoles }) => {
     console.log("Received selectedRoles:", selectedRoles, typeof selectedRoles);
@@ -643,6 +597,14 @@ io.on("connection", (socket) => {
             result: questResult,
             waitPlayers: waitPlayers,
           });
+        } else {
+          if (room.round >= 5) {
+            io.to(roomSessionKey).emit("game_over", {
+              result: "evil",
+              goodWins: null,
+              evilWins: null,
+            });
+          }
         }
 
         room.questVoting = null;

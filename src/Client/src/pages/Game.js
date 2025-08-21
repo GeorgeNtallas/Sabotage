@@ -52,6 +52,21 @@ function Game() {
   const [missionTeamSizes, setMissionTeamSizes] = useState(1);
   const [gameResult, setGameResult] = useState("");
 
+  // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
+  const [room, setRoom] = useState({});
+
+  useEffect(() => {
+    socket.on("state_update", (updatedRoom) => {
+      setRoom(updatedRoom);
+    });
+
+    return () => {
+      socket.off("state_update");
+    };
+  }, []);
+
+  // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS-------------
+
   // Assigne Roles to players
   useEffect(() => {
     socket.on(
@@ -214,25 +229,22 @@ function Game() {
           <img
             src="/images/Sabotage3.png"
             alt="Leader"
-            className="w-[30%] mb-10"
+            className="mb-10 w-40"
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
         </div>
 
         {/* Mobile Layout */}
-        <div className="relative z-10 block md:hidden space-y-4 ">
+        <div className="relative z-10 space-y-4 ">
           {/* Phase/Round/Exit */}
-          <div className="relative flex justify-start items-center h-16 w-full px-4">
-            {/* Exit Button */}
-            <div className="absolute left-2 ">
+          <div className="flex justify-center items-center h-16 w-full px-4">
+            <div className="flex items-center gap-10">
               <button
                 onClick={() => setShowExit(true)}
                 className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
               >
                 {t("game.exit")}
               </button>
-            </div>
-            <div className="absolute left-1/2 transform -translate-x-1/2">
               <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
                 <h3 className="text-center font-semibold mb-2">
                   {t("game.phase")} {phase} - {t("game.round")} {round}
@@ -258,8 +270,6 @@ function Game() {
                   })}
                 </div>
               </div>
-            </div>
-            <div className="absolute right-2">
               <AnimatedWindow
                 triggerLabel={t("game.menu")}
                 totalTeamSize={totalTeamSize}
@@ -269,226 +279,133 @@ function Game() {
           </div>
 
           {/* Character Card */}
-          <div className="flex flex-row space-x-4">
-            <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
-              <div className="flex items-center justify-center mb-2">
-                <h2 className="text-lg font-semibold pt-2">{name}</h2>
-                {isLeader && (
-                  <img
-                    src="/images/Crown.jpg"
-                    alt="Leader"
-                    className="w-6 h-5 mt-1 ml-2"
-                    onError={(e) => (e.target.src = "/images/default.jpg")}
-                  />
-                )}
+          <div className="flex justify-center ml-2">
+            <div className="flex flex-row space-x-4">
+              <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
+                <div className="flex items-center justify-center mb-2">
+                  <h2 className="text-lg font-semibold pt-2">{name}</h2>
+                  {isLeader && (
+                    <img
+                      src="/images/Crown.jpg"
+                      alt="Leader"
+                      className="w-6 h-5 mt-1 ml-2"
+                      onError={(e) => (e.target.src = "/images/default.jpg")}
+                    />
+                  )}
+                </div>
+                <img
+                  src={`/images/${character.name
+                    .toLowerCase()
+                    .replace(/\s+/g, "_")}.png`}
+                  alt={character.name}
+                  className="max-w-40 mx-auto mb-2 ml-3 mr-3"
+                  onError={(e) => (e.target.src = "/images/default.jpg")}
+                />
+                <h3 className="text-lg font-bold text-yellow-400">
+                  {character.name}
+                </h3>
+                <p className="text-sm text-gray-300 mb-1">
+                  {t(`characters.descriptions.${character.name}`)}
+                </p>
+                <p className="text-xs pb-2">
+                  {t("game.team")}:{" "}
+                  <span
+                    className={
+                      character.team === "good"
+                        ? "text-blue-400"
+                        : "text-red-400"
+                    }
+                  >
+                    {character.team === "good"
+                      ? t("game.good")
+                      : t("game.evil")}
+                  </span>
+                </p>
               </div>
-              <img
-                src={`/images/${character.name
-                  .toLowerCase()
-                  .replace(/\s+/g, "_")}.png`}
-                alt={character.name}
-                className="max-w-40 mx-auto mb-2 ml-3 mr-3"
-                onError={(e) => (e.target.src = "/images/default.jpg")}
-              />
-              <h3 className="text-lg font-bold text-yellow-400">
-                {character.name}
-              </h3>
-              <p className="text-sm text-gray-300 mb-1">
-                {t(`characters.descriptions.${character.name}`)}
-              </p>
-              <p className="text-xs pb-2">
-                {t("game.team")}:{" "}
-                <span
-                  className={
-                    character.team === "good" ? "text-blue-400" : "text-red-400"
-                  }
-                >
-                  {character.team === "good" ? t("game.good") : t("game.evil")}
-                </span>
-              </p>
-            </div>
 
-            {/* Players List */}
-            <div
-              className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-11/12 p-3 mx-auto text-center"
-              style={{ gridTemplateColumns: "1fr 1fr auto" }}
-            >
+              {/* Players List */}
               <div
-                className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
+                className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-48 p-2 mx-auto text-center"
                 style={{ gridTemplateColumns: "1fr 1fr auto" }}
               >
-                <h3 className="text-center">{t("lobby.players")}</h3>
-                <h3 className="text-center mr-3">{t("game.role")}</h3>
-                <h3 className="text-center mr-1">L</h3>
-              </div>
-              <div
-                className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
-                style={{ gridTemplateColumns: "1fr 1fr auto" }}
-              >
-                {players.map((player) => (
-                  <React.Fragment key={player.playerSessionKey}>
-                    <div className="text-center">{player.name}</div>
-                    <div className="text-center mr-2">
-                      {player.visibleRole === "evil"
-                        ? "Evil"
-                        : player.visibleRole === "Seer/Seraphina"
-                        ? "S/S"
-                        : ""}
-                    </div>
-                    <div className="text-center">
-                      {player.playerSessionKey === roundLeaderId && (
-                        <img
-                          src="/images/Crown.jpg"
-                          alt="Leader"
-                          className="w-4 h-4 mx-auto"
-                          onError={(e) =>
-                            (e.target.src = "/images/default.jpg")
-                          }
-                        />
-                      )}
-                    </div>
-                  </React.Fragment>
-                ))}
+                <div
+                  className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
+                  style={{ gridTemplateColumns: "1fr 1fr auto" }}
+                >
+                  <h3 className="text-center">{t("lobby.players")}</h3>
+                  <h3 className="text-center mr-3">{t("game.role")}</h3>
+                  <h3 className="text-center mr-1">L</h3>
+                </div>
+                <div
+                  className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
+                  style={{ gridTemplateColumns: "1fr 1fr auto" }}
+                >
+                  {players.map((player) => (
+                    <React.Fragment key={player.playerSessionKey}>
+                      <div className="text-center">{player.name}</div>
+                      <div className="text-center mr-2">
+                        {player.visibleRole === "evil"
+                          ? "Evil"
+                          : player.visibleRole === "Seer/Seraphina"
+                          ? "S/S"
+                          : ""}
+                      </div>
+                      <div className="text-center">
+                        {player.playerSessionKey === roundLeaderId && (
+                          <img
+                            src="/images/Crown.jpg"
+                            alt="Leader"
+                            className="w-4 h-4 mx-auto"
+                            onError={(e) =>
+                              (e.target.src = "/images/default.jpg")
+                            }
+                          />
+                        )}
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Action Buttons - Mobile */}
-          <div className="px-4">
-            {showPlayersVote && (
-              <button
-                onClick={() => setShowVoteModal(true)}
-                disabled={hasVoted}
-                className={`w-full rounded-lg p-3 mb-2 text-white ${
-                  hasVoted
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-amber-600 hover:bg-amber-700"
-                }`}
-              >
-                {hasVoted
-                  ? t("game.waitForOtherPlayers")
-                  : t("game.voteForQuestTeam")}
-              </button>
-            )}
-            {showQuestVoteButton && (
-              <button
-                onClick={() => setShowQuestVoteModal(true)}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
-              >
-                {t("game.proceedToQuest")}
-              </button>
-            )}
-            {isLeader && showLeaderVoteButton && (
-              <button
-                onClick={() => setShowLeaderVoteModal(true)}
-                className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
-              >
-                {t("game.leaderVote")}
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Desktop Layout */}
-        <div className="hidden md:block relative h-[70vh]">
-          {/* Phases - Rounds */}
-          <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900  rounded-lg p-4 text-center absolute left-[5%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
-            <h3 className="text-lg font-semibold mb-3">
-              {t("game.phase")} {phase} - {t("game.round")} {round}
-            </h3>
-            <div className="flex justify-center gap-2">
-              {[1, 2, 3, 4, 5].map((phaseNum) => {
-                let circleColor = "bg-gray-600";
-                if (phaseNum === phase) {
-                  circleColor = "bg-yellow-500";
-                } else if (phaseNum < phase) {
-                  const result = phaseResults[phaseNum - 1];
-                  circleColor =
-                    result === "success" ? "bg-blue-500" : "bg-red-500";
-                }
-                return (
-                  <div
-                    key={phaseNum}
-                    className={`w-8 h-8 rounded-full ${circleColor} flex items-center justify-center text-white text-sm font-bold`}
-                  >
-                    {phaseNum}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Character card */}
-          <div className="bg-gray-800 rounded-lg p-6 text-center absolute left-[41%] w-[18%] max-w-sm top-1/2 transform -translate-y-1/2">
-            <div className="flex items-center justify-center mb-4">
-              <h2 className="text-xl">{location.state?.name}</h2>
-              {isLeader && (
-                <img
-                  src="/images/Crown.jpg"
-                  alt="Leader"
-                  className="w-6 h-6 ml-2"
-                  onError={(e) => (e.target.src = "/images/default.jpg")}
-                />
+          <div className="flex justify-center">
+            <div className="w-80">
+              {showPlayersVote && (
+                <button
+                  onClick={() => setShowVoteModal(true)}
+                  disabled={hasVoted}
+                  className={`w-full rounded-lg p-3 mb-2 text-white ${
+                    hasVoted
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-amber-600 hover:bg-amber-700"
+                  }`}
+                >
+                  {hasVoted
+                    ? t("game.waitForOtherPlayers")
+                    : t("game.voteForQuestTeam")}
+                </button>
+              )}
+              {showQuestVoteButton && (
+                <button
+                  onClick={() => setShowQuestVoteModal(true)}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
+                >
+                  {t("game.proceedToQuest")}
+                </button>
+              )}
+              {isLeader && showLeaderVoteButton && (
+                <button
+                  onClick={() => setShowLeaderVoteModal(true)}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
+                >
+                  {t("game.leaderVote")}
+                </button>
               )}
             </div>
-            <img
-              src={`/images/${character.name
-                .toLowerCase()
-                .replace(/\s+/g, "_")}.png`}
-              alt={character.name}
-              className="w-full max-w-[200px] mx-auto"
-              onError={(e) => (e.target.src = "/images/default.jpg")}
-            />
-            <h3 className="text-2xl font-bold text-yellow-400">
-              {character.name}
-            </h3>
-            <p className="text-gray-300 mt-2">{character.description}</p>
-            <p className="text-sm mt-2">
-              {t("game.team")}:{" "}
-              <span
-                className={
-                  character.team === "good" ? "text-blue-400" : "text-red-400"
-                }
-              >
-                {character.team === "good" ? t("game.good") : t("game.evil")}
-              </span>
-            </p>
-          </div>
-
-          {/* Player List */}
-          <div className="bg-gray-800 rounded-lg p-4 text-center absolute left-[70%] w-[25%] max-w-sm top-1/2 transform -translate-y-1/2">
-            <div className="grid grid-cols-3 text-white font-bold mb-4 border-b border-gray-600 pb-2">
-              <h3>{t("lobby.players")}</h3>
-              <h3>Role</h3>
-              <h3>{t("lobby.leader")}</h3>
-            </div>
-            <div className="grid grid-cols-3 gap-y-3 text-sm text-gray-300">
-              {players.map((player) => (
-                <React.Fragment key={player.playerSessionKey}>
-                  <div className="text-center">{player.name}</div>
-                  <div className="text-center">
-                    {player.visibleRole === "evil"
-                      ? "Evil"
-                      : player.visibleRole === "Merlin/Morgana"
-                      ? "Merlin/Morgana"
-                      : ""}
-                  </div>
-                  <div className="text-center">
-                    {player.playerSessionKey === roundLeaderId && (
-                      <img
-                        src="/images/Crown.jpg"
-                        alt="Leader"
-                        className="w-[20px] h-auto mx-auto"
-                        onError={(e) => (e.target.src = "/images/default.jpg")}
-                      />
-                    )}
-                  </div>
-                </React.Fragment>
-              ))}
-            </div>
           </div>
         </div>
-
         {/* Player and Leader Votes */}
         <QuestPopup
           players={players}
@@ -497,40 +414,6 @@ function Game() {
           isLeader={isLeader}
         />
 
-        {/* Action Buttons - Desktop*/}
-        <div className="hidden md:block fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs px-4">
-          {showPlayersVote && (
-            <button
-              onClick={() => setShowVoteModal(true)}
-              disabled={hasVoted}
-              className={`w-full rounded-lg p-3 mb-2 text-white ${
-                hasVoted
-                  ? "bg-gray-600 cursor-not-allowed"
-                  : "bg-amber-600 hover:bg-amber-700"
-              }`}
-            >
-              {hasVoted
-                ? t("game.waitForOtherPlayers")
-                : t("game.voteForQuestTeam")}
-            </button>
-          )}
-          {showQuestVoteButton && (
-            <button
-              onClick={() => setShowQuestVoteModal(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2"
-            >
-              {t("game.proceedToQuest")}
-            </button>
-          )}
-          {isLeader && showLeaderVoteButton && (
-            <button
-              onClick={() => setShowLeaderVoteModal(true)}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3"
-            >
-              {t("game.leaderVote")}
-            </button>
-          )}
-        </div>
         {/* Voting Modal For All */}
         {showVoteModal && (
           <Modals
