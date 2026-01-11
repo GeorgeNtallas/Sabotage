@@ -8,7 +8,7 @@ import { io } from "socket.io-client";
 //   },
 // });
 
-const socket = io(process.env.REACT_APP_SERVER_URL || "http://localhost:4000", {
+const socket = io(process.env.REACT_APP_SERVER_URL, {
   transports: ["websocket"], // helps avoid CORS issues
   auth: {
     roomSessionKey: sessionStorage.getItem("roomSessionKey"),
