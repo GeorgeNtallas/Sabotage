@@ -8,8 +8,7 @@ import { io } from "socket.io-client";
 //   },
 // });
 
-// Use environment variable first, fallback only for local dev
-const socket = io("https://sabotage.onrender.com", {
+const socket = io(process.env.REACT_APP_SERVER_URL || "http://localhost:4000", {
   transports: ["websocket"], // helps avoid CORS issues
   auth: {
     roomSessionKey: sessionStorage.getItem("roomSessionKey"),
