@@ -27,13 +27,54 @@ function Lobby() {
     });
   };
 
+  // Handle browser/tab close or back navigation
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // best-effort notify server; browser may still close
+      socket.emit("exit", { roomSessionKey, playerSessionKey });
+      sessionStorage.removeItem("roomSessionKey");
+      // show native confirmation (message ignored by modern browsers)
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    const handlePopState = () => {
+      const leave = window.confirm(
+        "Leave the room? This will remove you from the game."
+      );
+      if (leave) {
+        socket.emit("exit", { roomSessionKey, playerSessionKey });
+        sessionStorage.removeItem("roomSessionKey");
+        navigate("/", { replace: true });
+      } else {
+        // user cancelled — restore router location including state to prevent losing `location.state`
+        navigate(location.pathname + location.search, {
+          replace: true,
+          state: location.state,
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+
+    // ensure a history entry exists so popstate fires when back pressed
+    window.history.pushState(null, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [roomSessionKey, playerSessionKey]);
+
   useEffect(() => {
     socket.emit(
       "getRoomPlayers",
       { roomSessionKey },
-      ({ roomPlayers, roomLeader }) => {
+      ({ roomPlayers, roomLeader, readyList }) => {
         setPlayers(roomPlayers);
         setLobbyLeaderId(roomLeader);
+        setReadyPlayers(readyList);
       }
     );
   }, [roomSessionKey, players]);
@@ -55,43 +96,26 @@ function Lobby() {
   }, [roomSessionKey, selectedRoles]);
 
   useEffect(() => {
-    // Update player list
-    socket.on("password_update", ({ roomPlayers, roomLeader }) => {
-      setPlayers(roomPlayers);
-      setLobbyLeaderId(roomLeader);
-
-      if (!readyPlayers.includes(playerSessionKey)) {
-        setTimeout(() => {
-          socket.emit("player_ready", playerSessionKey, roomSessionKey);
-        }, 2000);
-      }
-    });
-
-    return () => {
-      socket.off("password_update");
-    };
-  }, [name, navigate, playerSessionKey, readyPlayers, roomSessionKey]);
-
-  useEffect(() => {
-    // Update ready status
-    socket.on("player_informReady", (playerSessionKey) => {
-      setReadyPlayers((prev) => [...new Set([...prev, playerSessionKey])]);
-    });
-
-    return () => {
-      socket.off("player_ready");
-    };
-  }, [name, playerSessionKey, readyPlayers, roomSessionKey, selectedRoles]);
-
-  useEffect(() => {
     socket.on("game_started", () => {
-      navigate("/game", { state: { name } });
+      navigate(`/game?${roomSessionKey}`, { state: { name } });
     });
 
     return () => {
       socket.off("game_started");
     };
   }, [name, navigate, playerSessionKey]);
+
+  // If we rejoin an already-started game, server will emit character_assigned.
+  // Cache it and navigate directly to Game to resume.
+  useEffect(() => {
+    const onRound = (payload) => {
+      if (payload?.gameStarted) {
+        navigate(`/game?${roomSessionKey}`, { state: { name } });
+      }
+    };
+    socket.on("round_update", onRound);
+    return () => socket.off("round_update", onRound);
+  }, [navigate, roomSessionKey, name]);
 
   const handleReadyClick = () => {
     if (!readyPlayers.includes(playerSessionKey)) {
@@ -101,7 +125,6 @@ function Lobby() {
 
   const handleExitClick = () => {
     socket.emit("exit", { roomSessionKey, playerSessionKey });
-    sessionStorage.removeItem("playerSessionKey");
     sessionStorage.removeItem("roomSessionKey");
     navigate(`/`);
   };
@@ -149,21 +172,23 @@ function Lobby() {
             </ul>
           </div>
           <div className="flex flex-col text-center">
-            <div>
-              <button
-                onClick={handleReadyClick}
-                disabled={readyPlayers.includes(playerSessionKey)}
-                className={`text-md px-10 py-3 mb-4 bg-red-500 hover:bg-red-600 rounded-md font-bold transition ${
-                  readyPlayers.includes(playerSessionKey)
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-              >
-                {readyPlayers.includes(playerSessionKey)
-                  ? t("lobby.waiting")
-                  : t("lobby.ready")}
-              </button>
-            </div>
+            {!(isLeader && readyPlayers.includes(playerSessionKey)) && (
+              <div>
+                <button
+                  onClick={handleReadyClick}
+                  disabled={readyPlayers.includes(playerSessionKey)}
+                  className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition ${
+                    readyPlayers.includes(playerSessionKey)
+                      ? "bg-red-600 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  {readyPlayers.includes(playerSessionKey)
+                    ? t("lobby.waiting")
+                    : t("lobby.ready")}
+                </button>
+              </div>
+            )}
             <div>
               <button
                 onClick={handleExitClick}
@@ -183,6 +208,7 @@ function Lobby() {
                   disabled={!canStart}
                   onClick={() => {
                     socket.emit("start_game", {
+                      // TODO: Must be enabled when all players press ready
                       roomSessionKey,
                       selectedRoles: Array.from(selectedRoles),
                     });

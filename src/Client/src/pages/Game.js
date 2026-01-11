@@ -21,6 +21,24 @@ function Game() {
   const { t } = useTranslation();
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
+  const [displayName, setDisplayName] = useState(name || "");
+  // preload from cached assign if present (helps on reconnect routing from Lobby)
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem("lastCharacterPayload");
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed?.character) setCharacter(parsed.character);
+        if (Array.isArray(parsed?.players)) setPlayers(parsed.players);
+        if (Array.isArray(parsed?.gameCharacters))
+          setGameCharacters(parsed.gameCharacters);
+        const me = (parsed?.players || []).find(
+          (p) => p.playerSessionKey === playerSessionKey
+        );
+        if (me?.name) setDisplayName(me.name);
+      }
+    } catch {}
+  }, []);
   // Show elements
   const [showVoteModal, setShowVoteModal] = useState(false);
   const [showLeaderVoteModal, setShowLeaderVoteModal] = useState(false);
@@ -51,6 +69,7 @@ function Game() {
   const [phase, setPhase] = useState(1);
   const [missionTeamSizes, setMissionTeamSizes] = useState(1);
   const [gameResult, setGameResult] = useState("");
+  const [waitingForReconnect, setWaitingForReconnect] = useState(null);
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
   const [room, setRoom] = useState({});
@@ -67,24 +86,133 @@ function Game() {
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS-------------
 
+  // Request game state on mount for rejoining players
+  useEffect(() => {
+    if (roomSessionKey && playerSessionKey) {
+      socket.emit("request_game_state", { roomSessionKey, playerSessionKey });
+    }
+  }, [roomSessionKey, playerSessionKey]);
+
+  // Listen for game state response
+  useEffect(() => {
+    socket.on("game_state_response", ({ phaseResults: serverPhaseResults }) => {
+      if (serverPhaseResults && Array.isArray(serverPhaseResults)) {
+        setPhaseResults(serverPhaseResults);
+      }
+    });
+    return () => socket.off("game_state_response");
+  }, []);
+
   // Assigne Roles to players
   useEffect(() => {
     socket.on(
       "character_assigned",
-      ({ character, players, gameCharacters }) => {
+      ({ character, players: assignedPlayers, gameCharacters }) => {
         setCharacter(character);
-        setPlayers(players);
+        setPlayers(assignedPlayers);
         setGameCharacters(gameCharacters);
+        setWaitingForReconnect(null);
+
+        // cache for seamless reconnect rendering
+        try {
+          sessionStorage.setItem(
+            "lastCharacterPayload",
+            JSON.stringify({
+              character,
+              players: assignedPlayers,
+              gameCharacters,
+            })
+          );
+        } catch {}
+
+        // Update my display name on initial assign or reconnect
+        const me = (assignedPlayers || []).find(
+          (p) => p.playerSessionKey === playerSessionKey
+        );
+        if (me && me.name) setDisplayName(me.name);
       }
     );
     return () => socket.off("character_assigned");
+  }, [playerSessionKey]);
+
+  // clear cache once we have rendered at least once with live data
+  useEffect(() => {
+    if (character) {
+      try {
+        sessionStorage.removeItem("lastCharacterPayload");
+      } catch {}
+    }
+  }, [character]);
+
+  useEffect(() => {
+    socket.on("room_update", ({ playerList }) => {
+      const list = playerList.playerList || playerList;
+      const online = (list || []).filter((p) => p.online);
+      setPlayers(online);
+
+      // Keep my display name in sync with server data
+      const me = online.find((p) => p.playerSessionKey === playerSessionKey);
+      if (me && me.name) setDisplayName(me.name);
+    });
+    return () => socket.off("room_update");
+  }, [playerSessionKey]);
+
+  useEffect(() => {
+    socket.on("player_logged_off", ({ name }) => {
+      setWaitingForReconnect(`${name} logged off — waiting for reconnect`);
+      setShowVoteModal(false);
+      setShowLeaderVoteModal(false);
+      setShowQuestVoteModal(false);
+      setShowLeaderVoteButton(false);
+      setShowQuestVoteButton(false);
+      setShowQuestVoting(false);
+      setShowResultScreen(false);
+      setShowGameOver(false);
+      setShowExit(false);
+      setShowWaitScreen(false);
+      setHasVoted(false);
+      setShowPlayersVote(true);
+    });
+    socket.on("player_reconnected", () => {
+      setWaitingForReconnect(null);
+    });
+    return () => {
+      socket.off("player_logged_off");
+      socket.off("player_reconnected");
+    };
   }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const leave = window.confirm(
+        "Leave the room? This will remove you from the game."
+      );
+      if (leave) {
+        socket.emit("exit", { roomSessionKey, playerSessionKey });
+        sessionStorage.removeItem("roomSessionKey");
+        navigate("/", { replace: true });
+      } else {
+        navigate(location.pathname + location.search, {
+          replace: true,
+          state: location.state,
+        });
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    // ensure a history entry exists so popstate fires when back pressed
+    window.history.pushState(null, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [roomSessionKey, playerSessionKey, navigate]);
 
   // Update the room parameters
   useEffect(() => {
     socket.on(
       "round_update",
-      ({ roundLeader, round, phase, missionTeamSizes, totalTeamSize }) => {
+      ({ roundLeader, round, phase, missionTeamSizes, totalTeamSize, phaseResults }) => {
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
@@ -94,7 +222,13 @@ function Game() {
         setMissionTeamSizes(missionTeamSizes);
         setShowPlayersVote(true);
         setHasVoted(false);
+        setWaitingForReconnect(null);
         if (phase) setPhase(phase);
+
+        // Set phase results for rejoining players - don't clear existing results
+        if (phaseResults && Array.isArray(phaseResults) && phaseResults.length > 0) {
+          setPhaseResults(phaseResults);
+        }
       }
     );
     return () => socket.off("round_update");
@@ -154,7 +288,10 @@ function Game() {
   // Announce the quest result
   useEffect(() => {
     socket.on("inform_result", ({ result, success, fail }) => {
-      setPhaseResults((prev) => [...prev, result]);
+      setPhaseResults((prev) => {
+        const newResults = [...prev, result];
+        return newResults;
+      });
       setFinalPhaseResult((prev) => [...prev, result]);
       setFinalVoteResults({ success: success, fail: fail });
       setShowWaitScreen(false);
@@ -182,7 +319,6 @@ function Game() {
   useEffect(() => {
     socket.on("exit_to_home", () => {
       sessionStorage.removeItem("roomSessionKey");
-      sessionStorage.removeItem("playerSessionKey");
       navigate("/", { state: { name } });
     });
     return () => socket.off("exit_to_home");
@@ -213,7 +349,7 @@ function Game() {
 
   return (
     <AnimatePresence>
-      <motion.div
+      <motion.div //TODO: Make the background more alive (add animation or wind)
         className="relative min-h-screen w-full bg-gray-900 text-white p-2 sm:p-4"
         style={{
           backgroundImage: "url(/images/mythical.jpg      )",
@@ -233,7 +369,6 @@ function Game() {
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
         </div>
-
         {/* Mobile Layout */}
         <div className="relative z-10 space-y-4 ">
           {/* Phase/Round/Exit */}
@@ -252,13 +387,16 @@ function Game() {
                 <div className="flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((phaseNum) => {
                     let circleColor = "bg-gray-600";
+                    
                     if (phaseNum === phase) {
+                      // Current active phase
                       circleColor = "bg-purple-700";
                     } else if (phaseNum < phase) {
-                      const result = phaseResults[phaseNum - 1];
-                      circleColor =
-                        result === "success" ? "bg-amber-500" : "bg-red-500";
+                      // Completed phases - use finalPhaseResults or default to success
+                      const result = finalPhaseResults[phaseNum - 1] || phaseResults[phaseNum - 1] || "success";
+                      circleColor = result === "success" ? "bg-amber-500" : "bg-red-500";
                     }
+                    
                     return (
                       <div
                         key={phaseNum}
@@ -283,7 +421,9 @@ function Game() {
             <div className="flex flex-row space-x-4">
               <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
                 <div className="flex items-center justify-center mb-2">
-                  <h2 className="text-lg font-semibold pt-2">{name}</h2>
+                  <h2 className="text-lg font-semibold pt-2">
+                    {displayName || name}
+                  </h2>
                   {isLeader && (
                     <img
                       src="/images/Crown.jpg"
@@ -293,7 +433,7 @@ function Game() {
                     />
                   )}
                 </div>
-                <img
+                <img //TODO: make the image live
                   src={`/images/${character.name
                     .toLowerCase()
                     .replace(/\s+/g, "_")}.png`}
@@ -414,8 +554,6 @@ function Game() {
             isLeader={isLeader}
           />
         </div>
-
-
         {/* Voting Modal For All */}
         {showVoteModal && (
           <Modals
@@ -499,6 +637,14 @@ function Game() {
             leaderVotedPlayers={leaderVotedPlayers}
             setShowWaitScreen={setShowWaitScreen}
           />
+        )}
+        {waitingForReconnect && ( //TODO: Fix the ui
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+            <div className="bg-white text-black p-6 rounded-md">
+              <h3 className="font-bold mb-2">{waitingForReconnect}</h3>
+              <p>Please wait until they reconnect...</p>
+            </div>
+          </div>
         )}
       </motion.div>
     </AnimatePresence>

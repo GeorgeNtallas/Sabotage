@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
@@ -8,7 +8,6 @@ function Home() {
   const [password, setpassword] = useState("");
   const navigate = useNavigate();
   sessionStorage.removeItem("roomSessionKey");
-  sessionStorage.removeItem("playerSessionKey");
 
   const medievalFontStyle = {
     fontFamily: "MedievalSharp",
@@ -49,16 +48,23 @@ function Home() {
     socket.emit(
       "join_room",
       { name: name, password: password },
-      ({ roomSessionKey, playerSessionKey, isLeader, error }) => {
+      ({ roomSessionKey, playerSessionKey, isLeader, gameStarted, error }) => {
         if (error) {
           alert(error);
           return;
         }
         sessionStorage.setItem("roomSessionKey", roomSessionKey);
         sessionStorage.setItem("playerSessionKey", playerSessionKey);
-        navigate(`/lobby?${roomSessionKey}`, {
-          state: { name, isLeader, password },
-        });
+        
+        if (gameStarted) {
+          navigate(`/game?${roomSessionKey}`, {
+            state: { name, isLeader, password },
+          });
+        } else {
+          navigate(`/lobby?${roomSessionKey}`, {
+            state: { name, isLeader, password },
+          });
+        }
       }
     );
   };
@@ -134,3 +140,5 @@ function Home() {
 }
 
 export default Home;
+
+// TODO: player must get the playerSessionKey in home page
