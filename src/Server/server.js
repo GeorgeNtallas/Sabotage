@@ -179,7 +179,7 @@ const initializeRoom = (roomSessionKey) => ({
   characters: {},
   gameStarted: false,
   roundLeader: null,
-  round: 0,
+  round: 1,
   phase: 1,
   usedLeaders: [],
   voting: null,
