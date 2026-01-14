@@ -46,7 +46,7 @@
 }
 
 .animate-leaves {
-  animation: leaves 6s ease-in-out infinite;
+  animation: leaves 4s ease-in-out infinite;
   transform-origin: center;
   transform: translateZ(0);
   will-change: transform;
@@ -68,11 +68,11 @@
 
 @keyframes breathe {
   0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.5); }
+  50% { transform: scale(1.025); }
 }
 
 .animate-breathe {
-  animation: breathe 6s ease-in-out infinite;
+  animation: breathe 5s ease-in-out infinite;
   transform-origin: center center;
   transform: translateZ(0);
   will-change: transform;
@@ -81,7 +81,7 @@
 
 @keyframes head {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(0.2deg); }
+  50% { transform: rotate(0.3deg); }
 }
 
 .animate-head {
@@ -94,11 +94,11 @@
 
 @keyframes cape {
   0%, 100% { transform: rotate(0.1deg); }
-  50% { transform: rotate(0.5deg); }
+  50% { transform: rotate(-0.2deg); }
 }
 
 .animate-cape {
-  animation: cape 6s ease-in-out infinite;
+  animation: cape 5s ease-in-out infinite;
   transform-origin: top center;
   transform: translateZ(0);
   will-change: transform;

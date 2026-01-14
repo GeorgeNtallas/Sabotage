@@ -220,7 +220,7 @@ function Game() {
         totalTeamSize,
         phaseResults,
       }) => {
-        console.log('round_update received:', { roundLeader, round, phase });
+        console.log("round_update received:", { roundLeader, round, phase });
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
@@ -358,9 +358,9 @@ function Game() {
   }
 
   const isLeader = playerSessionKey === roundLeaderId;
-  
+
   // Debug logging
-  console.log('Leader check:', { playerSessionKey, roundLeaderId, isLeader });
+  console.log("Leader check:", { playerSessionKey, roundLeaderId, isLeader });
 
   return (
     <AnimatePresence>
@@ -465,7 +465,7 @@ function Game() {
                   )}
                 </div>
                 {character.name.toLowerCase() === "knight" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-amber-900">
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-amber-900 overflow-hidden">
                     <img
                       src="/images/Knight/Knight-background.webp"
                       alt="Knight"
@@ -488,7 +488,7 @@ function Game() {
                     />
                   </div>
                 ) : character.name.toLowerCase() === "thrall" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-green-900">
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-green-900 overflow-hidden">
                     <img
                       src="/images/Thrall/Thrall-background.webp"
                       alt="Thrall"
@@ -540,7 +540,7 @@ function Game() {
                     />
                   </div>
                 ) : character.name.toLowerCase() === "guardian" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-zinc-900">
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-zinc-900 overflow-hidden">
                     <img
                       src="/images/Guardian/Guardian-background.webp"
                       alt="Guardian"
@@ -594,7 +594,7 @@ function Game() {
                     />
                   </div>
                 ) : character.name.toLowerCase() === "shade" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900">
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
                     <img
                       src="/images/Shade/Shade-background.webp"
                       alt="Shade"
