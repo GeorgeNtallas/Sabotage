@@ -357,6 +357,9 @@ function Game() {
   }
 
   const isLeader = playerSessionKey === roundLeaderId;
+  
+  // Debug logging
+  console.log('Leader check:', { playerSessionKey, roundLeaderId, isLeader });
 
   return (
     <AnimatePresence>
