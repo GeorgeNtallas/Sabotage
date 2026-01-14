@@ -220,6 +220,7 @@ function Game() {
         totalTeamSize,
         phaseResults,
       }) => {
+        console.log('round_update received:', { roundLeader, round, phase });
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
