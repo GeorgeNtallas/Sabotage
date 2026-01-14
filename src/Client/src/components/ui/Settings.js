@@ -52,11 +52,11 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
               <label className="flex items-center gap-2 text-white">
                 <input
                   type="checkbox"
-                  checked={isChecked("Usurper")}
-                  onChange={() => toggleRole("Usurper")}
+                  checked={isChecked("Kaelen")}
+                  onChange={() => toggleRole("Kaelen")}
                   className="appearance-none w-4 h-4 rounded-md bg-transparent border border-white checked:bg-green-600   focus:ring-green-500  transition"
                 />
-                Usurper
+                Kaelen
               </label>
             )}
 

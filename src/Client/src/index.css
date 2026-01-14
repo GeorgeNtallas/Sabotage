@@ -12,9 +12,99 @@
   text-shadow: 0 0 8px #7f5af0, 0 0 12px #7f5af0;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
 .animate-fade-in {
   animation: fade-in 0.8s ease-out forwards;
 }
+@keyframes arm {
+  0%, 100% { transform: rotate(0deg) translateY(0px) scale(1); }
+  50% { transform: rotate(-1deg) translateY(-2px) scale(1.02); }
+}
+
+.animate-arm {
+  animation: arm 6s ease-in-out infinite;
+  transform-origin: center right;
+}
+
+@keyframes candlelight {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.7; filter: brightness(1.3); }
+}
+
+.animate-candlelight {
+  animation: candlelight 2s ease-in-out infinite;
+}
+
+@keyframes leaves {
+  0%, 100% { transform: rotate(0deg) translateX(0px); }
+  25% { transform: rotate(1deg) translateX(1px); }
+  75% { transform: rotate(-1deg) translateX(-1px); }
+}
+
+.animate-leaves {
+  animation: leaves 6s ease-in-out infinite;
+  transform-origin: center;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes trees {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(0.2deg); }
+}
+
+.animate-trees {
+  animation: trees 4s ease-in-out infinite;
+  transform-origin: bottom center;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-breathe {
+  animation: breathe 6s ease-in-out infinite;
+  transform-origin: center center;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes head {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(0.2deg); }
+}
+
+.animate-head {
+  animation: head 6s ease-in-out infinite;
+  transform-origin: center bottom;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+@keyframes cape {
+  0%, 100% { transform: rotate(0.1deg); }
+  50% { transform: rotate(0.5deg); }
+}
+
+.animate-cape {
+  animation: cape 6s ease-in-out infinite;
+  transform-origin: top center;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
 body {
   margin: 0;
   font-family: "MedievalSharp", cursive;

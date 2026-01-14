@@ -212,7 +212,14 @@ function Game() {
   useEffect(() => {
     socket.on(
       "round_update",
-      ({ roundLeader, round, phase, missionTeamSizes, totalTeamSize, phaseResults }) => {
+      ({
+        roundLeader,
+        round,
+        phase,
+        missionTeamSizes,
+        totalTeamSize,
+        phaseResults,
+      }) => {
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
@@ -226,7 +233,11 @@ function Game() {
         if (phase) setPhase(phase);
 
         // Set phase results for rejoining players - don't clear existing results
-        if (phaseResults && Array.isArray(phaseResults) && phaseResults.length > 0) {
+        if (
+          phaseResults &&
+          Array.isArray(phaseResults) &&
+          phaseResults.length > 0
+        ) {
           setPhaseResults(phaseResults);
         }
       }
@@ -350,11 +361,14 @@ function Game() {
   return (
     <AnimatePresence>
       <motion.div //TODO: Make the background more alive (add animation or wind)
-        className="relative min-h-screen w-full bg-gray-900 text-white p-2 sm:p-4"
+        className="relative w-full bg-gray-900 text-white overflow-y-auto"
         style={{
-          backgroundImage: "url(/images/mythical.jpg      )",
+          backgroundImage: "url(/images/mythical.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center",
+          height: "100vh",
+          margin: 0,
+          padding: 0,
         }}
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -387,23 +401,36 @@ function Game() {
                 <div className="flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((phaseNum) => {
                     let circleColor = "bg-gray-600";
-                    
+
                     if (phaseNum === phase) {
                       // Current active phase
-                      circleColor = "bg-purple-700";
+                      circleColor = "bg-cyan-600";
                     } else if (phaseNum < phase) {
                       // Completed phases - use finalPhaseResults or default to success
-                      const result = finalPhaseResults[phaseNum - 1] || phaseResults[phaseNum - 1] || "success";
-                      circleColor = result === "success" ? "bg-amber-500" : "bg-red-500";
+                      const result =
+                        finalPhaseResults[phaseNum - 1] ||
+                        phaseResults[phaseNum - 1] ||
+                        "success";
+                      circleColor =
+                        result === "success" ? "bg-amber-500" : "bg-red-500";
                     }
-                    
+
                     return (
-                      <div
+                      <motion.div
                         key={phaseNum}
                         className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
+                        animate={
+                          phaseNum === phase
+                            ? {
+                                opacity: [1, 0.5, 1],
+                                scale: [1, 1.05, 1],
+                              }
+                            : {}
+                        }
+                        transition={{ duration: 1, repeat: Infinity }}
                       >
                         {phaseNum}
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -433,14 +460,158 @@ function Game() {
                     />
                   )}
                 </div>
-                <img //TODO: make the image live
-                  src={`/images/${character.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "_")}.png`}
-                  alt={character.name}
-                  className="max-w-40 mx-auto mb-2 ml-3 mr-3"
-                  onError={(e) => (e.target.src = "/images/default.jpg")}
-                />
+                {character.name.toLowerCase() === "knight" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-amber-900">
+                    <img
+                      src="/images/Knight/Knight-background.webp"
+                      alt="Knight"
+                      className="w-full h-full"
+                    />
+                    <img
+                      src="/images/Knight/Knight-body.webp"
+                      alt="Knight Torso"
+                      className="absolute inset-0 w-full h-full animate-breathe"
+                    />
+                    <img
+                      src="/images/Knight/Knight_head.webp"
+                      alt="Knight Head"
+                      className="absolute inset-0 w-full h-full animate-head"
+                    />
+                    <img
+                      src="/images/Knight/Knight-cape.webp"
+                      alt="Knight Cape"
+                      className="absolute inset-0 w-full h-full animate-cape"
+                    />
+                  </div>
+                ) : character.name.toLowerCase() === "thrall" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-green-900">
+                    <img
+                      src="/images/Thrall/Thrall-background.webp"
+                      alt="Thrall"
+                      className="w-full h-full"
+                    />
+                    <img
+                      src="/images/Thrall/Thrall-body.webp"
+                      alt="Thrall Body"
+                      className="absolute inset-0 w-full h-full animate-breathe"
+                    />
+                    <img
+                      src="/images/Thrall/Thrall-head.webp"
+                      alt="Thrall Head"
+                      className="absolute inset-0 w-full h-full animate-head"
+                    />
+                  </div>
+                ) : character.name.toLowerCase() === "draven" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
+                    <img
+                      src="/images/Draven/Draven-background.webp"
+                      alt="Draven"
+                      className="w-full h-full"
+                    />
+                    <img
+                      src="/images/Draven/Draven-body.webp"
+                      alt="Draven Body"
+                      className="absolute inset-0 w-full h-full animate-breathe"
+                    />
+                    <img
+                      src="/images/Draven/Draven-trees.webp"
+                      alt="Draven Trees"
+                      className="absolute inset-0 w-full h-full animate-trees"
+                    />
+                    <img
+                      src="/images/Draven/Draven-trees1.webp"
+                      alt="Draven Trees 1"
+                      className="absolute inset-0 w-full h-full animate-trees"
+                    />
+                    <img
+                      src="/images/Draven/Draven-plants.webp"
+                      alt="Draven Plants"
+                      className="absolute inset-0 w-full h-full animate-leaves"
+                    />
+                    <img
+                      src="/images/Draven/Draven-plants1.webp"
+                      alt="Draven Plants 1"
+                      className="absolute inset-0 w-full h-full animate-leaves"
+                      style={{ animationDelay: "0.5s" }}
+                    />
+                  </div>
+                ) : character.name.toLowerCase() === "guardian" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-zinc-900">
+                    <img
+                      src="/images/Guardian/Guardian-background.webp"
+                      alt="Guardian"
+                      className="w-full h-full block"
+                    />
+                    <img
+                      src="/images/Guardian/Guardian-body.webp"
+                      alt="Guardian Body"
+                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
+                    />
+                    <img
+                      src="/images/Guardian/Guardian-head.webp"
+                      alt="Guardian Head"
+                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
+                    />
+                    <img
+                      src="/images/Guardian/Guardian-arm.webp"
+                      alt="Guardian Arm"
+                      className="absolute inset-0 w-full h-full animate-arm pointer-events-none"
+                    />
+                    <img
+                      src="/images/Guardian/Guardian-light.webp"
+                      alt="Guardian Light"
+                      className="absolute inset-0 w-full h-full animate-candlelight pointer-events-none"
+                    />
+                  </div>
+                ) : character.name.toLowerCase() === "seraphina" ? (
+                  <div
+                    className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-red-900 overflow-hidden"
+                    style={{ isolation: "isolate" }}
+                  >
+                    <img
+                      src="/images/Seraphina/Seraphina-background.webp"
+                      alt="Seraphina"
+                      className="w-full h-full block"
+                    />
+                    <img
+                      src="/images/Seraphina/Seraphina- body.webp"
+                      alt="Seraphina Body"
+                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
+                    />
+                    <img
+                      src="/images/Seraphina/Seraphina-head.webp"
+                      alt="Seraphina Head"
+                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
+                    />
+                    <img
+                      src="/images/Seraphina/Seraphina-light.webp"
+                      alt="Seraphina Light"
+                      className="absolute inset-0 w-full h-full animate-candlelight pointer-events-none"
+                    />
+                  </div>
+                ) : character.name.toLowerCase() === "shade" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900">
+                    <img
+                      src="/images/Shade/Shade-background.webp"
+                      alt="Shade"
+                      className="w-full h-full block"
+                    />
+                    <img
+                      src="/images/Shade/Shade-body.webp"
+                      alt="Shade Body"
+                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
+                    />
+                  </div>
+                ) : (
+                  <img
+                    src={`/images/${character.name
+                      .toLowerCase()
+                      .replace(/\s+/g, "_")}.png`}
+                    alt={character.name}
+                    className="max-w-40 mx-auto mb-2 ml-3 mr-3"
+                    onError={(e) => (e.target.src = "/images/default.jpg")}
+                  />
+                )}
                 <h3 className="text-lg font-bold text-yellow-400">
                   {character.name}
                 </h3>
@@ -652,3 +823,5 @@ function Game() {
 }
 
 export default Game;
+
+//TODO: Να βαλω δρακο να πεταει στο background ειπε η Αλεξια

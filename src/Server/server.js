@@ -418,7 +418,7 @@ io.on("connection", (socket) => {
     const initializeGameState = (room, playerList, roomSessionKey) => {
       const randomIndex = Math.floor(Math.random() * playerList.length);
       room.roundLeader = playerList[randomIndex].playerSessionKey;
-      room.usedLeaders = [room.roundLeader, room.roundLeader];
+      room.usedLeaders = [room.roundLeader];
       room.gameStarted = true;
       room.round = 1;
       room.phase = 1;

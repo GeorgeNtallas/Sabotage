@@ -170,7 +170,7 @@ const Modals = ({
                   // Send vote to server
                   setShowLeaderVoteModal(false);
                   setShowVoteModal(false);
-                  setShowQuestVoteButton(false);
+                  //setShowQuestVoteButton(false);
                   setSelectedPlayers([]);
                   socket.emit("leader_vote", {
                     roomSessionKey,
