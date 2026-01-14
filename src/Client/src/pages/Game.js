@@ -606,6 +606,29 @@ function Game() {
                       className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
                     />
                   </div>
+                ) : character.name.toLowerCase() === "seer" ? (
+                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
+                    <img
+                      src="/images/Seer/Seer-background.webp"
+                      alt="Seer"
+                      className="w-full h-full block"
+                    />
+                    <img
+                      src="/images/Seer/Seer-hand.webp"
+                      alt="Seer hand"
+                      className="absolute inset-0 w-full h-full animate-arm pointer-events-none"
+                    />
+                    <img
+                      src="/images/Seer/Seer-fog.webp"
+                      alt="Seer hand"
+                      className="absolute inset-0 w-full h-full animate-smoke pointer-events-none"
+                    />
+                    <img
+                      src="/images/Seer/Seer-head.webp"
+                      alt="Seer hand"
+                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
+                    />
+                  </div>
                 ) : (
                   <img
                     src={`/images/${character.name

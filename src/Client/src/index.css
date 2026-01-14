@@ -105,6 +105,16 @@
   backface-visibility: hidden;
 }
 
+@keyframes smoke {
+  0%, 100% { transform: rotate(-1deg) translateY(-3px); }
+  50% { transform: rotate(1deg) translateY(5px); }
+}
+
+.animate-smoke {
+  animation: smoke 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
 body {
   margin: 0;
   font-family: "MedievalSharp", cursive;
