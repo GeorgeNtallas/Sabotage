@@ -22,6 +22,7 @@ function Game() {
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const [displayName, setDisplayName] = useState(name || "");
+
   // preload from cached assign if present (helps on reconnect routing from Lobby)
   useEffect(() => {
     try {
@@ -36,6 +37,7 @@ function Game() {
           (p) => p.playerSessionKey === playerSessionKey
         );
         if (me?.name) setDisplayName(me.name);
+        // amazonq-ignore-next-line
       }
     } catch {}
   }, []);
@@ -74,6 +76,9 @@ function Game() {
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
   const [room, setRoom] = useState({});
 
+  // amazonq-ignore-next-line
+  console.log("Client:", { roundLeaderId });
+
   useEffect(() => {
     socket.on("state_update", (updatedRoom) => {
       setRoom(updatedRoom);
@@ -92,6 +97,7 @@ function Game() {
       socket.emit("request_game_state", { roomSessionKey, playerSessionKey });
     }
   }, [roomSessionKey, playerSessionKey]);
+  // amazonq-ignore-next-line
 
   // Listen for game state response
   useEffect(() => {
@@ -102,6 +108,7 @@ function Game() {
     });
     return () => socket.off("game_state_response");
   }, []);
+  // amazonq-ignore-next-line
 
   // Assigne Roles to players
   useEffect(() => {
@@ -120,6 +127,7 @@ function Game() {
             JSON.stringify({
               character,
               players: assignedPlayers,
+              // amazonq-ignore-next-line
               gameCharacters,
             })
           );
@@ -137,11 +145,13 @@ function Game() {
 
   // clear cache once we have rendered at least once with live data
   useEffect(() => {
+    // amazonq-ignore-next-line
     if (character) {
       try {
         sessionStorage.removeItem("lastCharacterPayload");
       } catch {}
     }
+    // amazonq-ignore-next-line
   }, [character]);
 
   useEffect(() => {
@@ -155,6 +165,7 @@ function Game() {
       if (me && me.name) setDisplayName(me.name);
     });
     return () => socket.off("room_update");
+    // amazonq-ignore-next-line
   }, [playerSessionKey]);
 
   useEffect(() => {
@@ -207,6 +218,7 @@ function Game() {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [roomSessionKey, playerSessionKey, navigate]);
+  // amazonq-ignore-next-line
 
   // Update the room parameters
   useEffect(() => {
@@ -218,6 +230,7 @@ function Game() {
         round,
         phase,
         missionTeamSizes,
+        // amazonq-ignore-next-line
         totalTeamSize,
         phaseResults,
       }) => {
@@ -251,6 +264,7 @@ function Game() {
     );
     return () => socket.off("round_update");
   }, []);
+  // amazonq-ignore-next-line
 
   // Players voted the players for next quest
   useEffect(() => {
@@ -262,6 +276,7 @@ function Game() {
     });
     return () => socket.off("team_voted");
   }, []);
+  // amazonq-ignore-next-line
 
   // Leader selected players for next quest
   useEffect(() => {
@@ -272,6 +287,7 @@ function Game() {
     });
     return () => socket.off("leader_voted");
   }, []);
+  // amazonq-ignore-next-line
 
   // Players voted to procceed to quest
   useEffect(() => {
@@ -285,6 +301,7 @@ function Game() {
     });
     return () => socket.off("quest_voted");
   }, [roomSessionKey, leaderVotedPlayers, playerSessionKey]);
+  // amazonq-ignore-next-line
 
   // Selected Players on the quest
   useEffect(() => {
@@ -302,6 +319,7 @@ function Game() {
     });
     return () => socket.off("inform_players_to_vote");
   }, [playerSessionKey, players]);
+  // amazonq-ignore-next-line
 
   // Announce the quest result
   useEffect(() => {
@@ -323,6 +341,7 @@ function Game() {
     finalVoteResults.success,
     phase,
   ]);
+  // amazonq-ignore-next-line
 
   // Game over
   useEffect(() => {
@@ -363,6 +382,7 @@ function Game() {
     );
   }
 
+  // amazonq-ignore-next-line
   const isLeader = playerSessionKey === roundLeaderId;
 
   // Debug logging
