@@ -213,6 +213,7 @@ function Game() {
     socket.on(
       "round_update",
       ({
+        source,
         roundLeader,
         round,
         phase,
@@ -220,7 +221,12 @@ function Game() {
         totalTeamSize,
         phaseResults,
       }) => {
-        console.log("round_update received:", { roundLeader, round, phase });
+        console.log("round_update received:", {
+          source,
+          roundLeader,
+          round,
+          phase,
+        });
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);

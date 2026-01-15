@@ -236,6 +236,7 @@ io.on("connection", (socket) => {
 
           // broadcast updated round/phase after reconnect so clients resume consistent state
           io.to(roomSessionKey).emit("round_update", {
+            source: "rejoin_broadcast",
             roundLeader: room.roundLeader,
             round: room.round,
             phase: room.phase,
@@ -269,19 +270,17 @@ io.on("connection", (socket) => {
           players: playersWithRoles,
           gameCharacters: room.characters ? Object.values(room.characters) : [],
         });
-        setTimeout(() => {
-          socket.emit("round_update", {
-            roundLeader: room.roundLeader,
-            round: room.round,
-            phase: room.phase,
-            missionTeamSizes:
-              missionTeamSizes[Object.keys(room.players).length][
-                room.phase - 1
-              ],
-            totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
-            gameStarted: room.gameStarted,
-          });
-        }, 2000);
+
+        socket.emit("round_update", {
+          source: "rejoin_individual",
+          roundLeader: room.roundLeader,
+          round: room.round,
+          phase: room.phase,
+          missionTeamSizes:
+            missionTeamSizes[Object.keys(room.players).length][room.phase - 1],
+          totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
+          gameStarted: room.gameStarted,
+        });
       }
     }
 
@@ -429,6 +428,7 @@ io.on("connection", (socket) => {
 
       setTimeout(() => {
         io.to(roomSessionKey).emit("round_update", {
+          source: "game_start_broadcast",
           roundLeader: room.roundLeader,
           round: room.round,
           phase: room.phase,
@@ -520,6 +520,7 @@ io.on("connection", (socket) => {
         await saveRoomToDb(roomSessionKey, room).catch(console.error);
         io.to(roomSessionKey).emit("player_reconnected");
         io.to(roomSessionKey).emit("round_update", {
+          source: "join_reconnect",
           roundLeader: room.roundLeader,
           round: room.round,
           phase: room.phase,
@@ -574,6 +575,7 @@ io.on("connection", (socket) => {
           });
 
           socket.emit("round_update", {
+            source: "next_round",
             roundLeader: room.roundLeader,
             round: room.round,
             phase: room.phase,
@@ -884,6 +886,7 @@ io.on("connection", (socket) => {
       await saveRoomToDb(roomSessionKey, room).catch(console.error);
 
       io.to(roomSessionKey).emit("round_update", {
+        source: "next_round",
         roundLeader: room.roundLeader,
         round: room.round,
         phase: room.phase || 1,
@@ -941,6 +944,7 @@ io.on("connection", (socket) => {
       await saveRoomToDb(roomSessionKey, room).catch(console.error);
 
       io.to(roomSessionKey).emit("round_update", {
+        source: "next_phase",
         roundLeader: room.roundLeader,
         round: room.round,
         phase: room.phase,
