@@ -200,7 +200,6 @@ io.on("connection", (socket) => {
   (async () => {
     const { roomSessionKey, playerSessionKey } = socket.handshake.auth;
 
-    //TODO: When a player quit the game and rejoin, the game resets and starts from the beginning
     // Rejoin
     if (roomSessionKey && playerSessionKey) {
       const room = await loadRoom(roomSessionKey);
@@ -270,16 +269,19 @@ io.on("connection", (socket) => {
           players: playersWithRoles,
           gameCharacters: room.characters ? Object.values(room.characters) : [],
         });
-
-        socket.emit("round_update", {
-          roundLeader: room.roundLeader,
-          round: room.round,
-          phase: room.phase,
-          missionTeamSizes:
-            missionTeamSizes[Object.keys(room.players).length][room.phase - 1],
-          totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
-          gameStarted: room.gameStarted,
-        });
+        setTimeout(() => {
+          socket.emit("round_update", {
+            roundLeader: room.roundLeader,
+            round: room.round,
+            phase: room.phase,
+            missionTeamSizes:
+              missionTeamSizes[Object.keys(room.players).length][
+                room.phase - 1
+              ],
+            totalTeamSize: missionTeamSizes[Object.keys(room.players).length],
+            gameStarted: room.gameStarted,
+          });
+        }, 2000);
       }
     }
 
@@ -464,7 +466,6 @@ io.on("connection", (socket) => {
       callback({ password, roomSessionKey, playerSessionKey, isLeader: true });
     });
 
-    //TODO: Make the player join again to game using the password and a name
     socket.on("join_room", async ({ name, password }, callback) => {
       if (!name?.trim()) return callback({ error: "Name is required" });
       const roomSessionKey = await findRoomSessionKeyByPassword(password);
@@ -1002,9 +1003,6 @@ io.on("connection", (socket) => {
       io.to(roomSessionKey).emit("room_update", { playerList });
     });
 
-    // TODO: make the current round to be at the start for all players (vote players)
-    // TODO: when the player for any reason leave the game, he has to be able to rejoin
-    // TODO: when the player exit the game, the other players and the database is not informed
     socket.on("disconnect", async () => {
       const mapping = socketToPlayer.get(socket.id);
       if (!mapping) return;

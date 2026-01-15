@@ -55,7 +55,7 @@ function Home() {
         }
         sessionStorage.setItem("roomSessionKey", roomSessionKey);
         sessionStorage.setItem("playerSessionKey", playerSessionKey);
-        
+
         if (gameStarted) {
           navigate(`/game?${roomSessionKey}`, {
             state: { name, isLeader, password },
@@ -140,5 +140,3 @@ function Home() {
 }
 
 export default Home;
-
-// TODO: player must get the playerSessionKey in home page
