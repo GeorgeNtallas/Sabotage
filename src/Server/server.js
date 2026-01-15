@@ -396,7 +396,7 @@ io.on("connection", (socket) => {
     };
 
     // Assigne Roles to players
-    const assignCharactersToPlayers = (
+    const assignCharactersToPlayers = async (
       playerList,
       gameCharacters,
       room,
@@ -423,21 +423,18 @@ io.on("connection", (socket) => {
           });
         }, 4000);
       });
-      // persist once after assigning characters
-      if (roomSessionKey)
-        saveRoomToDb(roomSessionKey, room).catch(console.error);
+      // always persist after assigning characters
+      await saveRoomToDb(roomSessionKey, room).catch(console.error);
     };
 
     // Initialaze the room parameters
-    const initializeGameState = async (room, playerList, roomSessionKey) => {
+    const initializeGameState = (room, playerList, roomSessionKey) => {
       const randomIndex = Math.floor(Math.random() * playerList.length);
       room.roundLeader = playerList[randomIndex].playerSessionKey;
       room.usedLeaders = [room.roundLeader];
       room.gameStarted = true;
       room.round = 1;
       room.phase = 1;
-
-      await saveRoomToDb(roomSessionKey, room).catch(console.error);
 
       io.to(roomSessionKey).emit("game_started");
 
@@ -662,13 +659,15 @@ io.on("connection", (socket) => {
           allCharacters
         );
 
-        assignCharactersToPlayers(
+        await assignCharactersToPlayers(
           playerList,
           gameCharacters,
           room,
           roomSessionKey
         );
-        await initializeGameState(room, playerList, roomSessionKey);
+        const roomFinal = initializeGameState(room, playerList, roomSessionKey);
+        // persist full game start state
+        await saveRoomToDb(roomSessionKey, roomFinal).catch(console.error);
       }
     });
 
