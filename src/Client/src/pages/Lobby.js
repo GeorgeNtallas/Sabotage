@@ -40,7 +40,7 @@ function Lobby() {
 
     const handlePopState = () => {
       const leave = window.confirm(
-        "Leave the room? This will remove you from the game."
+        "Leave the room? This will remove you from the game.",
       );
       if (leave) {
         socket.emit("exit", { roomSessionKey, playerSessionKey });
@@ -75,7 +75,7 @@ function Lobby() {
         setPlayers(roomPlayers);
         setLobbyLeaderId(roomLeader);
         setReadyPlayers(readyList);
-      }
+      },
     );
   }, [roomSessionKey, players]);
 
@@ -129,7 +129,7 @@ function Lobby() {
     navigate(`/`);
   };
 
-  const canStart = readyPlayers.length >= 1;
+  const canStart = readyPlayers.length >= 5;
   // --------------------------------------
   // 👇 Lobby UI
   return (

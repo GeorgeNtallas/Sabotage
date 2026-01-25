@@ -77,7 +77,6 @@ function Game() {
   const [room, setRoom] = useState({});
 
   // amazonq-ignore-next-line
-  console.log("Client:", { roundLeaderId });
 
   useEffect(() => {
     socket.on("state_update", (updatedRoom) => {
@@ -234,12 +233,6 @@ function Game() {
         totalTeamSize,
         phaseResults,
       }) => {
-        console.log("round_update received:", {
-          source,
-          roundLeader,
-          round,
-          phase,
-        });
         setRoundLeaderId(roundLeader);
         setRound(round);
         setSelectedPlayers([]);
@@ -384,9 +377,6 @@ function Game() {
 
   // amazonq-ignore-next-line
   const isLeader = playerSessionKey === roundLeaderId;
-
-  // Debug logging
-  console.log("Leader check:", { playerSessionKey, roundLeaderId, isLeader });
 
   return (
     <AnimatePresence>
@@ -878,3 +868,5 @@ function Game() {
 export default Game;
 
 //TODO: Να βαλω δρακο να πεταει στο background ειπε η Αλεξια
+//TODO: Να το κανω responsive
+//TODO: Να βαλω οριο στο username
