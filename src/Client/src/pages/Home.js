@@ -12,6 +12,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState("login");
   const navigate = useNavigate();
   const [showRules, setShowRules] = useState(false);
+  const [pressedButton, setPressedButton] = useState(null);
   sessionStorage.removeItem("roomSessionKey");
 
   const medievalFontStyle = {
@@ -76,7 +77,7 @@ function Home() {
 
   return (
     <div
-      className="relative min-h-screen bg-cover bg-center flex items-center justify-center "
+      className="relative h-dvh min-h-screen bg-cover bg-center flex items-center justify-center"
       style={{
         backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
         backgroundSize: "cover",
@@ -182,7 +183,14 @@ function Home() {
             />
             <button
               onClick={handleJoin}
-              className="w-full py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white "
+              onMouseDown={() => setPressedButton("join")}
+              onMouseUp={() => setPressedButton(null)}
+              onMouseLeave={() => setPressedButton(null)}
+              onTouchStart={() => setPressedButton("join")}
+              onTouchEnd={() => setPressedButton(null)}
+              className={`w-full py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white ${
+                pressedButton === "join" ? "scale-95 brightness-75" : ""
+              }`}
               style={{
                 marginTop: "20px",
                 fontFamily: "MedievalSharp",
@@ -193,7 +201,14 @@ function Home() {
             </button>
             <button
               onClick={handleCreate}
-              className="w-full py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white"
+              onMouseDown={() => setPressedButton("create")}
+              onMouseUp={() => setPressedButton(null)}
+              onMouseLeave={() => setPressedButton(null)}
+              onTouchStart={() => setPressedButton("create")}
+              onTouchEnd={() => setPressedButton(null)}
+              className={`w-full py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white ${
+                pressedButton === "create" ? "scale-95 brightness-75" : ""
+              }`}
               style={{
                 marginTop: "50px",
                 fontFamily: "MedievalSharp",
@@ -205,9 +220,9 @@ function Home() {
           </div>
         </div>
       </div>
-      <Notify 
-        message="Login section is under construction" 
-        show={activeTab === "login"} 
+      <Notify
+        message="Login section is under construction"
+        show={activeTab === "login"}
       />
       <Rules showRules={showRules} setShowRules={setShowRules} />
       <button

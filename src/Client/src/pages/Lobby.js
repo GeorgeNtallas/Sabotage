@@ -9,6 +9,7 @@ function Lobby() {
   const [players, setPlayers] = useState([]);
   const [readyPlayers, setReadyPlayers] = useState([]);
   const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
+  const [pressedButton, setPressedButton] = useState(null);
   const navigate = useNavigate();
   const [selectedRoles, setSelectedRoles] = useState(new Set());
   const { t } = useTranslation();
@@ -208,11 +209,18 @@ function Lobby() {
               <div>
                 <button
                   onClick={handleReadyClick}
+                  onMouseDown={() => setPressedButton('ready')}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton('ready')}
+                  onTouchEnd={() => setPressedButton(null)}
                   disabled={readyPlayers.includes(playerSessionKey)}
                   className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition  ${
                     readyPlayers.includes(playerSessionKey)
                       ? "bg-red-600 cursor-not-allowed"
-                      : "bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white"
+                      : `bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white ${
+                          pressedButton === 'ready' ? 'scale-95 brightness-75' : ''
+                        }`
                   }`}
                 >
                   {readyPlayers.includes(playerSessionKey)
@@ -224,7 +232,14 @@ function Lobby() {
             <div>
               <button
                 onClick={handleExitClick}
-                className={`px-6 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white`}
+                onMouseDown={() => setPressedButton('exit')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('exit')}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`px-6 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white ${
+                  pressedButton === 'exit' ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 {t("lobby.exit")}
               </button>
@@ -234,10 +249,17 @@ function Lobby() {
                 <button
                   className={`mt-4 px-6 py-3 rounded-md ${
                     canStart
-                      ? "bg-gradient-to-r bg-green-600 to-green-700 hover:bg-green-700 transition"
+                      ? `bg-gradient-to-r bg-green-600 to-green-700 hover:bg-green-700 transition ${
+                          pressedButton === 'start' ? 'scale-95 brightness-75' : ''
+                        }`
                       : "bg-green-500/10 backdrop-blur-md border-green-400/20 cursor-not-allowed"
                   } text-black font-semibold`}
                   disabled={!canStart}
+                  onMouseDown={() => setPressedButton('start')}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton('start')}
+                  onTouchEnd={() => setPressedButton(null)}
                   onClick={() => {
                     socket.emit("start_game", {
                       // TODO: Must be enabled when all players press ready

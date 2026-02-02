@@ -26,6 +26,7 @@ const Modals = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [pressedButton, setPressedButton] = React.useState(null);
 
   if (type === "voteAll") {
     // Vote Medal
@@ -90,11 +91,18 @@ const Modals = ({
                   setShowPlayersVote(false);
                   setSelectedPlayers([]);
                 }}
+                onMouseDown={() => setPressedButton('submit')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('submit')}
+                onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
                     ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
-                    : "bg-amber-600  hover:bg-amber-700"
+                    : `bg-amber-600  hover:bg-amber-700 ${
+                        pressedButton === 'submit' ? 'scale-95 brightness-75' : ''
+                      }`
                 }`}
               >
                 {t("modals.submitVote")}
@@ -105,7 +113,14 @@ const Modals = ({
                   setShowVoteModal(false);
                   setSelectedPlayers([]);
                 }}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                onMouseDown={() => setPressedButton('cancel')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('cancel')}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
+                  pressedButton === 'cancel' ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 {t("modals.cancel")}
               </button>
@@ -178,11 +193,18 @@ const Modals = ({
                     selectedPlayers,
                   });
                 }}
+                onMouseDown={() => setPressedButton('submit')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('submit')}
+                onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
                     ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
-                    : "bg-amber-600  hover:bg-amber-700"
+                    : `bg-amber-600  hover:bg-amber-700 ${
+                        pressedButton === 'submit' ? 'scale-95 brightness-75' : ''
+                      }`
                 }`}
               >
                 {t("modals.submitVote")}
@@ -193,7 +215,14 @@ const Modals = ({
                   setShowLeaderVoteModal(false);
                   setSelectedPlayers([]);
                 }}
-                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                onMouseDown={() => setPressedButton('cancel')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('cancel')}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
+                  pressedButton === 'cancel' ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 {t("modals.cancel")}
               </button>
@@ -225,7 +254,14 @@ const Modals = ({
                     setShowQuestVoteModal(false);
                     setShowQuestVoteButton(false);
                   }}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg"
+                  onMouseDown={() => setPressedButton('yes')}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton('yes')}
+                  onTouchEnd={() => setPressedButton(null)}
+                  className={`px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg ${
+                    pressedButton === 'yes' ? 'scale-95 brightness-75' : ''
+                  }`}
                 >
                   {t("modals.yes")}
                 </button>
@@ -241,7 +277,14 @@ const Modals = ({
                     setShowQuestVoteModal(false);
                     setShowQuestVoteButton(false);
                   }}
-                  className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
+                  onMouseDown={() => setPressedButton('no')}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton('no')}
+                  onTouchEnd={() => setPressedButton(null)}
+                  className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
+                    pressedButton === 'no' ? 'scale-95 brightness-75' : ''
+                  }`}
                 >
                   {t("modals.no")}
                 </button>
@@ -271,7 +314,14 @@ const Modals = ({
                   sessionStorage.removeItem("roomSessionKey");
                   navigate(`/`);
                 }}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
+                onMouseDown={() => setPressedButton('exit-yes')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('exit-yes')}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded ${
+                  pressedButton === 'exit-yes' ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 {t("modals.yes")}
               </button>
@@ -279,7 +329,14 @@ const Modals = ({
                 onClick={() => {
                   setShowExit(false);
                 }}
-                className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded"
+                onMouseDown={() => setPressedButton('exit-no')}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton('exit-no')}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded ${
+                  pressedButton === 'exit-no' ? 'scale-95 brightness-75' : ''
+                }`}
               >
                 {t("modals.no")}
               </button>
