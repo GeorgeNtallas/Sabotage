@@ -6,7 +6,7 @@ const Settings = ({ isLeader, readyPlayers, selectedRoles, toggleRole }) => {
   return (
     <div>
       {isLeader && (
-        <div className="mt-6 p-4 border border-white/20 rounded-md bg-white/5">
+        <div className="mt-6 p-4  rounded-md bg-indigo-500/15 border border-white/20 text-white">
           <h3 className="text-xl text-center font-semibold text-white mb-4">
             Include
           </h3>

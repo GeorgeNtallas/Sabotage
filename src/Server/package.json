@@ -4,16 +4,24 @@
   "description": "Backend server for Sabotage game using Express and Socket.IO",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "jest --verbose > test-results.log 2>&1 & type test-results.log",
+    "test:watch": "jest --watch --verbose",
+    "test:coverage": "jest --coverage --verbose > test-coverage.log 2>&1 & type test-coverage.log"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
     "mongoose": "^9.1.2",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "winston": "^3.19.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "socket.io-client": "^4.8.3"
   }
 }

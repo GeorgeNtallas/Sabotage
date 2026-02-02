@@ -1,10 +1,17 @@
 {
   "home": {
     "yourName": "Το όνομά σας",
-    "password": "Κωδικός",
+    "password": "Κωδικός προσβασης",
+    "roomPassword": "Κωδικός Δωματίου",
     "joinGame": "Είσοδος σε Δωμάτιο",
     "createGame": "Δημιουργία Παιχνιδιού",
-    "pleaseEnterName": "Παρακαλώ εισάγετε ένα όνομα."
+    "pleaseEnterName": "Παρακαλώ εισάγετε ένα όνομα.",
+    "rules": "Κανόνες",
+    "loginButton": "Συνδεση",
+    "quickPlayButton": "Γρήγορο παιχνίδι",
+    "login": "Συνδεση",
+    "signUp": "Εγγραφη",
+    "email": "Email"
   },
   "lobby": {
     "welcome": "Καλώς ήρθατε",

@@ -1,21 +1,13 @@
 import { io } from "socket.io-client";
+import { API_CONFIG, SOCKET_EVENTS } from "./constants";
 
-// const socket = io("http://localhost:4000", {
-//   transports: ["websocket"],
-//   auth: {
-//     roomSessionKey: sessionStorage.getItem("roomSessionKey"),
-//     playerSessionKey: sessionStorage.getItem("playerSessionKey"),
-//   },
-// });
-
-const socket = io(process.env.REACT_APP_SERVER_URL || "http://localhost:4000", {
-  transports: ["websocket"],
-  auth: (cb) => {
-    cb({
-      roomSessionKey: sessionStorage.getItem("roomSessionKey"),
-      playerSessionKey: sessionStorage.getItem("playerSessionKey"),
-    });
+const socket = io(API_CONFIG.SOCKET_URL, {
+  transports: API_CONFIG.SOCKET_TRANSPORTS,
+  auth: {
+    roomSessionKey: sessionStorage.getItem("roomSessionKey"),
+    playerSessionKey: sessionStorage.getItem("playerSessionKey"),
   },
 });
 
 export default socket;
+export { SOCKET_EVENTS };

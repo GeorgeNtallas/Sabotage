@@ -1,11 +1,11 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const RoomSchema = new mongoose.Schema(
   {
     // Identity / access
     roomSessionKey: { type: String, required: true, unique: true },
     // Unique 6-digit join code; allow multiple nulls (sparse)
-    password: { type: String, index: { unique: true, sparse: true } },
+    roomPassword: { type: String, index: { unique: true, sparse: true } },
 
     // Lobby / membership
     leader: { type: String, default: null }, // playerSessionKey of the leader
@@ -42,7 +42,7 @@ const RoomSchema = new mongoose.Schema(
           name: { type: String, default: null },
           since: { type: Number, default: null }, // timestamp (ms)
         },
-        { _id: false }
+        { _id: false },
       ),
       default: null,
     },
@@ -50,7 +50,7 @@ const RoomSchema = new mongoose.Schema(
     // Room lifecycle maintenance
     emptySince: { type: Number, default: null }, // timestamp (ms) when room became empty
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-module.exports = mongoose.model('Room', RoomSchema);
+module.exports = mongoose.model("Room", RoomSchema);

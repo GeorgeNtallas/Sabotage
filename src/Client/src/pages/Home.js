@@ -2,11 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
+import Rules from "../components/ui/Rules";
+import Notify from "../components/ui/Notify";
 
 function Home() {
   const [name, setName] = useState("");
-  const [password, setpassword] = useState("");
+  const [password, setPassword] = useState("");
+  const [roomPassword, setRoomPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("login");
   const navigate = useNavigate();
+  const [showRules, setShowRules] = useState(false);
   sessionStorage.removeItem("roomSessionKey");
 
   const medievalFontStyle = {
@@ -28,7 +33,7 @@ function Home() {
     socket.emit(
       "create_room",
       name,
-      ({ password, roomSessionKey, playerSessionKey, isLeader, error }) => {
+      ({ roomPassword, roomSessionKey, playerSessionKey, isLeader, error }) => {
         if (error) {
           alert(error);
           return;
@@ -38,16 +43,16 @@ function Home() {
         }
 
         navigate(`/lobby?${roomSessionKey}`, {
-          state: { name, isLeader, password },
+          state: { name, isLeader, roomPassword },
         });
-      }
+      },
     );
   };
 
   const handleJoin = () => {
     socket.emit(
       "join_room",
-      { name: name, password: password },
+      { name: name, roomPassword: roomPassword },
       ({ roomSessionKey, playerSessionKey, isLeader, gameStarted, error }) => {
         if (error) {
           alert(error);
@@ -58,14 +63,14 @@ function Home() {
 
         if (gameStarted) {
           navigate(`/game?${roomSessionKey}`, {
-            state: { name, isLeader, password },
+            state: { name, isLeader, roomPassword },
           });
         } else {
           navigate(`/lobby?${roomSessionKey}`, {
-            state: { name, isLeader, password },
+            state: { name, isLeader, roomPassword },
           });
         }
-      }
+      },
     );
   };
 
@@ -79,58 +84,139 @@ function Home() {
       }}
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
-      <div className="bg-white/1 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-8 w-full max-w-sm text-white">
+      <div className="mb-10 bg-black/60 backdrop-blur-md border border-black rounded-xl shadow-2xl p-8 w-[350px] h-[500px] text-white">
         <div className="flex justify-center">
           <img
             src="/images/Sabotage3.png"
             alt="Leader"
-            className="w-[45%] mb-2"
+            className="w-[55%] mb-2"
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
         </div>
 
-        <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80">
-          <input
-            type="text"
-            placeholder={t("home.yourName")}
-            className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-            style={medievalFontStyle}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder={t("home.password")}
-            className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-            style={medievalFontStyle}
-            value={password}
-            onChange={(e) => setpassword(e.target.value)}
-          />
+        {/* Tabs */}
+        <div className="flex mb-5 mt-5">
           <button
-            onClick={handleJoin}
-            className="w-full py-3 mb-4 bg-red-500 hover:bg-red-600 transition rounded-md font-bold"
-            style={{
-              marginTop: "10px",
-              fontFamily: "MedievalSharp",
-              fontWeight: 1000,
-            }}
+            onClick={() => setActiveTab("login")}
+            className={`flex-1 py-2 px-4 rounded-l-md font-bold transition ${
+              activeTab === "login"
+                ? "bg-rose-600 text-white"
+                : "bg-gray-800 text-gray-300 hover:text-white"
+            }`}
+            style={medievalFontStyle}
           >
-            {t("home.joinGame")}
+            {t("home.loginButton") || "Login"}
           </button>
-
           <button
-            onClick={handleCreate}
-            className="w-full py-3 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold"
-            style={{
-              marginTop: "50px",
-              fontFamily: "MedievalSharp",
-              fontWeight: 1000,
-            }}
+            onClick={() => setActiveTab("quickplay")}
+            className={`flex-1 py-2 px-4 rounded-r-md font-bold transition ${
+              activeTab === "quickplay"
+                ? "bg-rose-600 text-white"
+                : "bg-gray-800 text-gray-300 hover:text-white"
+            }`}
+            style={medievalFontStyle}
           >
-            {t("home.createGame")}
+            {t("home.quickPlayButton")}
           </button>
         </div>
+
+        <div
+          className="px-4 text-black rounded-2xl p-6 relative"
+          style={{ height: "280px" }}
+        >
+          <div
+            className={`transition-opacity duration-700 absolute inset-0 ${activeTab === "login" ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          >
+            <input
+              type="text"
+              placeholder={t("home.email")}
+              className="w-full mb-4 p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={medievalFontStyle}
+            />
+            <input
+              type="text"
+              placeholder={t("home.password")}
+              className="w-full p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={medievalFontStyle}
+            />
+            <button
+              className="w-full py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white"
+              style={{
+                marginTop: "20px",
+                fontFamily: "MedievalSharp",
+                fontWeight: 1000,
+              }}
+            >
+              {t("home.login")}
+            </button>
+            <button
+              className="w-full py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white"
+              style={{
+                marginTop: "50px",
+                fontFamily: "MedievalSharp",
+                fontWeight: 1000,
+              }}
+            >
+              {t("home.signUp")}
+            </button>
+          </div>
+
+          <div
+            className={`transition-opacity duration-700 absolute inset-0 ${activeTab === "quickplay" ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+          >
+            <input
+              type="text"
+              placeholder={t("home.yourName")}
+              className="w-full mb-4 p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={medievalFontStyle}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder={t("home.roomPassword")}
+              className="w-full  p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={medievalFontStyle}
+              value={roomPassword}
+              onChange={(e) => setRoomPassword(e.target.value)}
+            />
+            <button
+              onClick={handleJoin}
+              className="w-full py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white "
+              style={{
+                marginTop: "20px",
+                fontFamily: "MedievalSharp",
+                fontWeight: 1000,
+              }}
+            >
+              {t("home.joinGame")}
+            </button>
+            <button
+              onClick={handleCreate}
+              className="w-full py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white"
+              style={{
+                marginTop: "50px",
+                fontFamily: "MedievalSharp",
+                fontWeight: 1000,
+              }}
+            >
+              {t("home.createGame")}
+            </button>
+          </div>
+        </div>
       </div>
+      <Notify 
+        message="Login section is under construction" 
+        show={activeTab === "login"} 
+      />
+      <Rules showRules={showRules} setShowRules={setShowRules} />
+      <button
+        onClick={() => setShowRules(true)}
+        className="absolute bottom-10 transform -translate-y-1/2 bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded-lg font-bold z-10 border border-gray-800"
+        style={medievalFontStyle}
+      >
+        {t("home.rules")}
+      </button>
       <div className="absolute space-x-5 bottom-4 left-1/2 transform -translate-x-1/2 text-white">
         <button onClick={() => changeLanguage("en")}>English</button>
         <button onClick={() => changeLanguage("gr")}>Ελληνικά</button>

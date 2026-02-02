@@ -7,6 +7,31 @@ node_modules
 
 # testing
 /coverage
+__tests__/
+**/__tests__/
+logs/
+**/logs/
+**/test_results.log
+**/test-results.log
+jest.config.js
+**/jest.config.js
+*.test.js
+*.test.jsx
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.jsx
+*.spec.ts
+*.spec.tsx
+/test
+/tests
+**/test.js
+/.nyc_output
+/cypress
+/e2e
+setup*.js
+setupTests.js
+
 
 # production
 /build

@@ -2,9 +2,16 @@
   "home": {
     "yourName": "Your Name",
     "password": "Password",
+    "roomPassword": "Room Password",
     "joinGame": "Join Game",
     "createGame": "Create Game",
-    "pleaseEnterName": "Please enter a name."
+    "pleaseEnterName": "Please enter a name.",
+    "rules": "Rules",
+    "loginButton": "Login",
+    "quickPlayButton": "Quick Play",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "email": "Email"
   },
   "lobby": {
     "welcome": "Welcome",
@@ -64,6 +71,7 @@
     "gameplayText": "Throughout the game, players can say whatever they want. Use a mix of discussion, deception, accusations, and logical reasoning to achieve victory.",
     "teamBuildingTitle": "1. Team Building",
     "teamBuildingText": "All players vote for the players they want on the next Quest. The Leader selects a team and all players vote to approve or reject this team.",
+    "gameplayTitle": "How to play",
     "questTitle": "2. Quest",
     "questText": "The approved team decides whether the Quest will succeed or fail. Only one Evil player can cause failure. Choose your team carefully!",
     "strategyTitle": "Strategy Tip: Don't Trust Anyone",

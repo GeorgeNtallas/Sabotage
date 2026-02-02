@@ -12,6 +12,7 @@ import PhaseResult from "../components/ui/PhaseResult";
 import GameOver from "../components/ui/GameOver";
 import WaitScreen from "../components/ui/WaitScreen";
 import AnimatedWindow from "../components/ui/Info";
+import CharacterImage from "../components/ui/CharacterImage";
 
 function Game() {
   // Loc, roomSessionKey
@@ -34,7 +35,7 @@ function Game() {
         if (Array.isArray(parsed?.gameCharacters))
           setGameCharacters(parsed.gameCharacters);
         const me = (parsed?.players || []).find(
-          (p) => p.playerSessionKey === playerSessionKey
+          (p) => p.playerSessionKey === playerSessionKey,
         );
         if (me?.name) setDisplayName(me.name);
         // amazonq-ignore-next-line
@@ -128,16 +129,16 @@ function Game() {
               players: assignedPlayers,
               // amazonq-ignore-next-line
               gameCharacters,
-            })
+            }),
           );
         } catch {}
 
         // Update my display name on initial assign or reconnect
         const me = (assignedPlayers || []).find(
-          (p) => p.playerSessionKey === playerSessionKey
+          (p) => p.playerSessionKey === playerSessionKey,
         );
         if (me && me.name) setDisplayName(me.name);
-      }
+      },
     );
     return () => socket.off("character_assigned");
   }, [playerSessionKey]);
@@ -195,7 +196,7 @@ function Game() {
   useEffect(() => {
     const handlePopState = () => {
       const leave = window.confirm(
-        "Leave the room? This will remove you from the game."
+        "Leave the room? This will remove you from the game.",
       );
       if (leave) {
         socket.emit("exit", { roomSessionKey, playerSessionKey });
@@ -253,7 +254,7 @@ function Game() {
         ) {
           setPhaseResults(phaseResults);
         }
-      }
+      },
     );
     return () => socket.off("round_update");
   }, []);
@@ -480,181 +481,7 @@ function Game() {
                     />
                   )}
                 </div>
-                {character.name.toLowerCase() === "knight" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-amber-900 overflow-hidden">
-                    <img
-                      src="/images/Knight/Knight-background.webp"
-                      alt="Knight"
-                      className="w-full h-full"
-                    />
-                    <img
-                      src="/images/Knight/Knight-body.webp"
-                      alt="Knight Torso"
-                      className="absolute inset-0 w-full h-full animate-breathe"
-                    />
-                    <img
-                      src="/images/Knight/Knight_head.webp"
-                      alt="Knight Head"
-                      className="absolute inset-0 w-full h-full animate-head"
-                    />
-                    <img
-                      src="/images/Knight/Knight-cape.webp"
-                      alt="Knight Cape"
-                      className="absolute inset-0 w-full h-full animate-cape"
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "thrall" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-green-900 overflow-hidden">
-                    <img
-                      src="/images/Thrall/Thrall-background.webp"
-                      alt="Thrall"
-                      className="w-full h-full"
-                    />
-                    <img
-                      src="/images/Thrall/Thrall-body.webp"
-                      alt="Thrall Body"
-                      className="absolute inset-0 w-full h-full animate-breathe"
-                    />
-                    <img
-                      src="/images/Thrall/Thrall-head.webp"
-                      alt="Thrall Head"
-                      className="absolute inset-0 w-full h-full animate-head"
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "draven" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
-                    <img
-                      src="/images/Draven/Draven-background.webp"
-                      alt="Draven"
-                      className="w-full h-full"
-                    />
-                    <img
-                      src="/images/Draven/Draven-body.webp"
-                      alt="Draven Body"
-                      className="absolute inset-0 w-full h-full animate-breathe"
-                    />
-                    <img
-                      src="/images/Draven/Draven-trees.webp"
-                      alt="Draven Trees"
-                      className="absolute inset-0 w-full h-full animate-trees"
-                    />
-                    <img
-                      src="/images/Draven/Draven-trees1.webp"
-                      alt="Draven Trees 1"
-                      className="absolute inset-0 w-full h-full animate-trees"
-                    />
-                    <img
-                      src="/images/Draven/Draven-plants.webp"
-                      alt="Draven Plants"
-                      className="absolute inset-0 w-full h-full animate-leaves"
-                    />
-                    <img
-                      src="/images/Draven/Draven-plants1.webp"
-                      alt="Draven Plants 1"
-                      className="absolute inset-0 w-full h-full animate-leaves"
-                      style={{ animationDelay: "0.5s" }}
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "guardian" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-zinc-900 overflow-hidden">
-                    <img
-                      src="/images/Guardian/Guardian-background.webp"
-                      alt="Guardian"
-                      className="w-full h-full block"
-                    />
-                    <img
-                      src="/images/Guardian/Guardian-body.webp"
-                      alt="Guardian Body"
-                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
-                    />
-                    <img
-                      src="/images/Guardian/Guardian-head.webp"
-                      alt="Guardian Head"
-                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
-                    />
-                    <img
-                      src="/images/Guardian/Guardian-arm.webp"
-                      alt="Guardian Arm"
-                      className="absolute inset-0 w-full h-full animate-arm pointer-events-none"
-                    />
-                    <img
-                      src="/images/Guardian/Guardian-light.webp"
-                      alt="Guardian Light"
-                      className="absolute inset-0 w-full h-full animate-candlelight pointer-events-none"
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "seraphina" ? (
-                  <div
-                    className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-red-900 overflow-hidden"
-                    style={{ isolation: "isolate" }}
-                  >
-                    <img
-                      src="/images/Seraphina/Seraphina-background.webp"
-                      alt="Seraphina"
-                      className="w-full h-full block"
-                    />
-                    <img
-                      src="/images/Seraphina/Seraphina- body.webp"
-                      alt="Seraphina Body"
-                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
-                    />
-                    <img
-                      src="/images/Seraphina/Seraphina-head.webp"
-                      alt="Seraphina Head"
-                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
-                    />
-                    <img
-                      src="/images/Seraphina/Seraphina-light.webp"
-                      alt="Seraphina Light"
-                      className="absolute inset-0 w-full h-full animate-candlelight pointer-events-none"
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "shade" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
-                    <img
-                      src="/images/Shade/Shade-background.webp"
-                      alt="Shade"
-                      className="w-full h-full block"
-                    />
-                    <img
-                      src="/images/Shade/Shade-body.webp"
-                      alt="Shade Body"
-                      className="absolute inset-0 w-full h-full animate-breathe pointer-events-none"
-                    />
-                  </div>
-                ) : character.name.toLowerCase() === "seer" ? (
-                  <div className="relative max-w-40 mx-auto mb-2 ml-3 mr-3 bg-gray-900 overflow-hidden">
-                    <img
-                      src="/images/Seer/Seer-background.webp"
-                      alt="Seer"
-                      className="w-full h-full block"
-                    />
-                    <img
-                      src="/images/Seer/Seer-hand.webp"
-                      alt="Seer hand"
-                      className="absolute inset-0 w-full h-full animate-arm pointer-events-none"
-                    />
-                    <img
-                      src="/images/Seer/Seer-fog.webp"
-                      alt="Seer hand"
-                      className="absolute inset-0 w-full h-full animate-smoke pointer-events-none"
-                    />
-                    <img
-                      src="/images/Seer/Seer-head.webp"
-                      alt="Seer hand"
-                      className="absolute inset-0 w-full h-full animate-head pointer-events-none"
-                    />
-                  </div>
-                ) : (
-                  <img
-                    src={`/images/${character.name
-                      .toLowerCase()
-                      .replace(/\s+/g, "_")}.png`}
-                    alt={character.name}
-                    className="max-w-40 mx-auto mb-2 ml-3 mr-3"
-                    onError={(e) => (e.target.src = "/images/default.jpg")}
-                  />
-                )}
+                <CharacterImage characterName={character.name} />
                 <h3 className="text-lg font-bold text-yellow-400">
                   {character.name}
                 </h3>
@@ -701,8 +528,8 @@ function Game() {
                         {player.visibleRole === "evil"
                           ? "Evil"
                           : player.visibleRole === "Seer/Seraphina"
-                          ? "S/S"
-                          : ""}
+                            ? "S/S"
+                            : ""}
                       </div>
                       <div className="text-center">
                         {player.playerSessionKey === roundLeaderId && (

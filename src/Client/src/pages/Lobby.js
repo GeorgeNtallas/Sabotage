@@ -14,7 +14,7 @@ function Lobby() {
   const { t } = useTranslation();
   // Loc, roomId
   const location = useLocation();
-  const { name, isLeader, password } = location.state || {};
+  const { name, isLeader, roomPassword } = location.state || {};
 
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
@@ -68,16 +68,47 @@ function Lobby() {
   }, [roomSessionKey, playerSessionKey]);
 
   useEffect(() => {
-    socket.emit(
-      "getRoomPlayers",
-      { roomSessionKey },
-      ({ roomPlayers, roomLeader, readyList }) => {
-        setPlayers(roomPlayers);
-        setLobbyLeaderId(roomLeader);
-        setReadyPlayers(readyList);
-      },
-    );
-  }, [roomSessionKey, players]);
+    // Fetch players immediately on mount
+    const fetchPlayers = () => {
+      socket.emit(
+        "getRoomPlayers",
+        { roomSessionKey },
+        ({ roomPlayers, roomLeader, readyList }) => {
+          setPlayers(roomPlayers);
+          setLobbyLeaderId(roomLeader);
+          setReadyPlayers(readyList || []);
+        },
+      );
+    };
+
+    if (roomSessionKey) {
+      fetchPlayers();
+    }
+
+    // Listen for instant updates when someone marks ready
+    const handleReady = (playerSessionKeyReady) => {
+      setReadyPlayers((prev) => {
+        if (!prev.includes(playerSessionKeyReady)) {
+          return [...prev, playerSessionKeyReady];
+        }
+        return prev;
+      });
+    };
+
+    const handleRoomUpdate = ({ playerList }) => {
+      if (playerList) {
+        setPlayers(playerList);
+      }
+    };
+
+    socket.on("player_informReady", handleReady);
+    socket.on("room_update", handleRoomUpdate);
+
+    return () => {
+      socket.off("player_informReady", handleReady);
+      socket.off("room_update", handleRoomUpdate);
+    };
+  }, [roomSessionKey]); // Only re-run when roomSessionKey changes
 
   useEffect(() => {
     // Update ready players list
@@ -129,7 +160,7 @@ function Lobby() {
     navigate(`/`);
   };
 
-  const canStart = readyPlayers.length >= 5;
+  const canStart = readyPlayers.length >= 1;
   // --------------------------------------
   // 👇 Lobby UI
   return (
@@ -142,17 +173,18 @@ function Lobby() {
       }}
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
-      <div className="bg-white/1 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-8 w-full max-w-sm text-white">
+      <div className="mb-10 bg-black/60 backdrop-blur-md border border-black rounded-xl shadow-2xl p-8 w-[350px] h-[600px] text-white">
         <h2 className="text-3xl font-extrabold text-center mb-8">
           {t("lobby.welcome")} &nbsp;
-          <span className="text-indigo-300">{name}</span>
+          <span className="text-indigo-300 text-shadow">{name}</span>
         </h2>
-        <p className="mb-5 text-xl font-extrabold text-center">
-          {t("lobby.room")}: <span className="font-mono">{password}</span>
+        <p className="mb-5 text-xl font-extrabold text-center text-slate-300 italic">
+          {t("lobby.room")}:{" "}
+          <span className="font-mono text-indigo-300">{roomPassword}</span>
         </p>
 
-        <div className="max-w-sm mx-auto px-4 text-black backdrop-blur-md border-white/20 rounded-2xl p-6 shadow-2xl w-80 text">
-          <div className="w-full mb-4 p-3 rounded-md bg-white/10 border border-white/20 placeholder-white/80 text-white focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <div className="bg-black/1 rounded-2xl p-6 ">
+          <div className="w-full mb-4 p-3 rounded-md bg-indigo-500/15 border border-white/20 text-white">
             <h3 className="font-semibold mb-2 text-lg">
               {t("lobby.players")}:
             </h3>
@@ -177,10 +209,10 @@ function Lobby() {
                 <button
                   onClick={handleReadyClick}
                   disabled={readyPlayers.includes(playerSessionKey)}
-                  className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition ${
+                  className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition  ${
                     readyPlayers.includes(playerSessionKey)
                       ? "bg-red-600 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white"
                   }`}
                 >
                   {readyPlayers.includes(playerSessionKey)
@@ -192,7 +224,7 @@ function Lobby() {
             <div>
               <button
                 onClick={handleExitClick}
-                className={`px-6 py-3  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold`}
+                className={`px-6 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white`}
               >
                 {t("lobby.exit")}
               </button>
