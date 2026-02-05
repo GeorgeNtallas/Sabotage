@@ -25,7 +25,8 @@
     "waiting": "Αναμονή...",
     "exit": "Έξοδος",
     "startGame": "Έναρξη Παιχνιδιού",
-    "include": "Συμπερίληψη"
+    "include": "Συμπερίληψη",
+    "chat": "Chat"
   },
   "game": {
     "waitingForCharacter": "Αναμονή για ανάθεση χαρακτήρων...",
@@ -40,7 +41,8 @@
     "proceedToQuest": "Συνέχεια στην Αποστολή;",
     "leaderVote": "Επιλογή Ομάδας Αποστολής",
     "exit": "Έξοδος",
-    "role": "Ρόλος"
+    "role": "Ρόλος",
+    "chat": "Chat"
   },
   "modals": {
     "voteQuestTeam": "Ψηφίστε την Ομάδα Αποστολής",
@@ -128,5 +130,12 @@
     "chooseOutcome": "Επιλέξτε το αποτέλεσμα της αποστολής:",
     "success": "Επιτυχία",
     "fail": "Αποτυχία"
+  },
+  "chat": {
+    "title": "Chat",
+    "general": "General",
+    "send": "Αποστολή",
+    "placeholder": "Μήνυμα...",
+    "evil": "Κακοί"
   }
 }

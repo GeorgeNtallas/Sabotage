@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import socket from "../socket";
 import Settings from "../components/ui/Settings";
+import Chat from "../components/ui/Chat";
 
 function Lobby() {
   const [players, setPlayers] = useState([]);
@@ -12,6 +13,8 @@ function Lobby() {
   const [pressedButton, setPressedButton] = useState(null);
   const navigate = useNavigate();
   const [selectedRoles, setSelectedRoles] = useState(new Set());
+  const [showChat, setShowChat] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const { t } = useTranslation();
   // Loc, roomId
   const location = useLocation();
@@ -70,6 +73,22 @@ function Lobby() {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [roomSessionKey, playerSessionKey]);
+
+  useEffect(() => {
+    const handleChatMessage = () => {
+      if (!showChat) {
+        setUnreadMessages((prev) => prev + 1);
+      }
+    };
+
+    socket.on("chat_message", handleChatMessage);
+    return () => socket.off("chat_message", handleChatMessage);
+  }, [showChat]);
+
+  const handleChatOpen = () => {
+    setShowChat(true);
+    setUnreadMessages(0);
+  };
 
   useEffect(() => {
     // Fetch players immediately on mount
@@ -181,7 +200,7 @@ function Lobby() {
       }}
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
-      <div className="mb-10 bg-black/60 backdrop-blur-md border border-black rounded-xl shadow-2xl p-8 w-[350px] h-[600px] text-white">
+      <div className="mb-10 bg-black/60 backdrop-blur-md border border-black rounded-xl shadow-2xl p-4 w-[350px] h-[600px] text-white">
         <h2 className="text-3xl font-extrabold text-center mb-8">
           {t("lobby.welcome")} &nbsp;
           <span className="text-indigo-300 text-shadow">{name}</span>
@@ -206,7 +225,7 @@ function Lobby() {
           )}
         </div>
 
-        <div className="bg-black/1 rounded-2xl p-6 ">
+        <div className="bg-black/1 rounded-2xl p-6">
           <div className="w-full mb-4 p-3 rounded-md bg-indigo-500/15 border border-white/20 text-white">
             <h3 className="font-semibold mb-2 text-lg">
               {t("lobby.players")}:
@@ -226,9 +245,20 @@ function Lobby() {
               ))}
             </ul>
           </div>
-          <div className="flex flex-col text-center">
-            {!(isCurrentLeader && readyPlayers.includes(playerSessionKey)) && (
-              <div>
+          <div
+            className={
+              isCurrentLeader
+                ? "flex gap-4"
+                : "flex flex-col items-center gap-2"
+            }
+          >
+            {/* Left Column - Buttons */}
+            <div
+              className={`flex flex-col gap-2 ${isCurrentLeader ? "flex-1" : ""}`}
+            >
+              {!(
+                isCurrentLeader && readyPlayers.includes(playerSessionKey)
+              ) && (
                 <button
                   onClick={handleReadyClick}
                   onMouseDown={() => setPressedButton("ready")}
@@ -237,7 +267,7 @@ function Lobby() {
                   onTouchStart={() => setPressedButton("ready")}
                   onTouchEnd={() => setPressedButton(null)}
                   disabled={readyPlayers.includes(playerSessionKey)}
-                  className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition  ${
+                  className={`text-md px-5 py-3 rounded-md font-bold transition ${
                     readyPlayers.includes(playerSessionKey)
                       ? "bg-red-600 cursor-not-allowed"
                       : `bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white ${
@@ -251,9 +281,25 @@ function Lobby() {
                     ? t("lobby.waiting")
                     : t("lobby.ready")}
                 </button>
-              </div>
-            )}
-            <div>
+              )}
+              <button
+                onClick={handleChatOpen}
+                onMouseDown={() => setPressedButton("chat")}
+                onMouseUp={() => setPressedButton(null)}
+                onMouseLeave={() => setPressedButton(null)}
+                onTouchStart={() => setPressedButton("chat")}
+                onTouchEnd={() => setPressedButton(null)}
+                className={`relative text-md px-5 py-3 bg-gradient-to-r bg-indigo-700 hover:bg-indigo-800 hover:via-indigo-700 hover:to-indigo-800 transition rounded-md font-bold border border-indigo-900 text-white ${
+                  pressedButton === "chat" ? "scale-95 brightness-75" : ""
+                }`}
+              >
+                {t("lobby.chat") || "Chat"}
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    {unreadMessages}
+                  </span>
+                )}
+              </button>
               <button
                 onClick={handleExitClick}
                 onMouseDown={() => setPressedButton("exit")}
@@ -261,17 +307,15 @@ function Lobby() {
                 onMouseLeave={() => setPressedButton(null)}
                 onTouchStart={() => setPressedButton("exit")}
                 onTouchEnd={() => setPressedButton(null)}
-                className={`px-6 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white ${
+                className={`text-md px-5 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white ${
                   pressedButton === "exit" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("lobby.exit")}
               </button>
-            </div>
-            <div>
               {isCurrentLeader && (
                 <button
-                  className={`mt-4 px-6 py-3 rounded-md ${
+                  className={`text-md px-3 py-4 rounded-md ${
                     canStart
                       ? `bg-gradient-to-r bg-green-600 to-green-700 hover:bg-green-700 transition ${
                           pressedButton === "start"
@@ -288,7 +332,6 @@ function Lobby() {
                   onTouchEnd={() => setPressedButton(null)}
                   onClick={() => {
                     socket.emit("start_game", {
-                      // TODO: Must be enabled when all players press ready
                       roomSessionKey,
                       selectedRoles: Array.from(selectedRoles),
                     });
@@ -298,15 +341,27 @@ function Lobby() {
                 </button>
               )}
             </div>
+            {/* Right Column - Settings */}
+            {isCurrentLeader && (
+              <div className="flex-1">
+                <Settings
+                  isLeader={isCurrentLeader}
+                  readyPlayers={readyPlayers}
+                  selectedRoles={selectedRoles}
+                  toggleRole={toggleRole}
+                />
+              </div>
+            )}
           </div>
-          <Settings
-            isLeader={isCurrentLeader}
-            readyPlayers={readyPlayers}
-            selectedRoles={selectedRoles}
-            toggleRole={toggleRole}
-          />
         </div>
       </div>
+      <Chat
+        show={showChat}
+        onClose={() => setShowChat(false)}
+        character={{ team: "good" }}
+        playerSessionKey={playerSessionKey}
+        roomSessionKey={roomSessionKey}
+      />
     </div>
   );
 }

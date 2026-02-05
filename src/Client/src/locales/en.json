@@ -25,7 +25,8 @@
     "waiting": "Waiting...",
     "exit": "Exit",
     "startGame": "Start Game",
-    "include": "Include"
+    "include": "Include",
+    "chat": "Chat"
   },
   "game": {
     "waitingForCharacter": "Waiting for character assignment...",
@@ -40,7 +41,8 @@
     "proceedToQuest": "Proceed to Quest?",
     "leaderVote": "Leader Vote",
     "exit": "Exit",
-    "role": "Role"
+    "role": "Role",
+    "chat": "Chat"
   },
   "modals": {
     "voteQuestTeam": "Vote Quest Team",
@@ -130,5 +132,13 @@
     "chooseOutcome": "Choose the quest outcome:",
     "success": "Success",
     "fail": "Fail"
+  },
+  "chat": {
+    "title": "Chat",
+    "general": "General",
+    "send": "Send",
+    "placeholder": "Type your message here...",
+    "evil": "Evil"
   }
+
 }

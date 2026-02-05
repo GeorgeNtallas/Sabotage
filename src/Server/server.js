@@ -1442,6 +1442,25 @@ io.on("connection", (socket) => {
       }
     });
 
+    socket.on(
+      "send_chat_message",
+      async ({ roomSessionKey, playerSessionKey, message }) => {
+        try {
+          const room = await loadRoom(roomSessionKey);
+          if (!room || !room.players[playerSessionKey]) return;
+          const playerName = room.players[playerSessionKey].name;
+          io.to(roomSessionKey).emit("chat_message", {
+            playerName,
+            message,
+            senderSessionKey: playerSessionKey,
+          });
+          logger.info("Sent chat message", { roomSessionKey });
+        } catch (err) {
+          logger.info("Error sending chat message", { error: err.message });
+        }
+      },
+    );
+
     /**
      * Socket: exit_game
      * Player exits game - marks room for cleanup if empty

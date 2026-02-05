@@ -13,6 +13,7 @@ import GameOver from "../components/ui/GameOver";
 import WaitScreen from "../components/ui/WaitScreen";
 import AnimatedWindow from "../components/ui/Info";
 import CharacterImage from "../components/ui/CharacterImage";
+import Chat from "../components/ui/Chat";
 
 function Game() {
   // Loc, roomSessionKey
@@ -74,6 +75,8 @@ function Game() {
   const [gameResult, setGameResult] = useState("");
   const [waitingForReconnect, setWaitingForReconnect] = useState(null);
   const [pressedButton, setPressedButton] = useState(null);
+  const [showChat, setShowChat] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
   const [room, setRoom] = useState({});
@@ -220,6 +223,22 @@ function Game() {
     };
   }, [roomSessionKey, playerSessionKey, navigate]);
   // amazonq-ignore-next-line
+
+  useEffect(() => {
+    const handleChatMessage = () => {
+      if (!showChat) {
+        setUnreadMessages((prev) => prev + 1);
+      }
+    };
+
+    socket.on("chat_message", handleChatMessage);
+    return () => socket.off("chat_message", handleChatMessage);
+  }, [showChat]);
+
+  const handleChatOpen = () => {
+    setShowChat(true);
+    setUnreadMessages(0);
+  };
 
   // Update the room parameters
   useEffect(() => {
@@ -397,31 +416,50 @@ function Game() {
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       >
-        <div className="flex justify-center">
+        <div className="flex justify-around items-center h-16 w-full mt-2">
+          <button
+            onClick={() => setShowExit(true)}
+            onMouseDown={() => setPressedButton("exit")}
+            onMouseUp={() => setPressedButton(null)}
+            onMouseLeave={() => setPressedButton(null)}
+            onTouchStart={() => setPressedButton("exit")}
+            onTouchEnd={() => setPressedButton(null)}
+            className={`px-3 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
+              pressedButton === "exit" ? "scale-95 brightness-75" : ""
+            }`}
+          >
+            {t("game.exit")}
+          </button>
           <img
             src="/images/Sabotage3.png"
             alt="Leader"
-            className="mb-10 w-40"
+            className="w-40 ml-6"
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
+          <div className="w-20"></div>
         </div>
         {/* Mobile Layout */}
         <div className="relative z-10 space-y-4 ">
-          {/* Phase/Round/Exit */}
-          <div className="flex justify-center items-center h-16 w-full px-4">
+          {/* Phase/Round/Chat */}
+          <div className="flex justify-center items-center h-16 w-full px-4 mt-5">
             <div className="flex items-center gap-10">
               <button
-                onClick={() => setShowExit(true)}
-                onMouseDown={() => setPressedButton("exit")}
+                onClick={handleChatOpen}
+                onMouseDown={() => setPressedButton("chat")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton("exit")}
+                onTouchStart={() => setPressedButton("chat")}
                 onTouchEnd={() => setPressedButton(null)}
-                className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
-                  pressedButton === "exit" ? "scale-95 brightness-75" : ""
+                className={`relative px-3 py-2 bg-gradient-to-r bg-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-600 transition rounded-md font-bold ${
+                  pressedButton === "chat" ? "scale-95 brightness-75" : ""
                 }`}
               >
-                {t("game.exit")}
+                {t("game.chat")}
+                {unreadMessages > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                    {unreadMessages}
+                  </span>
+                )}
               </button>
               <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
                 <h3 className="text-center font-semibold mb-2">
@@ -724,6 +762,13 @@ function Game() {
             </div>
           </div>
         )}
+        <Chat
+          show={showChat}
+          onClose={() => setShowChat(false)}
+          character={character}
+          playerSessionKey={playerSessionKey}
+          roomSessionKey={roomSessionKey}
+        />
       </motion.div>
     </AnimatePresence>
   );
