@@ -581,7 +581,6 @@ io.on("connection", (socket) => {
      * Callback: {roomPassword, roomSessionKey, playerSessionKey, isLeader}
      */
     socket.on("create_room", async (name, roomName, isPublic, callback) => {
-      let newRoomName;
       try {
         if (!name?.trim()) return callback({ error: "Name is required" });
 
@@ -614,11 +613,11 @@ io.on("connection", (socket) => {
           const randomAdj =
             adjectives[Math.floor(Math.random() * adjectives.length)];
           const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-          newRoomName = `${randomAdj}${randomNoun}`;
+          roomName = `${randomAdj}${randomNoun}`;
         }
         // Check if room name already exists
         const existingRoom = await Room.findOne({
-          newRoomName: newRoomName.trim(),
+          roomName: roomName.trim(),
         }).lean();
         if (existingRoom) {
           return callback({ error: "Room name already exists" });
@@ -630,7 +629,7 @@ io.on("connection", (socket) => {
 
         const roomObj = initializeRoom(roomSessionKey);
         roomObj.roomPassword = roomPassword;
-        roomObj.roomName = newRoomName;
+        roomObj.roomName = roomName;
         roomObj.isPublic = isPublic;
         roomObj.leader = playerSessionKey;
         roomObj.players[playerSessionKey] = {
@@ -659,7 +658,7 @@ io.on("connection", (socket) => {
           roomSessionKey,
           playerSessionKey,
           isLeader: true,
-          newRoomName,
+          newRoomName: roomName,
           isPublic,
         });
       } catch (err) {
