@@ -11,6 +11,8 @@ const RoomSchema = new mongoose.Schema(
     leader: { type: String, default: null }, // playerSessionKey of the leader
     players: { type: Object, default: {} }, // { [playerSessionKey]: { id, playerSessionKey, name } }
     ready: { type: [String], default: [] },
+    isPublic: { type: Boolean, default: true },
+    roomName: { type: String, default: null },
 
     // Game setup
     characters: { type: Object, default: {} }, // { [playerSessionKey]: { name, team, ... } }

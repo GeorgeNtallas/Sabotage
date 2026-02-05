@@ -412,13 +412,13 @@ function Game() {
             <div className="flex items-center gap-10">
               <button
                 onClick={() => setShowExit(true)}
-                onMouseDown={() => setPressedButton('exit')}
+                onMouseDown={() => setPressedButton("exit")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('exit')}
+                onTouchStart={() => setPressedButton("exit")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2  bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
-                  pressedButton === 'exit' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "exit" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("game.exit")}
@@ -468,10 +468,10 @@ function Game() {
                 triggerLabel={t("game.menu")}
                 totalTeamSize={totalTeamSize}
                 gameCharacters={gameCharacters}
-                onMouseDown={() => setPressedButton('menu')}
+                onMouseDown={() => setPressedButton("menu")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('menu')}
+                onTouchStart={() => setPressedButton("menu")}
                 onTouchEnd={() => setPressedButton(null)}
                 pressedButton={pressedButton}
               />
@@ -570,17 +570,19 @@ function Game() {
               {showPlayersVote && (
                 <button
                   onClick={() => setShowVoteModal(true)}
-                  onMouseDown={() => setPressedButton('vote')}
+                  onMouseDown={() => setPressedButton("vote")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('vote')}
+                  onTouchStart={() => setPressedButton("vote")}
                   onTouchEnd={() => setPressedButton(null)}
                   disabled={hasVoted}
                   className={`w-full rounded-lg p-3 mb-2 text-white ${
                     hasVoted
                       ? "bg-gray-600 cursor-not-allowed"
                       : `bg-amber-600 hover:bg-amber-700 ${
-                          pressedButton === 'vote' ? 'scale-95 brightness-75' : ''
+                          pressedButton === "vote"
+                            ? "scale-95 brightness-75"
+                            : ""
                         }`
                   }`}
                 >
@@ -592,13 +594,13 @@ function Game() {
               {showQuestVoteButton && (
                 <button
                   onClick={() => setShowQuestVoteModal(true)}
-                  onMouseDown={() => setPressedButton('proceed')}
+                  onMouseDown={() => setPressedButton("proceed")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('proceed')}
+                  onTouchStart={() => setPressedButton("proceed")}
                   onTouchEnd={() => setPressedButton(null)}
                   className={`w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2 ${
-                    pressedButton === 'proceed' ? 'scale-95 brightness-75' : ''
+                    pressedButton === "proceed" ? "scale-95 brightness-75" : ""
                   }`}
                 >
                   {t("game.proceedToQuest")}
@@ -607,13 +609,13 @@ function Game() {
               {isLeader && showLeaderVoteButton && (
                 <button
                   onClick={() => setShowLeaderVoteModal(true)}
-                  onMouseDown={() => setPressedButton('leader')}
+                  onMouseDown={() => setPressedButton("leader")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('leader')}
+                  onTouchStart={() => setPressedButton("leader")}
                   onTouchEnd={() => setPressedButton(null)}
                   className={`w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 ${
-                    pressedButton === 'leader' ? 'scale-95 brightness-75' : ''
+                    pressedButton === "leader" ? "scale-95 brightness-75" : ""
                   }`}
                 >
                   {t("game.leaderVote")}
@@ -729,6 +731,4 @@ function Game() {
 
 export default Game;
 
-//TODO: Να βαλω δρακο να πεταει στο background ειπε η Αλεξια
 //TODO: Να το κανω responsive
-//TODO: Να βαλω οριο στο username

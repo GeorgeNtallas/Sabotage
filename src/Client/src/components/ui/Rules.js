@@ -16,20 +16,22 @@ function Rules({ showRules, setShowRules }) {
   return (
     <Animation show={showRules}>
       <div className="fixed inset-8 flex items-center justify-center z-50">
-        <div className="bg-zinc-900 rounded-xl p-6 w-[600px] h-[600px] text-black flex flex-col relative">
-          <button
-            onClick={() => setShowRules(false)}
-            className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded-lg font-bold z-10 border border-gray-800"
-            style={medievalFontStyle}
-          >
-            {t("info.close")}
-          </button>
-          <h2
-            className="text-2xl text-gray-200 font-bold mb-4"
-            style={medievalFontStyle}
-          >
-            {t("info.rulesAndTips")}
-          </h2>
+        <div className="bg-zinc-900 rounded-xl p-5 w-[600px] h-[600px] text-black flex flex-col relative">
+          <div className="flex justify-between items-center mb-4">
+            <div></div>
+            <h2
+              className="text-xl text-gray-200 font-bold"
+              style={medievalFontStyle}
+            >
+              {t("info.rulesAndTips")}
+            </h2>
+            <button
+              onClick={() => setShowRules(false)}
+              className="text-white hover:text-red-400 text-2xl font-bold"
+            >
+              x
+            </button>
+          </div>
 
           {/* Rules navigation buttons */}
           <div className="flex gap-1 mb-4 flex-wrap justify-center">

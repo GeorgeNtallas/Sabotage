@@ -15,10 +15,13 @@ function Lobby() {
   const { t } = useTranslation();
   // Loc, roomId
   const location = useLocation();
-  const { name, isLeader, roomPassword } = location.state || {};
+  const { name, isLeader, roomPassword, newRoomName, isPublic } =
+    location.state || {};
 
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
+
+  console.log(newRoomName, isPublic);
 
   const toggleRole = (role) => {
     setSelectedRoles((prev) => {
@@ -96,9 +99,12 @@ function Lobby() {
       });
     };
 
-    const handleRoomUpdate = ({ playerList }) => {
+    const handleRoomUpdate = ({ playerList, roomLeader }) => {
       if (playerList) {
         setPlayers(playerList);
+      }
+      if (roomLeader !== undefined) {
+        setLobbyLeaderId(roomLeader);
       }
     };
 
@@ -161,6 +167,7 @@ function Lobby() {
     navigate(`/`);
   };
 
+  const isCurrentLeader = lobbyLeaderId === playerSessionKey;
   const canStart = readyPlayers.length >= 1;
   // --------------------------------------
   // 👇 Lobby UI
@@ -179,10 +186,25 @@ function Lobby() {
           {t("lobby.welcome")} &nbsp;
           <span className="text-indigo-300 text-shadow">{name}</span>
         </h2>
-        <p className="mb-5 text-xl font-extrabold text-center text-slate-300 italic">
-          {t("lobby.room")}:{" "}
-          <span className="font-mono text-indigo-300">{roomPassword}</span>
-        </p>
+        <div className="flex items-center justify-center mb-2">
+          <p className="mb-5 text-xl font-extrabold text-center text-slate-300 italic">
+            {t("lobby.room")}:{" "}
+            {newRoomName?.trim() && (
+              <span className="font-mono text-indigo-300">{newRoomName}</span>
+            )}
+          </p>
+          <img
+            src={isPublic ? "/images/public.png" : "/images/private.png"}
+            alt={isPublic ? "Public" : "Private"}
+            className={isPublic ? "w-5 h-5 mb-5 ml-2" : "w-7 h-7 mb-5 ml-5"}
+            onError={(e) => (e.target.src = "/images/default.jpg")}
+          />
+          {!isPublic && (
+            <p className="mb-5 text-md font-extrabold text-center text-slate-300 italic">
+              <span className="font-mono text-indigo-300">{roomPassword}</span>
+            </p>
+          )}
+        </div>
 
         <div className="bg-black/1 rounded-2xl p-6 ">
           <div className="w-full mb-4 p-3 rounded-md bg-indigo-500/15 border border-white/20 text-white">
@@ -205,21 +227,23 @@ function Lobby() {
             </ul>
           </div>
           <div className="flex flex-col text-center">
-            {!(isLeader && readyPlayers.includes(playerSessionKey)) && (
+            {!(isCurrentLeader && readyPlayers.includes(playerSessionKey)) && (
               <div>
                 <button
                   onClick={handleReadyClick}
-                  onMouseDown={() => setPressedButton('ready')}
+                  onMouseDown={() => setPressedButton("ready")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('ready')}
+                  onTouchStart={() => setPressedButton("ready")}
                   onTouchEnd={() => setPressedButton(null)}
                   disabled={readyPlayers.includes(playerSessionKey)}
                   className={`text-md px-10 py-3 mb-4 rounded-md font-bold transition  ${
                     readyPlayers.includes(playerSessionKey)
                       ? "bg-red-600 cursor-not-allowed"
                       : `bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white ${
-                          pressedButton === 'ready' ? 'scale-95 brightness-75' : ''
+                          pressedButton === "ready"
+                            ? "scale-95 brightness-75"
+                            : ""
                         }`
                   }`}
                 >
@@ -232,33 +256,35 @@ function Lobby() {
             <div>
               <button
                 onClick={handleExitClick}
-                onMouseDown={() => setPressedButton('exit')}
+                onMouseDown={() => setPressedButton("exit")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('exit')}
+                onTouchStart={() => setPressedButton("exit")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-6 py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white ${
-                  pressedButton === 'exit' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "exit" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("lobby.exit")}
               </button>
             </div>
             <div>
-              {isLeader && (
+              {isCurrentLeader && (
                 <button
                   className={`mt-4 px-6 py-3 rounded-md ${
                     canStart
                       ? `bg-gradient-to-r bg-green-600 to-green-700 hover:bg-green-700 transition ${
-                          pressedButton === 'start' ? 'scale-95 brightness-75' : ''
+                          pressedButton === "start"
+                            ? "scale-95 brightness-75"
+                            : ""
                         }`
                       : "bg-green-500/10 backdrop-blur-md border-green-400/20 cursor-not-allowed"
                   } text-black font-semibold`}
                   disabled={!canStart}
-                  onMouseDown={() => setPressedButton('start')}
+                  onMouseDown={() => setPressedButton("start")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('start')}
+                  onTouchStart={() => setPressedButton("start")}
                   onTouchEnd={() => setPressedButton(null)}
                   onClick={() => {
                     socket.emit("start_game", {
@@ -274,7 +300,7 @@ function Lobby() {
             </div>
           </div>
           <Settings
-            isLeader={isLeader}
+            isLeader={isCurrentLeader}
             readyPlayers={readyPlayers}
             selectedRoles={selectedRoles}
             toggleRole={toggleRole}

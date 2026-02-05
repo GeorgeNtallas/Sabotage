@@ -226,9 +226,50 @@ async function findRoomSessionKeyByroomPassword(roomPassword) {
   return doc ? doc.roomSessionKey : null;
 }
 
+// Finds a room by name (for public rooms)
+async function findRoomByName(roomName) {
+  const doc = await Room.findOne({ roomName }).lean();
+  return doc;
+}
+
+// Checks if input is a numeric password (6 digits)
+const isNumericPassword = (input) => /^\d{6}$/.test(input);
+
+// Join room with name/password detection
+async function handleRoomJoin(name, input) {
+  if (!name?.trim()) return { error: "Name is required" };
+
+  let room = null;
+  let requiresPassword = false;
+
+  // Find by password (if numeric)
+  if (isNumericPassword(input)) {
+    const roomSessionKey = await findRoomSessionKeyByroomPassword(input);
+    room = await loadRoom(roomSessionKey);
+    if (room && room.roomPassword === input) {
+      return { room, requiresPassword: false };
+    }
+  }
+
+  // If not found by password, find by name
+  room = await findRoomByName(input);
+  if (room) {
+    if (room.isPublic) {
+      return { room, requiresPassword: false };
+    } else {
+      // Private room found by name - requires password
+      return { room, requiresPassword: true };
+    }
+  }
+
+  return { error: "Room not found" };
+}
+
 // Initializes a new room object with default values
 const initializeRoom = (roomSessionKey) => ({
   roomPassword: null,
+  roomName: null,
+  isPublic: true,
   players: {},
   ready: [],
   characters: {},
@@ -288,7 +329,7 @@ io.on("connection", (socket) => {
           delete room.waitingForReconnect;
 
           try {
-            await saveRoomToDb(roomSessionKey, room).catch(console.error);
+            await saveRoomToDb(roomSessionKey, room);
             logger.info("Deleted waitingForReconnect for player", {
               playerSessionKey,
             });
@@ -352,6 +393,37 @@ io.on("connection", (socket) => {
         });
       }
     }
+
+    /**
+     * Socket: get_available_rooms
+     * Retrieves all available rooms with player info and joinable status
+     * Callback: {rooms}
+     */
+    socket.on("get_available_rooms", async (callback) => {
+      try {
+        const allRooms = await Room.find({}).lean();
+        const roomsData = allRooms.map((room) => ({
+          roomSessionKey: room.roomSessionKey,
+          roomName: room.roomName,
+          roomPassword: room.roomPassword,
+          isPublic: room.isPublic,
+          joinable: !room.gameStarted,
+          playerCount: Object.keys(room.players || {}).length,
+          players: Object.values(room.players || {}).map((p) => ({
+            name: p.name,
+            online: !!p.id,
+          })),
+        }));
+        callback({ rooms: roomsData });
+        logger.info("Retrieved available rooms", { count: roomsData.length });
+      } catch (err) {
+        logger.error("Failed to get available rooms", {
+          error: err.message,
+          stack: err.stack,
+        });
+        callback({ rooms: [] });
+      }
+    });
 
     /**
      * Socket: create-room
@@ -508,45 +580,91 @@ io.on("connection", (socket) => {
      * Params: name (string) - Player's display name
      * Callback: {roomPassword, roomSessionKey, playerSessionKey, isLeader}
      */
-    socket.on("create_room", async (name, callback) => {
+    socket.on("create_room", async (name, roomName, isPublic, callback) => {
+      let newRoomName;
       try {
-      } catch (err) {}
-      if (!name?.trim()) return callback({ error: "Name is required" });
+        if (!name?.trim()) return callback({ error: "Name is required" });
 
-      const roomSessionKey = crypto.randomUUID();
-      const playerSessionKey = crypto.randomUUID();
-      const roomPassword = await generateRoomPassword();
+        // Generate random room name if not provided
+        if (!roomName?.trim()) {
+          const adjectives = [
+            "Dark",
+            "Ancient",
+            "Mystic",
+            "Shadow",
+            "Golden",
+            "Silver",
+            "Iron",
+            "Crystal",
+            "Dragon",
+            "Phoenix",
+          ];
+          const nouns = [
+            "Castle",
+            "Tower",
+            "Fortress",
+            "Keep",
+            "Hall",
+            "Realm",
+            "Kingdom",
+            "Citadel",
+            "Sanctuary",
+            "Haven",
+          ];
+          const randomAdj =
+            adjectives[Math.floor(Math.random() * adjectives.length)];
+          const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+          newRoomName = `${randomAdj}${randomNoun}`;
+        }
+        // Check if room name already exists
+        const existingRoom = await Room.findOne({
+          newRoomName: newRoomName.trim(),
+        }).lean();
+        if (existingRoom) {
+          return callback({ error: "Room name already exists" });
+        }
 
-      const roomObj = initializeRoom(roomSessionKey);
-      roomObj.roomPassword = roomPassword;
-      roomObj.leader = playerSessionKey;
-      roomObj.players[playerSessionKey] = {
-        id: socket.id,
-        playerSessionKey,
-        name,
-      };
+        const roomSessionKey = crypto.randomUUID();
+        const playerSessionKey = crypto.randomUUID();
+        const roomPassword = await generateRoomPassword();
 
-      try {
-        await saveRoomToDb(roomSessionKey, roomObj).catch(console.error);
-        logger.info("Saved new room", { roomSessionKey, playerSessionKey });
-      } catch (err) {
-        logger.error("Failed to save new room", {
+        const roomObj = initializeRoom(roomSessionKey);
+        roomObj.roomPassword = roomPassword;
+        roomObj.roomName = newRoomName;
+        roomObj.isPublic = isPublic;
+        roomObj.leader = playerSessionKey;
+        roomObj.players[playerSessionKey] = {
+          id: socket.id,
+          playerSessionKey,
+          name,
+        };
+
+        try {
+          await saveRoomToDb(roomSessionKey, roomObj);
+          logger.info("Saved new room", { roomSessionKey, playerSessionKey });
+        } catch (err) {
+          logger.error("Failed to save new room", {
+            roomSessionKey,
+            playerSessionKey,
+            error: err.message,
+          });
+        }
+
+        playerSocketByPlayerSessionKey.set(playerSessionKey, socket.id);
+        socketToPlayer.set(socket.id, { roomSessionKey, playerSessionKey });
+        socket.join(roomSessionKey);
+
+        callback({
+          roomPassword,
           roomSessionKey,
           playerSessionKey,
-          error: err.message,
+          isLeader: true,
+          newRoomName,
+          isPublic,
         });
+      } catch (err) {
+        callback({ error: "Failed to create room" });
       }
-
-      playerSocketByPlayerSessionKey.set(playerSessionKey, socket.id);
-      socketToPlayer.set(socket.id, { roomSessionKey, playerSessionKey });
-      socket.join(roomSessionKey);
-
-      callback({
-        roomPassword,
-        roomSessionKey,
-        playerSessionKey,
-        isLeader: true,
-      });
     });
 
     /**
@@ -555,17 +673,29 @@ io.on("connection", (socket) => {
      * Params: {name, roomPassword}
      * Callback: {roomSessionKey, playerSessionKey, isLeader, gameStarted}
      */
-    socket.on("join_room", async ({ name, roomPassword }, callback) => {
+    socket.on("join_room", async ({ name, input, password }, callback) => {
       try {
-        if (!name?.trim()) return callback({ error: "Name is required" });
-        const roomSessionKey =
-          await findRoomSessionKeyByroomPassword(roomPassword);
-        const room = await loadRoom(roomSessionKey);
+        const joinResult = await handleRoomJoin(name, input);
 
-        if (!room) return callback({ error: "Room not found" });
-        if (room.roomPassword !== roomPassword)
-          return callback({ error: "Invalid room roomPassword" });
+        if (joinResult.error) {
+          return callback({ error: joinResult.error });
+        }
 
+        if (joinResult.requiresPassword) {
+          if (!password) {
+            return callback({
+              requiresPassword: true,
+              roomName: joinResult.room.roomName,
+            });
+          }
+
+          // Verify password for private room
+          if (joinResult.room.roomPassword !== password) {
+            return callback({ error: "Invalid password" });
+          }
+        }
+
+        const room = joinResult.room;
         // Try to find an existing player with the same name (case-insensitive)
         const playerEntry = Object.entries(room.players || {}).find(
           ([, p]) => p.name && p.name.toLowerCase() === name.toLowerCase(),
@@ -597,18 +727,23 @@ io.on("connection", (socket) => {
         }
 
         try {
-          await saveRoomToDb(roomSessionKey, room);
-          logger.info("Saved room to DB", { roomSessionKey });
+          await saveRoomToDb(room.roomSessionKey, room);
+          logger.info("Saved room to DB", {
+            roomSessionKey: room.roomSessionKey,
+          });
         } catch (err) {
           logger.info("Failed to save room to DB", {
-            roomSessionKey,
+            roomSessionKey: room.roomSessionKey,
             error: err.message,
           });
         }
 
         playerSocketByPlayerSessionKey.set(playerSessionKey, socket.id);
-        socketToPlayer.set(socket.id, { roomSessionKey, playerSessionKey });
-        socket.join(roomSessionKey);
+        socketToPlayer.set(socket.id, {
+          roomSessionKey: room.roomSessionKey,
+          playerSessionKey,
+        });
+        socket.join(room.roomSessionKey);
 
         // if this was a reclaim of an offline session, clear waiting flag and notify everyone
         if (
@@ -618,17 +753,19 @@ io.on("connection", (socket) => {
           delete room.waitingForReconnect;
 
           try {
-            await saveRoomToDb(roomSessionKey, room).catch(console.error);
-            logger.info("Saved room to DB", { roomSessionKey });
+            await saveRoomToDb(room.roomSessionKey, room);
+            logger.info("Saved room to DB", {
+              roomSessionKey: room.roomSessionKey,
+            });
           } catch (err) {
             logger.info("Failed to save room to DB", {
-              roomSessionKey,
+              roomSessionKey: room.roomSessionKey,
               error: err.message,
             });
           }
 
-          io.to(roomSessionKey).emit("player_reconnected");
-          io.to(roomSessionKey).emit("round_update", {
+          io.to(room.roomSessionKey).emit("player_reconnected");
+          io.to(room.roomSessionKey).emit("round_update", {
             source: "join_reconnect",
             roundLeader: room.roundLeader,
             round: room.round,
@@ -644,10 +781,13 @@ io.on("connection", (socket) => {
 
         const isLeader = room.leader === playerSessionKey;
         callback({
-          roomSessionKey,
+          roomSessionKey: room.roomSessionKey,
           playerSessionKey,
           isLeader,
           gameStarted: room.gameStarted,
+          roomName: room.roomName,
+          roomPassword: room.roomPassword,
+          isPublic: room.isPublic,
         });
 
         // Broadcast updated player list to all players in the room (for lobby refresh)
@@ -656,7 +796,7 @@ io.on("connection", (socket) => {
           playerSessionKey: p.playerSessionKey,
           online: !!p.id,
         }));
-        io.to(roomSessionKey).emit("room_update", { playerList });
+        io.to(room.roomSessionKey).emit("room_update", { playerList });
 
         // Send game state if game is active and player has character
         if (
@@ -708,7 +848,10 @@ io.on("connection", (socket) => {
             });
           }, 500);
         }
-        logger.info("Joined room", { roomSessionKey, playerSessionKey });
+        logger.info("Joined room", {
+          roomSessionKey: room.roomSessionKey,
+          playerSessionKey,
+        });
       } catch (err) {
         logger.info("Error joining room", { error: err.message });
       }
@@ -1340,16 +1483,38 @@ io.on("connection", (socket) => {
         const room = await loadRoom(roomSessionKey);
         if (!room || !room.players || !room.players[playerSessionKey]) return;
 
-        // Mark offline but keep the player entry for reconnect
-        const leavingPlayer = room.players[playerSessionKey];
-        leavingPlayer.id = null;
+        if (room.gameStarted) {
+          // Game is active - mark offline but keep for reconnection
+          const leavingPlayer = room.players[playerSessionKey];
+          leavingPlayer.id = null;
 
-        // track waiting for reconnect
-        room.waitingForReconnect = {
-          playerSessionKey,
-          name: leavingPlayer.name,
-          since: Date.now(),
-        };
+          room.waitingForReconnect = {
+            playerSessionKey,
+            name: leavingPlayer.name,
+            since: Date.now(),
+          };
+
+          io.to(roomSessionKey).emit("player_logged_off", {
+            name: leavingPlayer.name,
+          });
+        } else {
+          // Game not started - remove player completely
+          const leavingPlayer = room.players[playerSessionKey];
+          delete room.players[playerSessionKey];
+
+          // Remove from ready list if present
+          if (room.ready) {
+            room.ready = room.ready.filter((psk) => psk !== playerSessionKey);
+          }
+
+          // Transfer leadership if leaving player was leader
+          if (room.leader === playerSessionKey) {
+            const remainingPlayers = Object.keys(room.players);
+            if (remainingPlayers.length > 0) {
+              room.leader = remainingPlayers[0]; // First remaining player becomes leader
+            }
+          }
+        }
 
         // cleanup mappings
         const sid = playerSocketByPlayerSessionKey.get(playerSessionKey);
@@ -1368,17 +1533,15 @@ io.on("connection", (socket) => {
           });
         }
 
-        // notify others to show waiting overlay and refresh roster
-        io.to(roomSessionKey).emit("player_logged_off", {
-          name: leavingPlayer.name,
-        });
-
         const playerList = Object.values(room.players || {}).map((p) => ({
           name: p.name,
           playerSessionKey: p.playerSessionKey,
           online: !!p.id,
         }));
-        io.to(roomSessionKey).emit("room_update", { playerList });
+        io.to(roomSessionKey).emit("room_update", {
+          playerList,
+          roomLeader: room.leader,
+        });
 
         logger.info("Player exited", { roomSessionKey, playerSessionKey });
       } catch (err) {
