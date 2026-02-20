@@ -24,6 +24,7 @@ function Game() {
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const [displayName, setDisplayName] = useState(name || "");
+  const [fadeIn, setFadeIn] = useState(false);
 
   // preload from cached assign if present (helps on reconnect routing from Lobby)
   useEffect(() => {
@@ -135,6 +136,7 @@ function Game() {
         setPlayers(assignedPlayers);
         setGameCharacters(gameCharacters);
         setWaitingForReconnect(null);
+        setFadeIn(true);
 
         // cache for seamless reconnect rendering
         try {
@@ -378,26 +380,19 @@ function Game() {
     return () => socket.off("exit_to_home");
   }, [name, navigate]);
 
-  if (!character) {
-    return (
-      <div
-        className="flex items-center justify-center h-screen bg-gray-900 text-white"
-        style={{
-          backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <h2 className="text-2xl">{t("game.waitingForCharacter")}</h2>
-      </div>
-    );
-  }
-
   // amazonq-ignore-next-line
   const isLeader = playerSessionKey === roundLeaderId;
 
   return (
     <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: fadeIn ? 1 : 0 }}
+        transition={{ duration: 1 }}
+        className="w-full h-full bg-black"
+      >
+      {character && (
+        <>
       {isDesktop ? (
         <DesktopGameView
           character={character}
@@ -562,6 +557,9 @@ function Game() {
         roomSessionKey={roomSessionKey}
         isDesktop={isDesktop}
       />
+      </>
+      )}
+      </motion.div>
     </>
   );
 }

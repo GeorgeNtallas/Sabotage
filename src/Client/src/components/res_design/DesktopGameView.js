@@ -34,6 +34,8 @@ function DesktopGameView({
 }) {
   const { t } = useTranslation();
 
+  if (!character) return null;
+
   return (
     <div
       className="relative w-full bg-gray-900 text-white overflow-hidden"
@@ -45,6 +47,7 @@ function DesktopGameView({
         display: "grid",
         gridTemplateRows: "auto 1fr auto",
         gridTemplateColumns: "1fr",
+        opacity: 'inherit'
       }}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}

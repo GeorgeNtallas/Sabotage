@@ -33,6 +33,8 @@ function MobileGameView({
 }) {
   const { t } = useTranslation();
 
+  if (!character) return null;
+
   return (
     <div
       className="relative w-full bg-gray-900 text-white overflow-y-auto"
@@ -43,6 +45,7 @@ function MobileGameView({
         height: "100vh",
         margin: 0,
         padding: 0,
+        opacity: 'inherit'
       }}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 import socket from "../socket";
 import Chat from "../components/ui/Chat";
 import DesktopLobbyView from "../components/res_design/DesktopLobbyView";
@@ -17,6 +18,7 @@ function Lobby() {
   const [showChat, setShowChat] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [fadeOut, setFadeOut] = useState(false);
   const { t } = useTranslation();
   // Loc, roomId
   const location = useLocation();
@@ -168,20 +170,26 @@ function Lobby() {
 
   useEffect(() => {
     socket.on("game_started", () => {
-      navigate(`/game?${roomSessionKey}`, { state: { name } });
+      setFadeOut(true);
+      setTimeout(() => {
+        navigate(`/game?${roomSessionKey}`, { state: { name } });
+      }, 800);
     });
 
     return () => {
       socket.off("game_started");
     };
-  }, [name, navigate, playerSessionKey]);
+  }, [name, navigate, playerSessionKey, roomSessionKey]);
 
   // If we rejoin an already-started game, server will emit character_assigned.
   // Cache it and navigate directly to Game to resume.
   useEffect(() => {
     const onRound = (payload) => {
       if (payload?.gameStarted) {
-        navigate(`/game?${roomSessionKey}`, { state: { name } });
+        setFadeOut(true);
+        setTimeout(() => {
+          navigate(`/game?${roomSessionKey}`, { state: { name } });
+        }, 800);
       }
     };
     socket.on("round_update", onRound);
@@ -212,6 +220,12 @@ function Lobby() {
 
   return (
     <>
+      <motion.div
+        initial={{ opacity: 1 }}
+        animate={{ opacity: fadeOut ? 0 : 1 }}
+        transition={{ duration: 0.8 }}
+        className="w-full h-full bg-black"
+      >
       {isDesktop ? (
         <DesktopLobbyView
           name={name}
@@ -264,6 +278,7 @@ function Lobby() {
         roomSessionKey={roomSessionKey}
         isDesktop={isDesktop}
       />
+      </motion.div>
     </>
   );
 }
