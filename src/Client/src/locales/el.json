@@ -63,13 +63,14 @@
     "characters": "Ρόλοι",
     "rulesAndTips": "Κανόνες ",
     "numberOfPlayersInEachQuest": "Αριθμός Παικτών σε Κάθε Αποστολή",
-    "players": "παίκτες",
+    "players": "παίκτες ψηφού,",
     "close": "Κλείσιμο",
     "goal": "Στόχος",
     "howToPlay": "Παιχνιδι",
     "strategyTips": "Στρατιγικές",
     "tips": "Συμβουλές",
-    "allCharacters": "Ρολοι"
+    "allCharacters": "Ρολοι",
+    "failsNeeded": "Αποτυχιες κακών"
   },
   "rules": {
     "goalTitle": "Στόχος",

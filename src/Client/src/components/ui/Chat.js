@@ -56,7 +56,7 @@ function Chat({
 
   if (isDesktop) {
     return (
-      <div className="fixed left-16 top-1/2 transform -translate-y-1/2 w-[350px] h-[400px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl flex flex-col z-10">
+      <div className="w-[350px] h-[400px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl flex flex-col z-10">
         {/* Header */}
         <div className="flex justify-center items-center p-2 border-b border-slate-600">
           <h2 className="text-lg font-bold text-white">{t("chat.title")}</h2>

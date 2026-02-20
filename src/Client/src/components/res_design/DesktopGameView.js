@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import CharacterImage from "../ui/CharacterImage";
 import AnimatedWindow from "../ui/Info";
+import Chat from "../ui/Chat";
 
 function DesktopGameView({
   character,
@@ -16,6 +17,7 @@ function DesktopGameView({
   phaseResults,
   totalTeamSize,
   gameCharacters,
+  phaseVoters,
   showPlayersVote,
   hasVoted,
   showQuestVoteButton,
@@ -29,6 +31,8 @@ function DesktopGameView({
   handleChatOpen,
   unreadMessages,
   showChat,
+  playerSessionKey,
+  roomSessionKey,
   finalTeamSuggestions,
   leaderVotedPlayers,
 }) {
@@ -47,7 +51,7 @@ function DesktopGameView({
         display: "grid",
         gridTemplateRows: "auto 1fr auto",
         gridTemplateColumns: "1fr",
-        opacity: 'inherit'
+        opacity: "inherit",
       }}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -66,8 +70,18 @@ function DesktopGameView({
 
       {/* Row 2: 3 Columns */}
       <div className="grid grid-cols-3 gap-4 px-4 overflow-y-auto">
-        {/* Column 1: Empty */}
-        <div className="flex flex-col w-[350px]"></div>
+        {/* Column 1: Chat */}
+        <div className="flex flex-col items-center justify-center">
+          <Chat
+            show={showChat}
+            onClose={() => {}}
+            character={character}
+            playerSessionKey={playerSessionKey}
+            roomSessionKey={roomSessionKey}
+            onMessagesRead={() => handleChatOpen && handleChatOpen()}
+            isDesktop={true}
+          />
+        </div>
 
         {/* Column 2: Phase-Round, Exit-Menu */}
         <div className="flex flex-col items-center gap-4">
@@ -123,6 +137,8 @@ function DesktopGameView({
               triggerLabel={t("game.menu")}
               totalTeamSize={totalTeamSize}
               gameCharacters={gameCharacters}
+              phaseVoters={phaseVoters}
+              players={players}
               onMouseDown={() => setPressedButton("menu")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
@@ -166,7 +182,7 @@ function DesktopGameView({
 
         {/* Column 3: 2 Rows */}
         <div
-          className="grid gap-4 w-[350px] ml-6"
+          className="grid gap-4 w-[350px] ml-[15%] justify-center"
           style={{ gridTemplateRows: "5fr 2fr" }}
         >
           {/* Row 1: Player List */}

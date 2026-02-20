@@ -78,6 +78,7 @@ function Game() {
   const [showChat, setShowChat] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [phaseVoters, setPhaseVoters] = useState({});
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
   const [room, setRoom] = useState({});
@@ -264,9 +265,9 @@ function Game() {
         round,
         phase,
         missionTeamSizes,
-        // amazonq-ignore-next-line
         totalTeamSize,
         phaseResults,
+        phaseVoters: serverPhaseVoters,
       }) => {
         setRoundLeaderId(roundLeader);
         setRound(round);
@@ -279,8 +280,8 @@ function Game() {
         setHasVoted(false);
         setWaitingForReconnect(null);
         if (phase) setPhase(phase);
+        if (serverPhaseVoters) setPhaseVoters(serverPhaseVoters);
 
-        // Set phase results for rejoining players - don't clear existing results
         if (
           phaseResults &&
           Array.isArray(phaseResults) &&
@@ -292,7 +293,6 @@ function Game() {
     );
     return () => socket.off("round_update");
   }, []);
-  // amazonq-ignore-next-line
 
   // Players voted the players for next quest
   useEffect(() => {
@@ -406,6 +406,7 @@ function Game() {
           phaseResults={phaseResults}
           totalTeamSize={totalTeamSize}
           gameCharacters={gameCharacters}
+          phaseVoters={phaseVoters}
           showPlayersVote={showPlayersVote}
           hasVoted={hasVoted}
           showQuestVoteButton={showQuestVoteButton}
@@ -419,6 +420,8 @@ function Game() {
           handleChatOpen={handleChatOpen}
           unreadMessages={unreadMessages}
           showChat={showChat}
+          playerSessionKey={playerSessionKey}
+          roomSessionKey={roomSessionKey}
           finalTeamSuggestions={finalTeamSuggestions}
           leaderVotedPlayers={leaderVotedPlayers}
         />
@@ -435,6 +438,7 @@ function Game() {
           phaseResults={phaseResults}
           totalTeamSize={totalTeamSize}
           gameCharacters={gameCharacters}
+          phaseVoters={phaseVoters}
           showPlayersVote={showPlayersVote}
           hasVoted={hasVoted}
           showQuestVoteButton={showQuestVoteButton}
@@ -549,14 +553,16 @@ function Game() {
           </div>
         </div>
       )}
-      <Chat
-        show={showChat}
-        onClose={() => !isDesktop && setShowChat(false)}
-        character={character}
-        playerSessionKey={playerSessionKey}
-        roomSessionKey={roomSessionKey}
-        isDesktop={isDesktop}
-      />
+      {!isDesktop && (
+        <Chat
+          show={showChat}
+          onClose={() => setShowChat(false)}
+          character={character}
+          playerSessionKey={playerSessionKey}
+          roomSessionKey={roomSessionKey}
+          isDesktop={false}
+        />
+      )}
       </>
       )}
       </motion.div>

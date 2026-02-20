@@ -16,6 +16,7 @@ function MobileGameView({
   phaseResults,
   totalTeamSize,
   gameCharacters,
+  phaseVoters,
   showPlayersVote,
   hasVoted,
   showQuestVoteButton,
@@ -141,6 +142,8 @@ function MobileGameView({
               triggerLabel={t("game.menu")}
               totalTeamSize={totalTeamSize}
               gameCharacters={gameCharacters}
+              phaseVoters={phaseVoters}
+              players={players}
               onMouseDown={() => setPressedButton("menu")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}

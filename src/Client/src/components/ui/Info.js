@@ -6,6 +6,8 @@ export default function AnimatedWindow({
   triggerLabel = "Menu",
   totalTeamSize,
   gameCharacters,
+  phaseVoters = {},
+  players = [],
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -21,7 +23,7 @@ export default function AnimatedWindow({
 
   // Deduplicate by name
   const uniqueCharacters = Array.from(
-    new Map(gameCharacters.map((c) => [c.name, c])).values()
+    new Map(gameCharacters.map((c) => [c.name, c])).values(),
   );
 
   return (
@@ -37,7 +39,7 @@ export default function AnimatedWindow({
       {/* Trigger button */}
       <button
         onClick={handleToggle}
-        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 transition rounded-md font-bold relative z-[60]"
+        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 transition rounded-md font-bold relative z-[40]"
       >
         {triggerLabel}
       </button>
@@ -115,19 +117,54 @@ export default function AnimatedWindow({
                     </h2>
                     {totalTeamSize && (
                       <div className="space-y-2 flex flex-col items-center mt-4">
-                        {[1, 2, 3, 4, 5].map((phase) => (
-                          <div
-                            key={phase}
-                            className="w-[60%] flex justify-center items-center gap-5 p-1 bg-slate-700 rounded"
-                          >
-                            <span className="font-semibold">
-                              {t("info.phase")} {phase} :
-                            </span>
-                            <span className="text-amber-400">
-                              {totalTeamSize[phase - 1]} {t("info.players")}
-                            </span>
-                          </div>
-                        ))}
+                        {[1, 2, 3, 4, 5].map((phase) => {
+                          const voters = phaseVoters[phase] || [];
+                          const voterNames = voters
+                            .map(
+                              (psk) =>
+                                players.find((p) => p.playerSessionKey === psk)
+                                  ?.name,
+                            )
+                            .filter(Boolean);
+
+                          const playerCount = players.length;
+                          let failsNeeded = 1;
+                          if (
+                            playerCount >= 7 &&
+                            playerCount <= 10 &&
+                            phase === 4
+                          ) {
+                            failsNeeded = 2;
+                          }
+
+                          return (
+                            <div
+                              key={phase}
+                              className="w-[94%] bg-slate-700 rounded p-2"
+                            >
+                              <div className="flex justify-between items-center px-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">
+                                    {t("info.phase")} {phase} :
+                                  </span>
+                                  <span className="text-amber-400">
+                                    {totalTeamSize[phase - 1]}{" "}
+                                    {t("info.players")}
+                                  </span>
+                                  <span className="text-red-400 text-xs">
+                                    {failsNeeded} {t("info.failsNeeded")}
+                                    {failsNeeded > 1 ? "s" : ""}
+                                  </span>
+                                </div>
+                              </div>
+                              {voterNames.length > 0 && (
+                                <div className="mt-1 text-xs text-gray-300 text-center">
+                                  {voterNames.join(", ")}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -172,7 +209,7 @@ export default function AnimatedWindow({
                         </p>
                         <p className="text-gray-300">
                           {t(
-                            `characters.descriptions.${selectedCharacter.name}`
+                            `characters.descriptions.${selectedCharacter.name}`,
                           )}
                         </p>
                       </div>
@@ -379,8 +416,6 @@ export default function AnimatedWindow({
                   </div>
                 )}
               </div>
-
-
             </div>
           </motion.div>
         )}

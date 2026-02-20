@@ -354,6 +354,9 @@ io.on("connection", (socket) => {
               ],
             totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
             gameStarted: room.gameStarted,
+            phaseVoters: Object.fromEntries(
+              Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+            ),
           });
         }
 
@@ -390,6 +393,9 @@ io.on("connection", (socket) => {
             ],
           totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
           gameStarted: room.gameStarted,
+          phaseVoters: Object.fromEntries(
+            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+          ),
         });
       }
     }
@@ -569,6 +575,7 @@ io.on("connection", (socket) => {
           missionTeamSizes: MISSION_TEAM_SIZES[playerList.length][0],
           totalTeamSize: MISSION_TEAM_SIZES[playerList.length],
           gameStarted: room.gameStarted,
+          phaseVoters: {},
         });
       }, GAME_TIMERS.GAME_START_BROADCAST_DELAY);
       return room;
@@ -775,6 +782,9 @@ io.on("connection", (socket) => {
               ],
             totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
             gameStarted: room.gameStarted,
+            phaseVoters: Object.fromEntries(
+              Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+            ),
           });
         }
 
@@ -844,6 +854,9 @@ io.on("connection", (socket) => {
               totalTeamSize:
                 MISSION_TEAM_SIZES[Object.keys(room.players).length],
               gameStarted: room.gameStarted,
+              phaseVoters: Object.fromEntries(
+                Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+              ),
             });
           }, 500);
         }
@@ -1347,6 +1360,9 @@ io.on("connection", (socket) => {
             MISSION_TEAM_SIZES[playerList.length][(room.phase || 1) - 1],
           totalTeamSize: MISSION_TEAM_SIZES[playerList.length],
           gameStarted: room.gameStarted,
+          phaseVoters: Object.fromEntries(
+            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+          ),
         });
 
         setTimeout(async () => {
@@ -1434,6 +1450,9 @@ io.on("connection", (socket) => {
             MISSION_TEAM_SIZES[playerList.length][(room.phase || 1) - 1],
           totalTeamSize: MISSION_TEAM_SIZES[playerList.length],
           gameStarted: room.gameStarted,
+          phaseVoters: Object.fromEntries(
+            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+          ),
         });
 
         setTimeout(async () => {
