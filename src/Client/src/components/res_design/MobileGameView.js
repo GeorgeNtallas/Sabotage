@@ -34,7 +34,7 @@ function MobileGameView({
   const { t } = useTranslation();
 
   return (
-    <motion.div
+    <div
       className="relative w-full bg-gray-900 text-white overflow-y-auto"
       style={{
         backgroundImage: "url(/images/mythical.jpg)",
@@ -343,7 +343,7 @@ function MobileGameView({
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 

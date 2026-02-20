@@ -38,7 +38,7 @@ function Chat({
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, show]);
 
   const handleSendMessage = () => {
     if (!messageInput.trim()) return;
