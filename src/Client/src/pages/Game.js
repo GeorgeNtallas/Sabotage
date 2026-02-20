@@ -11,9 +11,9 @@ import QuestVote from "../components/ui/QuestVote";
 import PhaseResult from "../components/ui/PhaseResult";
 import GameOver from "../components/ui/GameOver";
 import WaitScreen from "../components/ui/WaitScreen";
-import AnimatedWindow from "../components/ui/Info";
-import CharacterImage from "../components/ui/CharacterImage";
 import Chat from "../components/ui/Chat";
+import DesktopGameView from "../components/res_design/DesktopGameView";
+import MobileGameView from "../components/res_design/MobileGameView";
 
 function Game() {
   // Loc, roomSessionKey
@@ -63,7 +63,6 @@ function Game() {
   const [character, setCharacter] = useState(null);
   const [leaderVotedPlayers, setLeaderVotedPlayers] = useState([]);
   const [finalTeamSuggestions, setFinalTeamSuggestions] = useState([]);
-  const [finalPhaseResults, setFinalPhaseResult] = useState([]);
   const [finalVoteResults, setFinalVoteResults] = useState({});
   const [totalTeamSize, setTotalTeamSize] = useState([]);
   const [gameCharacters, setGameCharacters] = useState([]);
@@ -77,6 +76,7 @@ function Game() {
   const [pressedButton, setPressedButton] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS------------
   const [room, setRoom] = useState({});
@@ -94,6 +94,18 @@ function Game() {
   }, []);
 
   // -------------ΤΗΕ NEW IMPLEMENTATION OF THE SOCKETS-------------
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop) {
+      setShowChat(true);
+    }
+  }, [isDesktop]);
 
   // Request game state on mount for rejoining players
   useEffect(() => {
@@ -226,14 +238,14 @@ function Game() {
 
   useEffect(() => {
     const handleChatMessage = () => {
-      if (!showChat) {
+      if (!showChat && !isDesktop) {
         setUnreadMessages((prev) => prev + 1);
       }
     };
 
     socket.on("chat_message", handleChatMessage);
     return () => socket.off("chat_message", handleChatMessage);
-  }, [showChat]);
+  }, [showChat, isDesktop]);
 
   const handleChatOpen = () => {
     setShowChat(true);
@@ -338,23 +350,14 @@ function Game() {
   // Announce the quest result
   useEffect(() => {
     socket.on("inform_result", ({ result, success, fail }) => {
-      setPhaseResults((prev) => {
-        const newResults = [...prev, result];
-        return newResults;
-      });
-      setFinalPhaseResult((prev) => [...prev, result]);
+      setPhaseResults((prev) => [...prev, result]);
       setFinalVoteResults({ success: success, fail: fail });
       setShowWaitScreen(false);
       setShowResultScreen(true);
     });
 
     return () => socket.off("inform_result");
-  }, [
-    finalPhaseResults,
-    finalVoteResults.fail,
-    finalVoteResults.success,
-    phase,
-  ]);
+  }, []);
   // amazonq-ignore-next-line
 
   // Game over
@@ -377,22 +380,16 @@ function Game() {
 
   if (!character) {
     return (
-      <AnimatePresence>
-        <motion.div
-          className="flex items-center justify-center h-screen bg-gray-900 text-white"
-          style={{
-            backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-2xl">{t("game.waitingForCharacter")}</h2>
-        </motion.div>
-      </AnimatePresence>
+      <div
+        className="flex items-center justify-center h-screen bg-gray-900 text-white"
+        style={{
+          backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <h2 className="text-2xl">{t("game.waitingForCharacter")}</h2>
+      </div>
     );
   }
 
@@ -400,380 +397,173 @@ function Game() {
   const isLeader = playerSessionKey === roundLeaderId;
 
   return (
-    <AnimatePresence>
-      <motion.div //TODO: Make the background more alive (add animation or wind)
-        className="relative w-full bg-gray-900 text-white overflow-y-auto"
-        style={{
-          backgroundImage: "url(/images/mythical.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "100vh",
-          margin: 0,
-          padding: 0,
-        }}
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
-      >
-        <div className="flex justify-around items-center h-16 w-full mt-2">
-          <button
-            onClick={() => setShowExit(true)}
-            onMouseDown={() => setPressedButton("exit")}
-            onMouseUp={() => setPressedButton(null)}
-            onMouseLeave={() => setPressedButton(null)}
-            onTouchStart={() => setPressedButton("exit")}
-            onTouchEnd={() => setPressedButton(null)}
-            className={`px-3 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
-              pressedButton === "exit" ? "scale-95 brightness-75" : ""
-            }`}
-          >
-            {t("game.exit")}
-          </button>
-          <img
-            src="/images/Sabotage3.png"
-            alt="Leader"
-            className="w-40 ml-6"
-            onError={(e) => (e.target.src = "/images/default.jpg")}
-          />
-          <div className="w-20"></div>
-        </div>
-        {/* Mobile Layout */}
-        <div className="relative z-10 space-y-4 ">
-          {/* Phase/Round/Chat */}
-          <div className="flex justify-center items-center h-16 w-full px-4 mt-5">
-            <div className="flex items-center gap-10">
-              <button
-                onClick={handleChatOpen}
-                onMouseDown={() => setPressedButton("chat")}
-                onMouseUp={() => setPressedButton(null)}
-                onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton("chat")}
-                onTouchEnd={() => setPressedButton(null)}
-                className={`relative px-3 py-2 bg-gradient-to-r bg-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-600 transition rounded-md font-bold ${
-                  pressedButton === "chat" ? "scale-95 brightness-75" : ""
-                }`}
-              >
-                {t("game.chat")}
-                {unreadMessages > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-                    {unreadMessages}
-                  </span>
-                )}
-              </button>
-              <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg p-3 text-center">
-                <h3 className="text-center font-semibold mb-2">
-                  {t("game.phase")} {phase} - {t("game.round")} {round}
-                </h3>
-                <div className="flex justify-center gap-2">
-                  {[1, 2, 3, 4, 5].map((phaseNum) => {
-                    let circleColor = "bg-gray-600";
-
-                    if (phaseNum === phase) {
-                      // Current active phase
-                      circleColor = "bg-cyan-600";
-                    } else if (phaseNum < phase) {
-                      // Completed phases - use finalPhaseResults or default to success
-                      const result =
-                        finalPhaseResults[phaseNum - 1] ||
-                        phaseResults[phaseNum - 1] ||
-                        "success";
-                      circleColor =
-                        result === "success" ? "bg-amber-500" : "bg-red-500";
-                    }
-
-                    return (
-                      <motion.div
-                        key={phaseNum}
-                        className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
-                        animate={
-                          phaseNum === phase
-                            ? {
-                                opacity: [1, 0.5, 1],
-                                scale: [1, 1.05, 1],
-                              }
-                            : {}
-                        }
-                        transition={{ duration: 1, repeat: Infinity }}
-                      >
-                        {phaseNum}
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-              <AnimatedWindow
-                triggerLabel={t("game.menu")}
-                totalTeamSize={totalTeamSize}
-                gameCharacters={gameCharacters}
-                onMouseDown={() => setPressedButton("menu")}
-                onMouseUp={() => setPressedButton(null)}
-                onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton("menu")}
-                onTouchEnd={() => setPressedButton(null)}
-                pressedButton={pressedButton}
-              />
-            </div>
-          </div>
-
-          {/* Character Card */}
-          <div className="flex justify-center ml-2">
-            <div className="flex flex-row space-x-4">
-              <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 rounded-lg mx-auto text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <h2 className="text-lg font-semibold pt-2">
-                    {displayName || name}
-                  </h2>
-                  {isLeader && (
-                    <img
-                      src="/images/Crown.jpg"
-                      alt="Leader"
-                      className="w-6 h-5 mt-1 ml-2"
-                      onError={(e) => (e.target.src = "/images/default.jpg")}
-                    />
-                  )}
-                </div>
-                <CharacterImage characterName={character.name} />
-                <h3 className="text-lg font-bold text-yellow-400">
-                  {character.name}
-                </h3>
-                <p className="text-sm text-gray-300 mb-1">
-                  {t(`characters.descriptions.${character.name}`)}
-                </p>
-                <p className="text-xs pb-2">
-                  {t("game.team")}:{" "}
-                  <span
-                    className={
-                      character.team === "good"
-                        ? "text-blue-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {character.team === "good"
-                      ? t("game.good")
-                      : t("game.evil")}
-                  </span>
-                </p>
-              </div>
-
-              {/* Players List */}
-              <div
-                className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-lg w-48 p-2 mx-auto text-center"
-                style={{ gridTemplateColumns: "1fr 1fr auto" }}
-              >
-                <div
-                  className="grid grid-cols-3 text-white font-bold mb-3 border-b border-gray-600 pb-2 text-sm"
-                  style={{ gridTemplateColumns: "1fr 1fr auto" }}
-                >
-                  <h3 className="text-center">{t("lobby.players")}</h3>
-                  <h3 className="text-center mr-3">{t("game.role")}</h3>
-                  <h3 className="text-center mr-1">L</h3>
-                </div>
-                <div
-                  className="grid grid-cols-3 gap-y-2 text-xs text-gray-300"
-                  style={{ gridTemplateColumns: "1fr 1fr auto" }}
-                >
-                  {players.map((player) => (
-                    <React.Fragment key={player.playerSessionKey}>
-                      <div className="text-center">{player.name}</div>
-                      <div className="text-center mr-2">
-                        {player.visibleRole === "evil"
-                          ? "Evil"
-                          : player.visibleRole === "Seer/Seraphina"
-                            ? "S/S"
-                            : ""}
-                      </div>
-                      <div className="text-center">
-                        {player.playerSessionKey === roundLeaderId && (
-                          <img
-                            src="/images/Crown.jpg"
-                            alt="Leader"
-                            className="w-4 h-4 mx-auto"
-                            onError={(e) =>
-                              (e.target.src = "/images/default.jpg")
-                            }
-                          />
-                        )}
-                      </div>
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Action Buttons - Mobile */}
-          <div className="flex justify-center">
-            <div className="w-80">
-              {showPlayersVote && (
-                <button
-                  onClick={() => setShowVoteModal(true)}
-                  onMouseDown={() => setPressedButton("vote")}
-                  onMouseUp={() => setPressedButton(null)}
-                  onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton("vote")}
-                  onTouchEnd={() => setPressedButton(null)}
-                  disabled={hasVoted}
-                  className={`w-full rounded-lg p-3 mb-2 text-white ${
-                    hasVoted
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : `bg-amber-600 hover:bg-amber-700 ${
-                          pressedButton === "vote"
-                            ? "scale-95 brightness-75"
-                            : ""
-                        }`
-                  }`}
-                >
-                  {hasVoted
-                    ? t("game.waitForOtherPlayers")
-                    : t("game.voteForQuestTeam")}
-                </button>
-              )}
-              {showQuestVoteButton && (
-                <button
-                  onClick={() => setShowQuestVoteModal(true)}
-                  onMouseDown={() => setPressedButton("proceed")}
-                  onMouseUp={() => setPressedButton(null)}
-                  onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton("proceed")}
-                  onTouchEnd={() => setPressedButton(null)}
-                  className={`w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 mb-2 ${
-                    pressedButton === "proceed" ? "scale-95 brightness-75" : ""
-                  }`}
-                >
-                  {t("game.proceedToQuest")}
-                </button>
-              )}
-              {isLeader && showLeaderVoteButton && (
-                <button
-                  onClick={() => setShowLeaderVoteModal(true)}
-                  onMouseDown={() => setPressedButton("leader")}
-                  onMouseUp={() => setPressedButton(null)}
-                  onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton("leader")}
-                  onTouchEnd={() => setPressedButton(null)}
-                  className={`w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg p-3 ${
-                    pressedButton === "leader" ? "scale-95 brightness-75" : ""
-                  }`}
-                >
-                  {t("game.leaderVote")}
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Player and Leader Votes */}
-          <QuestPopup
-            players={players}
-            finalTeamSuggestions={finalTeamSuggestions}
-            leaderVotedPlayers={leaderVotedPlayers}
-            isLeader={isLeader}
-          />
-        </div>
-        {/* Voting Modal For All */}
-        {showVoteModal && (
-          <Modals
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-            setSelectedPlayers={setSelectedPlayers}
-            selectedPlayers={selectedPlayers}
-            setShowVoteModal={setShowVoteModal}
-            setShowPlayersVote={setShowPlayersVote}
-            ShowVoteModal={showVoteModal}
-            players={players}
-            type="voteAll"
-            missionTeamSizes={missionTeamSizes}
-          />
-        )}
-        {/* Voting Modal For Leader */}
-        {showLeaderVoteModal && (
-          <Modals
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-            setSelectedPlayers={setSelectedPlayers}
-            selectedPlayers={selectedPlayers}
-            setShowVoteModal={setShowVoteModal}
-            setShowPlayersVote={setShowPlayersVote}
-            setShowLeaderVoteModal={setShowLeaderVoteModal}
-            showLeaderVoteModal={showLeaderVoteModal}
-            setShowQuestVoteButton={setShowQuestVoteButton}
-            players={players}
-            type="leaderVote"
-            missionTeamSizes={missionTeamSizes}
-          />
-        )}
-        {/* Voting Modal Selected Players */}
-        {showQuestVoteModal && (
-          <Modals
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-            leaderVotedPlayers={leaderVotedPlayers}
-            setShowQuestVoteButton={setShowQuestVoteButton}
-            setShowQuestVoteModal={setShowQuestVoteModal}
-            showQuestVoteModal={showQuestVoteModal}
-            type="questVote"
-          />
-        )}
-        {/* Selected Players Vote */}
-        {showQuestVoting && (
-          <QuestVote
-            setShowQuestVoting={setShowQuestVoting}
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-            show={showQuestVoting}
-            phase={phase}
-          />
-        )}
-        {/* Phase Result */}
-        {showResultScreen && (
-          <PhaseResult
-            votes={finalVoteResults}
-            setShowResultScreen={setShowResultScreen}
-            show={showResultScreen}
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-          />
-        )}
-        {showGameOver && (
-          <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
-        )}
-        {showExit && (
-          <Modals
-            roomSessionKey={roomSessionKey}
-            playerSessionKey={playerSessionKey}
-            players={players}
-            setShowExit={setShowExit}
-            showExit={showExit}
-            type="exit"
-          />
-        )}
-        {showWaitScreen && (
-          <WaitScreen
-            roomSessionKey={roomSessionKey}
-            leaderVotedPlayers={leaderVotedPlayers}
-            setShowWaitScreen={setShowWaitScreen}
-          />
-        )}
-        {waitingForReconnect && ( //TODO: Fix the ui
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-            <div className="bg-white text-black p-6 rounded-md">
-              <h3 className="font-bold mb-2">{waitingForReconnect}</h3>
-              <p>Please wait until they reconnect...</p>
-            </div>
-          </div>
-        )}
-        <Chat
-          show={showChat}
-          onClose={() => setShowChat(false)}
+    <>
+      {isDesktop ? (
+        <DesktopGameView
           character={character}
-          playerSessionKey={playerSessionKey}
-          roomSessionKey={roomSessionKey}
+          displayName={displayName}
+          name={name}
+          isLeader={isLeader}
+          players={players}
+          roundLeaderId={roundLeaderId}
+          phase={phase}
+          round={round}
+          phaseResults={phaseResults}
+          totalTeamSize={totalTeamSize}
+          gameCharacters={gameCharacters}
+          showPlayersVote={showPlayersVote}
+          hasVoted={hasVoted}
+          showQuestVoteButton={showQuestVoteButton}
+          showLeaderVoteButton={showLeaderVoteButton}
+          setShowVoteModal={setShowVoteModal}
+          setShowQuestVoteModal={setShowQuestVoteModal}
+          setShowLeaderVoteModal={setShowLeaderVoteModal}
+          setShowExit={setShowExit}
+          pressedButton={pressedButton}
+          setPressedButton={setPressedButton}
+          handleChatOpen={handleChatOpen}
+          unreadMessages={unreadMessages}
+          showChat={showChat}
+          finalTeamSuggestions={finalTeamSuggestions}
+          leaderVotedPlayers={leaderVotedPlayers}
         />
-      </motion.div>
-    </AnimatePresence>
+      ) : (
+        <MobileGameView
+          character={character}
+          displayName={displayName}
+          name={name}
+          isLeader={isLeader}
+          players={players}
+          roundLeaderId={roundLeaderId}
+          phase={phase}
+          round={round}
+          phaseResults={phaseResults}
+          totalTeamSize={totalTeamSize}
+          gameCharacters={gameCharacters}
+          showPlayersVote={showPlayersVote}
+          hasVoted={hasVoted}
+          showQuestVoteButton={showQuestVoteButton}
+          showLeaderVoteButton={showLeaderVoteButton}
+          setShowVoteModal={setShowVoteModal}
+          setShowQuestVoteModal={setShowQuestVoteModal}
+          setShowLeaderVoteModal={setShowLeaderVoteModal}
+          setShowExit={setShowExit}
+          pressedButton={pressedButton}
+          setPressedButton={setPressedButton}
+          handleChatOpen={handleChatOpen}
+          unreadMessages={unreadMessages}
+          finalTeamSuggestions={finalTeamSuggestions}
+          leaderVotedPlayers={leaderVotedPlayers}
+        />
+      )}
+      <QuestPopup
+        players={players}
+        finalTeamSuggestions={finalTeamSuggestions}
+        leaderVotedPlayers={leaderVotedPlayers}
+        isLeader={isLeader}
+      />
+      {/* Voting Modal For All */}
+      {showVoteModal && (
+        <Modals
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          setSelectedPlayers={setSelectedPlayers}
+          selectedPlayers={selectedPlayers}
+          setShowVoteModal={setShowVoteModal}
+          setShowPlayersVote={setShowPlayersVote}
+          ShowVoteModal={showVoteModal}
+          players={players}
+          type="voteAll"
+          missionTeamSizes={missionTeamSizes}
+        />
+      )}
+      {/* Voting Modal For Leader */}
+      {showLeaderVoteModal && (
+        <Modals
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          setSelectedPlayers={setSelectedPlayers}
+          selectedPlayers={selectedPlayers}
+          setShowVoteModal={setShowVoteModal}
+          setShowPlayersVote={setShowPlayersVote}
+          setShowLeaderVoteModal={setShowLeaderVoteModal}
+          showLeaderVoteModal={showLeaderVoteModal}
+          setShowQuestVoteButton={setShowQuestVoteButton}
+          players={players}
+          type="leaderVote"
+          missionTeamSizes={missionTeamSizes}
+        />
+      )}
+      {/* Voting Modal Selected Players */}
+      {showQuestVoteModal && (
+        <Modals
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          leaderVotedPlayers={leaderVotedPlayers}
+          setShowQuestVoteButton={setShowQuestVoteButton}
+          setShowQuestVoteModal={setShowQuestVoteModal}
+          showQuestVoteModal={showQuestVoteModal}
+          type="questVote"
+        />
+      )}
+      {/* Selected Players Vote */}
+      {showQuestVoting && (
+        <QuestVote
+          setShowQuestVoting={setShowQuestVoting}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          show={showQuestVoting}
+          phase={phase}
+        />
+      )}
+      {/* Phase Result */}
+      {showResultScreen && (
+        <PhaseResult
+          votes={finalVoteResults}
+          setShowResultScreen={setShowResultScreen}
+          show={showResultScreen}
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+        />
+      )}
+      {showGameOver && (
+        <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
+      )}
+      {showExit && (
+        <Modals
+          roomSessionKey={roomSessionKey}
+          playerSessionKey={playerSessionKey}
+          players={players}
+          setShowExit={setShowExit}
+          showExit={showExit}
+          type="exit"
+        />
+      )}
+      {showWaitScreen && (
+        <WaitScreen
+          roomSessionKey={roomSessionKey}
+          leaderVotedPlayers={leaderVotedPlayers}
+          setShowWaitScreen={setShowWaitScreen}
+        />
+      )}
+      {waitingForReconnect && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white text-black p-6 rounded-md">
+            <h3 className="font-bold mb-2">{waitingForReconnect}</h3>
+            <p>Please wait until they reconnect...</p>
+          </div>
+        </div>
+      )}
+      <Chat
+        show={showChat}
+        onClose={() => !isDesktop && setShowChat(false)}
+        character={character}
+        playerSessionKey={playerSessionKey}
+        roomSessionKey={roomSessionKey}
+        isDesktop={isDesktop}
+      />
+    </>
   );
 }
 
 export default Game;
-
-//TODO: Να το κανω responsive

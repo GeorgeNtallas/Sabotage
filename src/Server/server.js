@@ -282,11 +282,11 @@ const initializeRoom = (roomSessionKey) => ({
   questVoting: null,
   votedPlayers: [],
   final_result: {
-    1: { votes: { success: 0, fail: 0 }, result: [] },
-    2: { votes: { success: 0, fail: 0 }, result: [] },
-    3: { votes: { success: 0, fail: 0 }, result: [] },
-    4: { votes: { success: 0, fail: 0 }, result: [] },
-    5: { votes: { success: 0, fail: 0 }, result: [] },
+    1: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
+    2: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
+    3: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
+    4: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
+    5: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
   },
   transitioning: false,
   roomSessionKey,
@@ -1215,6 +1215,18 @@ io.on("connection", (socket) => {
           const room = await loadRoom(roomSessionKey);
           if (!room || !room.players[playerSessionKey]) return;
 
+          // Initialize voters array if not present
+          if (!room.final_result[room.phase].voters) {
+            room.final_result[room.phase].voters = [];
+          }
+
+          // Check if player already voted
+          if (room.final_result[room.phase].voters.includes(playerSessionKey)) {
+            return; // Already voted, ignore duplicate
+          }
+
+          // Record the vote
+          room.final_result[room.phase].voters.push(playerSessionKey);
           if (vote === "success") room.final_result[room.phase].votes.success++;
           else room.final_result[room.phase].votes.fail++;
 

@@ -13,10 +13,10 @@ export default function AnimatedWindow({
   const [activeTab, setActiveTab] = useState("option1");
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [rulesSection, setRulesSection] = useState("goal");
-  const handleOpen = (e) => {
+  const handleToggle = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setButtonRect(rect);
-    setOpen(true);
+    setOpen(!open);
   };
 
   // Deduplicate by name
@@ -26,10 +26,18 @@ export default function AnimatedWindow({
 
   return (
     <>
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       {/* Trigger button */}
       <button
-        onClick={handleOpen}
-        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 transition rounded-md font-bold"
+        onClick={handleToggle}
+        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 transition rounded-md font-bold relative z-[60]"
       >
         {triggerLabel}
       </button>
@@ -38,7 +46,7 @@ export default function AnimatedWindow({
       <AnimatePresence>
         {open && buttonRect && (
           <motion.div
-            className="fixed z-50"
+            className="fixed z-50 pointer-events-none"
             initial={{
               top: buttonRect.top,
               left: buttonRect.left,
@@ -63,7 +71,7 @@ export default function AnimatedWindow({
             }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
           >
-            <div className="w-[90%] max-h ml-5 mt-10  justify-center flex flex-col rounded-2xl shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 overflow-hidden">
+            <div className="w-[90%] max-h ml-5 mt-10  justify-center flex flex-col rounded-2xl shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 overflow-hidden pointer-events-auto">
               {/* Tab buttons */}
               <div className="flex gap-2 p-2 border-b border-slate-700 bg-slate-800">
                 <button
@@ -372,15 +380,7 @@ export default function AnimatedWindow({
                 )}
               </div>
 
-              {/* Footer Close button */}
-              <div className="p-2 border-t border-slate-700 flex justify-end bg-slate-800">
-                <button
-                  className="px-4 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 transition"
-                  onClick={() => setOpen(false)}
-                >
-                  {t("info.close")}
-                </button>
-              </div>
+
             </div>
           </motion.div>
         )}

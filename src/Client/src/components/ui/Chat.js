@@ -3,7 +3,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import socket from "../../socket";
 
-function Chat({ show, onClose, character, playerSessionKey, roomSessionKey, onMessagesRead }) {
+function Chat({
+  show,
+  onClose,
+  character,
+  playerSessionKey,
+  roomSessionKey,
+  onMessagesRead,
+  isDesktop = false,
+}) {
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState("");
@@ -45,6 +53,61 @@ function Chat({ show, onClose, character, playerSessionKey, roomSessionKey, onMe
   };
 
   if (!show) return null;
+
+  if (isDesktop) {
+    return (
+      <div className="fixed left-16 top-1/2 transform -translate-y-1/2 w-[350px] h-[400px] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl flex flex-col z-10">
+        {/* Header */}
+        <div className="flex justify-center items-center p-2 border-b border-slate-600">
+          <h2 className="text-lg font-bold text-white">{t("chat.title")}</h2>
+        </div>
+
+        {/* Messages */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-2 space-y-1">
+          {messages.map((msg, idx) => {
+            const isOwnMessage = msg.senderSessionKey === playerSessionKey;
+            return (
+              <div
+                key={idx}
+                className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-lg p-1.5 ${
+                    isOwnMessage ? "bg-indigo-600/80" : "bg-slate-700/50"
+                  }`}
+                >
+                  <span className="font-bold text-amber-400 text-xs">
+                    {msg.playerName}
+                  </span>
+                  <p className="text-gray-200 text-xs break-words">
+                    {msg.message}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Input */}
+        <div className="p-2 border-t border-slate-600 flex flex-col gap-1">
+          <input
+            type="text"
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            placeholder={t("chat.placeholder") || "Type..."}
+            className="w-full bg-slate-700 text-white text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-2 py-1.5 rounded-lg transition"
+          >
+            {t("chat.send") || "Send"}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <AnimatePresence>

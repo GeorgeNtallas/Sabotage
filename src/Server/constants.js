@@ -34,8 +34,8 @@ const GAME_TIMERS = {
 
 // Room Cleanup Configuration
 const ROOM_CLEANUP = {
-  CHECK_INTERVAL_MS: 2 * 60 * 1000, // 2 minutes
-  EMPTY_GRACE_PERIOD_MS: 5 * 60 * 1000, // 5 minutes
+  CHECK_INTERVAL_MS: 10 * 60 * 1000, // 10 minutes
+  EMPTY_GRACE_PERIOD_MS: 20 * 60 * 1000, // 20 minutes
 };
 
 // Game Rules - Mission Team Sizes by player count
