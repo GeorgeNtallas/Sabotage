@@ -38,15 +38,19 @@ function MobileGameView({
 
   return (
     <div
-      className="relative w-full bg-gray-900 text-white overflow-y-auto"
+      className="relative w-full bg-gray-900 text-white"
       style={{
         backgroundImage: "url(/images/mythical.jpg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: "100vh",
+        minHeight: "100dvh",
+        height: "100dvh",
         margin: 0,
         padding: 0,
-        opacity: 'inherit'
+        overflowY: "auto",
+        overflowX: "hidden",
+        WebkitOverflowScrolling: "touch",
+        opacity: "inherit",
       }}
       initial={{ opacity: 0, scale: 0.95, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
