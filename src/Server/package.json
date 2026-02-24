@@ -3,8 +3,17 @@
   "version": "1.0.0",
   "description": "Backend server for Sabotage game using Express and Socket.IO",
   "main": "server.js",
+  "keywords": [
+    "sabotage",
+    "game",
+    "express",
+    "socket.io",
+    "multiplayer"
+  ],
+  "author": "Ntallas Georgios",
+  "license": "MIT",
   "scripts": {
-    "start": "node server.js",
+    "start": "nodemon server.js",
     "test": "jest --verbose > test-results.log 2>&1 & type test-results.log",
     "test:watch": "jest --watch --verbose",
     "test:coverage": "jest --coverage --verbose > test-coverage.log 2>&1 & type test-coverage.log"

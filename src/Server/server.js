@@ -355,7 +355,10 @@ io.on("connection", (socket) => {
             totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
             gameStarted: room.gameStarted,
             phaseVoters: Object.fromEntries(
-              Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+              Object.entries(room.final_result || {}).map(([phase, data]) => [
+                phase,
+                data.voters || [],
+              ]),
             ),
           });
         }
@@ -394,7 +397,10 @@ io.on("connection", (socket) => {
           totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
           gameStarted: room.gameStarted,
           phaseVoters: Object.fromEntries(
-            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+            Object.entries(room.final_result || {}).map(([phase, data]) => [
+              phase,
+              data.voters || [],
+            ]),
           ),
         });
       }
@@ -783,7 +789,10 @@ io.on("connection", (socket) => {
             totalTeamSize: MISSION_TEAM_SIZES[Object.keys(room.players).length],
             gameStarted: room.gameStarted,
             phaseVoters: Object.fromEntries(
-              Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+              Object.entries(room.final_result || {}).map(([phase, data]) => [
+                phase,
+                data.voters || [],
+              ]),
             ),
           });
         }
@@ -855,7 +864,10 @@ io.on("connection", (socket) => {
                 MISSION_TEAM_SIZES[Object.keys(room.players).length],
               gameStarted: room.gameStarted,
               phaseVoters: Object.fromEntries(
-                Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+                Object.entries(room.final_result || {}).map(([phase, data]) => [
+                  phase,
+                  data.voters || [],
+                ]),
               ),
             });
           }, 500);
@@ -1361,7 +1373,10 @@ io.on("connection", (socket) => {
           totalTeamSize: MISSION_TEAM_SIZES[playerList.length],
           gameStarted: room.gameStarted,
           phaseVoters: Object.fromEntries(
-            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+            Object.entries(room.final_result || {}).map(([phase, data]) => [
+              phase,
+              data.voters || [],
+            ]),
           ),
         });
 
@@ -1451,7 +1466,10 @@ io.on("connection", (socket) => {
           totalTeamSize: MISSION_TEAM_SIZES[playerList.length],
           gameStarted: room.gameStarted,
           phaseVoters: Object.fromEntries(
-            Object.entries(room.final_result || {}).map(([phase, data]) => [phase, data.voters || []])
+            Object.entries(room.final_result || {}).map(([phase, data]) => [
+              phase,
+              data.voters || [],
+            ]),
           ),
         });
 
