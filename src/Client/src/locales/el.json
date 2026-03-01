@@ -42,7 +42,9 @@
     "leaderVote": "Επιλογή Ομάδας Αποστολής",
     "exit": "Έξοδος",
     "role": "Ρόλος",
-    "chat": "Chat"
+    "chat": "Chat",
+    "max_players": "Max",
+    "submit": "Υποβολή"
   },
   "modals": {
     "voteQuestTeam": "Ψηφίστε την Ομάδα Αποστολής",

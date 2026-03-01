@@ -99,8 +99,8 @@ function Game() {
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -356,6 +356,7 @@ function Game() {
       setFinalVoteResults({ success: success, fail: fail });
       setShowWaitScreen(false);
       setShowResultScreen(true);
+      console.log("after showresultscreen made true", showResultScreen);
     });
 
     return () => socket.off("inform_result");
@@ -373,10 +374,21 @@ function Game() {
 
   // Game over
   useEffect(() => {
-    socket.on("exit_to_home", () => {
-      sessionStorage.removeItem("roomSessionKey");
-      navigate("/", { state: { name } });
-    });
+    socket.on(
+      "exit_to_lobby",
+      ({ leader, isPublic, password, roomName, readyList }) => {
+        navigate(`/lobby?${roomSessionKey}`, {
+          state: {
+            name: name,
+            isLeader: leader,
+            roomPassword: password,
+            newRoomName: roomName,
+            isPublic: isPublic,
+            readyList: readyList,
+          },
+        });
+      },
+    );
     return () => socket.off("exit_to_home");
   }, [name, navigate]);
 
@@ -391,180 +403,181 @@ function Game() {
         transition={{ duration: 1 }}
         className="w-full h-full bg-black"
       >
-      {character && (
-        <>
-      {isDesktop ? (
-        <DesktopGameView
-          character={character}
-          displayName={displayName}
-          name={name}
-          isLeader={isLeader}
-          players={players}
-          roundLeaderId={roundLeaderId}
-          phase={phase}
-          round={round}
-          phaseResults={phaseResults}
-          totalTeamSize={totalTeamSize}
-          gameCharacters={gameCharacters}
-          phaseVoters={phaseVoters}
-          showPlayersVote={showPlayersVote}
-          hasVoted={hasVoted}
-          showQuestVoteButton={showQuestVoteButton}
-          showLeaderVoteButton={showLeaderVoteButton}
-          setShowVoteModal={setShowVoteModal}
-          setShowQuestVoteModal={setShowQuestVoteModal}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowExit={setShowExit}
-          pressedButton={pressedButton}
-          setPressedButton={setPressedButton}
-          handleChatOpen={handleChatOpen}
-          unreadMessages={unreadMessages}
-          showChat={showChat}
-          playerSessionKey={playerSessionKey}
-          roomSessionKey={roomSessionKey}
-          finalTeamSuggestions={finalTeamSuggestions}
-          leaderVotedPlayers={leaderVotedPlayers}
-        />
-      ) : (
-        <MobileGameView
-          character={character}
-          displayName={displayName}
-          name={name}
-          isLeader={isLeader}
-          players={players}
-          roundLeaderId={roundLeaderId}
-          phase={phase}
-          round={round}
-          phaseResults={phaseResults}
-          totalTeamSize={totalTeamSize}
-          gameCharacters={gameCharacters}
-          phaseVoters={phaseVoters}
-          showPlayersVote={showPlayersVote}
-          hasVoted={hasVoted}
-          showQuestVoteButton={showQuestVoteButton}
-          showLeaderVoteButton={showLeaderVoteButton}
-          setShowVoteModal={setShowVoteModal}
-          setShowQuestVoteModal={setShowQuestVoteModal}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          setShowExit={setShowExit}
-          pressedButton={pressedButton}
-          setPressedButton={setPressedButton}
-          handleChatOpen={handleChatOpen}
-          unreadMessages={unreadMessages}
-          finalTeamSuggestions={finalTeamSuggestions}
-          leaderVotedPlayers={leaderVotedPlayers}
-        />
-      )}
-      <QuestPopup
-        players={players}
-        finalTeamSuggestions={finalTeamSuggestions}
-        leaderVotedPlayers={leaderVotedPlayers}
-        isLeader={isLeader}
-      />
-      {/* Voting Modal For All */}
-      {showVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          setSelectedPlayers={setSelectedPlayers}
-          selectedPlayers={selectedPlayers}
-          setShowVoteModal={setShowVoteModal}
-          setShowPlayersVote={setShowPlayersVote}
-          ShowVoteModal={showVoteModal}
-          players={players}
-          type="voteAll"
-          missionTeamSizes={missionTeamSizes}
-        />
-      )}
-      {/* Voting Modal For Leader */}
-      {showLeaderVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          setSelectedPlayers={setSelectedPlayers}
-          selectedPlayers={selectedPlayers}
-          setShowVoteModal={setShowVoteModal}
-          setShowPlayersVote={setShowPlayersVote}
-          setShowLeaderVoteModal={setShowLeaderVoteModal}
-          showLeaderVoteModal={showLeaderVoteModal}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          players={players}
-          type="leaderVote"
-          missionTeamSizes={missionTeamSizes}
-        />
-      )}
-      {/* Voting Modal Selected Players */}
-      {showQuestVoteModal && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowQuestVoteButton={setShowQuestVoteButton}
-          setShowQuestVoteModal={setShowQuestVoteModal}
-          showQuestVoteModal={showQuestVoteModal}
-          type="questVote"
-        />
-      )}
-      {/* Selected Players Vote */}
-      {showQuestVoting && (
-        <QuestVote
-          setShowQuestVoting={setShowQuestVoting}
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          show={showQuestVoting}
-          phase={phase}
-        />
-      )}
-      {/* Phase Result */}
-      {showResultScreen && (
-        <PhaseResult
-          votes={finalVoteResults}
-          setShowResultScreen={setShowResultScreen}
-          show={showResultScreen}
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-        />
-      )}
-      {showGameOver && (
-        <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
-      )}
-      {showExit && (
-        <Modals
-          roomSessionKey={roomSessionKey}
-          playerSessionKey={playerSessionKey}
-          players={players}
-          setShowExit={setShowExit}
-          showExit={showExit}
-          type="exit"
-        />
-      )}
-      {showWaitScreen && (
-        <WaitScreen
-          roomSessionKey={roomSessionKey}
-          leaderVotedPlayers={leaderVotedPlayers}
-          setShowWaitScreen={setShowWaitScreen}
-        />
-      )}
-      {waitingForReconnect && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white text-black p-6 rounded-md">
-            <h3 className="font-bold mb-2">{waitingForReconnect}</h3>
-            <p>Please wait until they reconnect...</p>
-          </div>
-        </div>
-      )}
-      {!isDesktop && (
-        <Chat
-          show={showChat}
-          onClose={() => setShowChat(false)}
-          character={character}
-          playerSessionKey={playerSessionKey}
-          roomSessionKey={roomSessionKey}
-          isDesktop={false}
-        />
-      )}
-      </>
-      )}
+        {character && (
+          <>
+            {isDesktop ? (
+              <DesktopGameView
+                character={character}
+                displayName={displayName}
+                name={name}
+                isLeader={isLeader}
+                players={players}
+                roundLeaderId={roundLeaderId}
+                phase={phase}
+                round={round}
+                phaseResults={phaseResults}
+                totalTeamSize={totalTeamSize}
+                gameCharacters={gameCharacters}
+                phaseVoters={phaseVoters}
+                showPlayersVote={showPlayersVote}
+                hasVoted={hasVoted}
+                showQuestVoteButton={showQuestVoteButton}
+                showLeaderVoteButton={showLeaderVoteButton}
+                setShowVoteModal={setShowVoteModal}
+                setShowQuestVoteModal={setShowQuestVoteModal}
+                setShowLeaderVoteModal={setShowLeaderVoteModal}
+                setShowExit={setShowExit}
+                pressedButton={pressedButton}
+                setPressedButton={setPressedButton}
+                handleChatOpen={handleChatOpen}
+                unreadMessages={unreadMessages}
+                showChat={showChat}
+                playerSessionKey={playerSessionKey}
+                roomSessionKey={roomSessionKey}
+                finalTeamSuggestions={finalTeamSuggestions}
+                leaderVotedPlayers={leaderVotedPlayers}
+              />
+            ) : (
+              <MobileGameView
+                character={character}
+                displayName={displayName}
+                name={name}
+                isLeader={isLeader}
+                players={players}
+                roundLeaderId={roundLeaderId}
+                phase={phase}
+                round={round}
+                phaseResults={phaseResults}
+                totalTeamSize={totalTeamSize}
+                gameCharacters={gameCharacters}
+                phaseVoters={phaseVoters}
+                showPlayersVote={showPlayersVote}
+                hasVoted={hasVoted}
+                showQuestVoteButton={showQuestVoteButton}
+                showLeaderVoteButton={showLeaderVoteButton}
+                setShowVoteModal={setShowVoteModal}
+                setShowQuestVoteModal={setShowQuestVoteModal}
+                setShowLeaderVoteModal={setShowLeaderVoteModal}
+                setShowExit={setShowExit}
+                pressedButton={pressedButton}
+                setPressedButton={setPressedButton}
+                handleChatOpen={handleChatOpen}
+                unreadMessages={unreadMessages}
+                finalTeamSuggestions={finalTeamSuggestions}
+                leaderVotedPlayers={leaderVotedPlayers}
+              />
+            )}
+            <QuestPopup
+              players={players}
+              finalTeamSuggestions={finalTeamSuggestions}
+              leaderVotedPlayers={leaderVotedPlayers}
+              isLeader={isLeader}
+            />
+            {/* Voting Modal For All */}
+            {showVoteModal && (
+              <Modals
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+                setSelectedPlayers={setSelectedPlayers}
+                selectedPlayers={selectedPlayers}
+                setShowVoteModal={setShowVoteModal}
+                setShowPlayersVote={setShowPlayersVote}
+                ShowVoteModal={showVoteModal}
+                players={players}
+                type="voteAll"
+                missionTeamSizes={missionTeamSizes}
+              />
+            )}
+            {/* Voting Modal For Leader */}
+            {showLeaderVoteModal && (
+              <Modals
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+                setSelectedPlayers={setSelectedPlayers}
+                selectedPlayers={selectedPlayers}
+                setShowVoteModal={setShowVoteModal}
+                setShowPlayersVote={setShowPlayersVote}
+                setShowLeaderVoteModal={setShowLeaderVoteModal}
+                showLeaderVoteModal={showLeaderVoteModal}
+                setShowQuestVoteButton={setShowQuestVoteButton}
+                players={players}
+                type="leaderVote"
+                missionTeamSizes={missionTeamSizes}
+              />
+            )}
+            {/* Voting Modal Selected Players */}
+            {showQuestVoteModal && (
+              <Modals
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+                leaderVotedPlayers={leaderVotedPlayers}
+                setShowQuestVoteButton={setShowQuestVoteButton}
+                setShowQuestVoteModal={setShowQuestVoteModal}
+                showQuestVoteModal={showQuestVoteModal}
+                type="questVote"
+              />
+            )}
+            {/* Selected Players Vote */}
+            {showQuestVoting && (
+              <QuestVote
+                setShowQuestVoting={setShowQuestVoting}
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+                show={showQuestVoting}
+                phase={phase}
+              />
+            )}
+            {console.log("showResultScreen", showResultScreen)}{" "}
+            {/* Phase Result */}
+            {showResultScreen && (
+              <PhaseResult
+                votes={finalVoteResults}
+                setShowResultScreen={setShowResultScreen}
+                show={showResultScreen}
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+              />
+            )}
+            {showGameOver && (
+              <GameOver roomSessionKey={roomSessionKey} winner={gameResult} />
+            )}
+            {showExit && (
+              <Modals
+                roomSessionKey={roomSessionKey}
+                playerSessionKey={playerSessionKey}
+                players={players}
+                setShowExit={setShowExit}
+                showExit={showExit}
+                type="exit"
+              />
+            )}
+            {showWaitScreen && (
+              <WaitScreen
+                roomSessionKey={roomSessionKey}
+                leaderVotedPlayers={leaderVotedPlayers}
+                setShowWaitScreen={setShowWaitScreen}
+              />
+            )}
+            {waitingForReconnect && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                <div className="bg-white text-black p-6 rounded-md">
+                  <h3 className="font-bold mb-2">{waitingForReconnect}</h3>
+                  <p>Please wait until they reconnect...</p>
+                </div>
+              </div>
+            )}
+            {!isDesktop && (
+              <Chat
+                show={showChat}
+                onClose={() => setShowChat(false)}
+                character={character}
+                playerSessionKey={playerSessionKey}
+                roomSessionKey={roomSessionKey}
+                isDesktop={false}
+              />
+            )}
+          </>
+        )}
       </motion.div>
     </>
   );

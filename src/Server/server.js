@@ -216,7 +216,8 @@ const calculateVisibleRole = (viewerCharacter, targetCharacter) => {
     targetTeam === "evil"
   )
     return "evil";
-  if (viewer === "Kaelen" && targetTeam === "good") return "good";
+  // Kaelen is evil and doesn't see any players
+  if (viewer === "Kaelen") return "";
   return "";
 };
 
@@ -998,6 +999,157 @@ io.on("connection", (socket) => {
     });
 
     /**
+     * Socket: start_game_one_device
+     *
+     *
+     */
+    socket.on(
+      "start_game_one_device",
+      async ({ roomSessionKey, selectedRoles, players }) => {
+        try {
+          let room = await loadRoom(roomSessionKey);
+          if (!room) {
+            // Create new room if it doesn't exist
+            console.log("Creating new room");
+            room = initializeRoom(newRoomSessionKey);
+            roomSessionKey = newRoomSessionKey;
+          }
+
+          // Check if current player is the leader (or set as leader if room is new)
+          const currentPlayer = Object.values(room.players).find(
+            (p) => p.id === socket.id,
+          );
+
+          if (!room.leader) {
+            room.leader = currentPlayer
+              ? currentPlayer.playerSessionKey
+              : "leader";
+          }
+
+          if (
+            !currentPlayer ||
+            currentPlayer.playerSessionKey !== room.leader
+          ) {
+            return;
+          }
+
+          // Convert player names to player objects with session keys
+          const playerList = players.map((name) => {
+            const playerSessionKey = generateRoomSessionKey();
+            return {
+              name,
+              playerSessionKey,
+              id: socket.id, // All players share the same socket id for one device mode
+              online: true,
+            };
+          });
+
+          // Add players to room
+          room.players = {};
+          room.leader = playerList[0].playerSessionKey;
+          playerList.forEach((player) => {
+            room.players[player.playerSessionKey] = player;
+          });
+
+          const allCharacters = getAllCharacters();
+          const shuffledPlayers = shuffleArray(playerList);
+          const gameCharacters = buildGameCharacters(
+            selectedRoles,
+            playerList.length,
+            allCharacters,
+          );
+
+          await assignCharactersToPlayers(
+            shuffledPlayers,
+            gameCharacters,
+            room,
+            roomSessionKey,
+          );
+          const roomFinal = initializeGameState(
+            room,
+            shuffledPlayers,
+            roomSessionKey,
+          );
+
+          // persist full game start state
+          try {
+            await saveRoomToDb(roomSessionKey, roomFinal);
+            logger.info("Saved room to DB", { roomSessionKey });
+          } catch (err) {
+            logger.info("Failed to save room to DB", {
+              roomSessionKey,
+              error: err.message,
+            });
+          }
+
+          // Build players list with visible roles for the client
+          const playersWithRoles = shuffledPlayers.map((player) => ({
+            name: player.name,
+            playerSessionKey: player.playerSessionKey,
+            visibleRole: calculateVisibleRole(
+              roomFinal.characters[player.playerSessionKey],
+              roomFinal.characters[player.playerSessionKey],
+            ),
+          }));
+          logger.info("Players with roles", { playersWithRoles });
+
+          // Emit game started event to client
+          const playerCount = Object.values(roomFinal.players).length;
+          io.to(roomSessionKey).emit("game_started_one_device", {
+            characters: roomFinal.characters,
+            players: playersWithRoles,
+            missionTeamSizes: MISSION_TEAM_SIZES[playerCount],
+          });
+
+          logger.info("One device game started", { roomSessionKey });
+        } catch (err) {
+          logger.info("Error starting one device game", { error: err.message });
+        }
+      },
+    );
+
+    socket.on("leader_change_one_device", async ({ roomSessionKey }) => {
+      try {
+        const room = await loadRoom(roomSessionKey);
+        if (!room) return;
+
+        const playerList = Object.values(room.players);
+        const availablePlayers = playerList.filter(
+          (p) => !room.usedLeaders.includes(p.playerSessionKey),
+        );
+
+        if (availablePlayers.length === 0) {
+          room.usedLeaders = [];
+          const randomIndex = Math.floor(Math.random() * playerList.length);
+          room.roundLeader = playerList[randomIndex].playerSessionKey;
+        } else {
+          const randomIndex = Math.floor(
+            Math.random() * availablePlayers.length,
+          );
+          room.roundLeader = availablePlayers[randomIndex].playerSessionKey;
+        }
+
+        room.usedLeaders.push(room.roundLeader);
+        room.round = (room.round || 0) + 1;
+        try {
+          await saveRoomToDb(roomSessionKey, room);
+          logger.info("Saved room to DB", { roomSessionKey });
+        } catch (err) {
+          logger.info("Failed to save room to DB", {
+            roomSessionKey,
+            error: err.message,
+          });
+        }
+        io.to(roomSessionKey).emit("leader_changed_one_device", {
+          roundLeader: room.roundLeader,
+        });
+        logger.info("Leader changed", { roomSessionKey });
+      } catch (err) {
+        logger.info("Error changing leader", { error: err.message });
+      }
+    });
+
+    /**
      * Socket: vote_team
      * Records team voting from a player - selects highest voted players for quest
      * When all players vote, determines the quest team based on vote counts
@@ -1520,18 +1672,38 @@ io.on("connection", (socket) => {
       try {
         const room = await loadRoom(roomSessionKey);
         if (!room) return;
-        io.to(roomSessionKey).emit("exit_to_home");
-        if (!room.players || Object.keys(room.players).length === 0) {
-          try {
-            await saveRoomToDb(roomSessionKey, room);
-            logger.info("Saved room to DB", { roomSessionKey });
-          } catch (err) {
-            logger.info("Failed to save room to DB", {
-              roomSessionKey,
-              error: err.message,
-            });
-          }
+
+        const leader = room.leader;
+        const isPublic = room.isPublic;
+        const password = room.password;
+        const roomName = room.roomName;
+        const players = room.players;
+
+        const roomObj = initializeRoom(roomSessionKey);
+        roomObj.roomPassword = password;
+        roomObj.roomName = roomName;
+        roomObj.isPublic = isPublic;
+        roomObj.leader = leader;
+        roomObj.players = players;
+
+        io.to(roomSessionKey).emit("exit_to_lobby", {
+          leader: leader || null,
+          isPublic: isPublic || null,
+          password: password || null,
+          roomName: roomName || null,
+          readyList: [],
+        });
+
+        try {
+          await saveRoomToDb(roomSessionKey, roomObj);
+          logger.info("Saved room to DB", { roomSessionKey });
+        } catch (err) {
+          logger.info("Failed to save room to DB", {
+            roomSessionKey,
+            error: err.message,
+          });
         }
+
         logger.info("Exited game", { roomSessionKey });
       } catch (err) {
         logger.info("Error getting room players", { error: err.message });

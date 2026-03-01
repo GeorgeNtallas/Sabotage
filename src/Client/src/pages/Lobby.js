@@ -9,8 +9,12 @@ import DesktopLobbyView from "../components/res_design/DesktopLobbyView";
 import MobileLobbyView from "../components/res_design/MobileLobbyView";
 
 function Lobby() {
+  // Loc, roomId
+  const location = useLocation();
+  const { name, isLeader, roomPassword, newRoomName, isPublic, readyList } =
+    location.state || {};
   const [players, setPlayers] = useState([]);
-  const [readyPlayers, setReadyPlayers] = useState([]);
+  const [readyPlayers, setReadyPlayers] = useState(readyList || []);
   const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
   const [pressedButton, setPressedButton] = useState(null);
   const navigate = useNavigate();
@@ -20,10 +24,6 @@ function Lobby() {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [fadeOut, setFadeOut] = useState(false);
   const { t } = useTranslation();
-  // Loc, roomId
-  const location = useLocation();
-  const { name, isLeader, roomPassword, newRoomName, isPublic } =
-    location.state || {};
 
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
@@ -40,8 +40,8 @@ function Lobby() {
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
@@ -226,58 +226,58 @@ function Lobby() {
         transition={{ duration: 0.8 }}
         className="w-full h-full bg-black"
       >
-      {isDesktop ? (
-        <DesktopLobbyView
-          name={name}
-          newRoomName={newRoomName}
-          isPublic={isPublic}
-          roomPassword={roomPassword}
-          players={players}
-          lobbyLeaderId={lobbyLeaderId}
-          readyPlayers={readyPlayers}
+        {isDesktop ? (
+          <DesktopLobbyView
+            name={name}
+            newRoomName={newRoomName}
+            isPublic={isPublic}
+            roomPassword={roomPassword}
+            players={players}
+            lobbyLeaderId={lobbyLeaderId}
+            readyPlayers={readyPlayers}
+            playerSessionKey={playerSessionKey}
+            isCurrentLeader={isCurrentLeader}
+            canStart={canStart}
+            pressedButton={pressedButton}
+            setPressedButton={setPressedButton}
+            handleReadyClick={handleReadyClick}
+            handleExitClick={handleExitClick}
+            handleStartGame={handleStartGame}
+            showChat={showChat}
+            selectedRoles={selectedRoles}
+            toggleRole={toggleRole}
+          />
+        ) : (
+          <MobileLobbyView
+            name={name}
+            newRoomName={newRoomName}
+            isPublic={isPublic}
+            roomPassword={roomPassword}
+            players={players}
+            lobbyLeaderId={lobbyLeaderId}
+            readyPlayers={readyPlayers}
+            playerSessionKey={playerSessionKey}
+            isCurrentLeader={isCurrentLeader}
+            canStart={canStart}
+            pressedButton={pressedButton}
+            setPressedButton={setPressedButton}
+            handleReadyClick={handleReadyClick}
+            handleChatOpen={handleChatOpen}
+            handleExitClick={handleExitClick}
+            handleStartGame={handleStartGame}
+            unreadMessages={unreadMessages}
+            selectedRoles={selectedRoles}
+            toggleRole={toggleRole}
+          />
+        )}
+        <Chat
+          show={showChat}
+          onClose={() => !isDesktop && setShowChat(false)}
+          character={{ team: "good" }}
           playerSessionKey={playerSessionKey}
-          isCurrentLeader={isCurrentLeader}
-          canStart={canStart}
-          pressedButton={pressedButton}
-          setPressedButton={setPressedButton}
-          handleReadyClick={handleReadyClick}
-          handleExitClick={handleExitClick}
-          handleStartGame={handleStartGame}
-          showChat={showChat}
-          selectedRoles={selectedRoles}
-          toggleRole={toggleRole}
+          roomSessionKey={roomSessionKey}
+          isDesktop={isDesktop}
         />
-      ) : (
-        <MobileLobbyView
-          name={name}
-          newRoomName={newRoomName}
-          isPublic={isPublic}
-          roomPassword={roomPassword}
-          players={players}
-          lobbyLeaderId={lobbyLeaderId}
-          readyPlayers={readyPlayers}
-          playerSessionKey={playerSessionKey}
-          isCurrentLeader={isCurrentLeader}
-          canStart={canStart}
-          pressedButton={pressedButton}
-          setPressedButton={setPressedButton}
-          handleReadyClick={handleReadyClick}
-          handleChatOpen={handleChatOpen}
-          handleExitClick={handleExitClick}
-          handleStartGame={handleStartGame}
-          unreadMessages={unreadMessages}
-          selectedRoles={selectedRoles}
-          toggleRole={toggleRole}
-        />
-      )}
-      <Chat
-        show={showChat}
-        onClose={() => !isDesktop && setShowChat(false)}
-        character={{ team: "good" }}
-        playerSessionKey={playerSessionKey}
-        roomSessionKey={roomSessionKey}
-        isDesktop={isDesktop}
-      />
       </motion.div>
     </>
   );

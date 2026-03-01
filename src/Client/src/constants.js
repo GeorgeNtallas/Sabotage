@@ -4,7 +4,9 @@
 
 // API & Socket Configuration
 export const API_CONFIG = {
-  SOCKET_URL: process.env.REACT_APP_SERVER_URL || `http://${window.location.hostname}:4000`,
+  SOCKET_URL:
+    process.env.REACT_APP_SERVER_URL ||
+    `http://${window.location.hostname}:4000`,
   SOCKET_TRANSPORTS: ["websocket"],
 };
 
@@ -63,9 +65,64 @@ export const SOCKET_EVENTS = {
   ROOM_UPDATE: "room_update",
 };
 
+// Game Phases & Results
+export const GAME_PHASES = {
+  MAX_PHASES: 5,
+  WIN_THRESHOLD: 3, // First to 3 wins
+  SPECIAL_PHASE: 4, // Phase 4 requires 2 fails for large games
+  LARGE_GAME_MIN_PLAYERS: 7,
+  LARGE_GAME_MAX_PLAYERS: 10,
+};
+
+// Character Definitions
+export const CHARACTERS = {
+  Seer: {
+    name: "Seer",
+    team: "good",
+    description: "Knows who the evil players are",
+  },
+  Guardian: {
+    name: "Guardian",
+    team: "good",
+    description: "Knows who Seer and Seraphina are",
+  },
+  Knight: {
+    name: "Knight",
+    team: "good",
+    description: "A Loyal Knight",
+  },
+  Seraphina: {
+    name: "Seraphina",
+    team: "evil",
+    description: "Appears as Seer to Guardian",
+  },
+  Shade: {
+    name: "Shade",
+    team: "evil",
+    description: "Can kill Seer at the end",
+  },
+  Thrall: {
+    name: "Thrall",
+    team: "evil",
+    description: "A Dark Knight",
+  },
+  Draven: {
+    name: "Draven",
+    team: "evil",
+    description: "Unknown for Seer",
+  },
+  Kaelen: {
+    name: "Kaelen",
+    team: "evil",
+    description: "Unknown to evil. Does not know Evil",
+  },
+};
+
 export default {
   API_CONFIG,
   GAME_TIMERS,
   MISSION_TEAM_SIZES,
   SOCKET_EVENTS,
+  GAME_PHASES,
+  CHARACTERS,
 };

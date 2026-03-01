@@ -15,6 +15,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState("login");
   const [gameAction, setGameAction] = useState("join");
   const [isPublic, setIsPublic] = useState(true);
+  const [oneDevice, setOneDevice] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [pendingRoomName, setPendingRoomName] = useState("");
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ function Home() {
       playerName,
       roomName,
       isPublic,
+
       ({
         roomPassword,
         roomSessionKey,
@@ -59,6 +61,16 @@ function Home() {
           sessionStorage.setItem("playerSessionKey", playerSessionKey);
         }
 
+        if (oneDevice) {
+          navigate(`/onedevice?${roomSessionKey}`, {
+            state: {
+              name: playerName,
+              isLeader,
+              newRoomName,
+            },
+          });
+          return;
+        }
         navigate(`/lobby?${roomSessionKey}`, {
           state: {
             name: playerName,
@@ -66,6 +78,7 @@ function Home() {
             roomPassword,
             newRoomName,
             isPublic,
+            readyList: [],
           },
         });
       },
@@ -117,6 +130,7 @@ function Home() {
               roomPassword,
               newRoomName: roomName,
               isPublic,
+              readyList: [],
             },
           });
         }
@@ -189,7 +203,7 @@ function Home() {
       }}
     >
       <div className="absolute inset-0 bg-black/40 z-0"></div>
-      <div className="mb-10 bg-black/60 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl p-8 sm:p-8 w-[80%] max-w-sm text-white flex flex-col ">
+      <div className="mb-10 bg-black/60 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl p-4 sm:p-8 w-[85%] max-w-sm text-white flex flex-col ">
         <div className="flex justify-center">
           <img
             src="/images/Sabotage3.png"
@@ -358,26 +372,50 @@ function Home() {
                 />
                 <div className="flex mt-1 mb-3 sm:mb-4">
                   <button
-                    onClick={() => setIsPublic(true)}
-                    className={`flex-1 py-2 px-4 rounded-l-md font-bold transition ${
-                      isPublic
-                        ? "bg-purple-800 text-white"
-                        : "bg-gray-800 text-gray-300 hover:text-white"
+                    onClick={() => {
+                      setIsPublic(true);
+                      setOneDevice(false);
+                    }}
+                    className={`flex-1 py-2 px-4 text-sm rounded-l-md font-bold transition ${
+                      oneDevice
+                        ? "bg-gray-800 text-gray-300 hover:text-white"
+                        : isPublic
+                          ? "bg-purple-800 text-white"
+                          : "bg-gray-800 text-gray-300 hover:text-white"
                     }`}
                     style={medievalFontStyle}
                   >
                     Public
                   </button>
                   <button
-                    onClick={() => setIsPublic(false)}
-                    className={`flex-1 py-2 px-4 rounded-r-md font-bold transition ${
-                      !isPublic
+                    onClick={() => {
+                      setIsPublic(false);
+                      setOneDevice(false);
+                    }}
+                    className={`flex-1 py-2 px-4 text-sm font-bold transition ${
+                      oneDevice
+                        ? "bg-gray-800 text-gray-300 hover:text-white"
+                        : !isPublic
+                          ? "bg-purple-800 text-white"
+                          : "bg-gray-800 text-gray-300 hover:text-white"
+                    }`}
+                    style={medievalFontStyle}
+                  >
+                    Private
+                  </button>
+                  <button
+                    onClick={() => {
+                      setOneDevice(true);
+                      setIsPublic(false);
+                    }}
+                    className={`flex-2 py-2 px-4 text-sm rounded-r-md font-bold transition sm:hidden ${
+                      oneDevice
                         ? "bg-purple-800 text-white"
                         : "bg-gray-800 text-gray-300 hover:text-white"
                     }`}
                     style={medievalFontStyle}
                   >
-                    Private
+                    One Device
                   </button>
                 </div>
                 <button

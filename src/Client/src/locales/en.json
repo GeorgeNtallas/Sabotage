@@ -42,7 +42,10 @@
     "leaderVote": "Leader Vote",
     "exit": "Exit",
     "role": "Role",
-    "chat": "Chat"
+    "chat": "Chat",
+    "pick": "Pick ",
+    "players": "players",
+    "submit": "Submit"
   },
   "modals": {
     "voteQuestTeam": "Vote Quest Team",
