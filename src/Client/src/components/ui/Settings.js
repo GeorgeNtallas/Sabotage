@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 const Settings = ({
   isLeader,
@@ -12,6 +13,7 @@ const Settings = ({
 }) => {
   const [activeTab, setActiveTab] = useState("characters");
   const isChecked = (role) => selectedRoles.has(role);
+  const { t } = useTranslation();
 
   const playerCount = readyPlayers.length + 1;
 
@@ -50,9 +52,14 @@ const Settings = ({
               <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
               <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
               <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
-              
+
               <div className="flex justify-between items-center p-4 border-b border-cyan-500/30">
-                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400" style={{ fontFamily: "MedievalSharp" }}>⚙️ Quest Settings</h2>
+                <h2
+                  className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+                  style={{ fontFamily: "MedievalSharp" }}
+                >
+                  ⚙️ {t("oneDevice.questSettings")}
+                </h2>
                 <button
                   onClick={() => setShowSettings(false)}
                   className="text-cyan-400 hover:text-cyan-300 text-3xl font-bold"
@@ -70,7 +77,7 @@ const Settings = ({
                   }`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Heroes
+                  {t("oneDevice.heroes")}
                 </button>
                 <button
                   onClick={() => setActiveTab("gameSettings")}
@@ -81,7 +88,7 @@ const Settings = ({
                   }`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Rules
+                  {t("oneDevice.rules")}
                 </button>
                 <button
                   onClick={() => setActiveTab("gameModes")}
@@ -92,7 +99,7 @@ const Settings = ({
                   }`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Modes
+                  {t("oneDevice.modes")}
                 </button>
               </div>
               <div className="p-4">
@@ -112,9 +119,14 @@ const Settings = ({
                           src={character.icon}
                           alt={character.name}
                           className="w-16 h-16 rounded-full mb-2 border border-cyan-500/30"
-                          onError={(e) => (e.target.src = "/images/default.jpg")}
+                          onError={(e) =>
+                            (e.target.src = "/images/default.jpg")
+                          }
                         />
-                        <span className="text-xs font-semibold text-cyan-200" style={{ fontFamily: "MedievalSharp" }}>
+                        <span
+                          className="text-xs font-semibold text-cyan-200"
+                          style={{ fontFamily: "MedievalSharp" }}
+                        >
                           {character.name}
                         </span>
                       </button>
@@ -122,13 +134,19 @@ const Settings = ({
                   </div>
                 )}
                 {activeTab === "gameSettings" && (
-                  <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
-                    🏰 Coming soon...
+                  <div
+                    className="text-center text-cyan-400/50 py-8"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
+                    🏰 {t("oneDevice.comingSoon")}
                   </div>
                 )}
                 {activeTab === "gameModes" && (
-                  <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
-                    ⚔️ Coming soon...
+                  <div
+                    className="text-center text-cyan-400/50 py-8"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
+                    ⚔️ {t("oneDevice.comingSoon")}
                   </div>
                 )}
               </div>
@@ -147,10 +165,13 @@ const Settings = ({
           <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
           <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>
           <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400"></div>
-          
+
           <div className="p-4 border-b border-cyan-500/30">
-            <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-center" style={{ fontFamily: "MedievalSharp" }}>
-              ⚙️ Quest Settings
+            <h2
+              className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-center"
+              style={{ fontFamily: "MedievalSharp" }}
+            >
+              ⚙️ {t("oneDevice.questSettings")}
             </h2>
           </div>
           <div className="flex border-b border-cyan-500/30">
@@ -163,7 +184,7 @@ const Settings = ({
               }`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              Heroes
+              {t("oneDevice.heroes")}
             </button>
             <button
               onClick={() => setActiveTab("gameSettings")}
@@ -174,7 +195,7 @@ const Settings = ({
               }`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              Rules
+              {t("oneDevice.rules")}
             </button>
             <button
               onClick={() => setActiveTab("gameModes")}
@@ -185,7 +206,7 @@ const Settings = ({
               }`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              Modes
+              {t("oneDevice.modes")}
             </button>
           </div>
           <div className="p-4">
@@ -207,7 +228,10 @@ const Settings = ({
                       className="w-16 h-16 rounded-full mb-2 border border-cyan-500/30"
                       onError={(e) => (e.target.src = "/images/default.jpg")}
                     />
-                    <span className="text-xs font-semibold text-cyan-200" style={{ fontFamily: "MedievalSharp" }}>
+                    <span
+                      className="text-xs font-semibold text-cyan-200"
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
                       {character.name}
                     </span>
                   </button>
@@ -215,13 +239,19 @@ const Settings = ({
               </div>
             )}
             {activeTab === "gameSettings" && (
-              <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
-                🏰 Coming soon...
+              <div
+                className="text-center text-cyan-400/50 py-8"
+                style={{ fontFamily: "MedievalSharp" }}
+              >
+                🏰 {t("oneDevice.comingSoon")}
               </div>
             )}
             {activeTab === "gameModes" && (
-              <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
-                ⚔️ Coming soon...
+              <div
+                className="text-center text-cyan-400/50 py-8"
+                style={{ fontFamily: "MedievalSharp" }}
+              >
+                ⚔️ {t("oneDevice.comingSoon")}
               </div>
             )}
           </div>

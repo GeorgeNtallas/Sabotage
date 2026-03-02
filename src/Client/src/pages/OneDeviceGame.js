@@ -394,12 +394,13 @@ function OneDeviceGame() {
               duration: 0.5,
               ease: "easeInOut",
             }}
-            className="w-full min-h-screen flex flex-col"
+            className="w-full h-screen flex flex-col"
             style={{
               backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
+              backgroundAttachment: "fixed",
             }}
           >
             <div className="absolute inset-0 bg-black/60"></div>
@@ -441,7 +442,7 @@ function OneDeviceGame() {
                           className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 mb-3 sm:mb-4 z-20"
                           style={{ fontFamily: "MedievalSharp" }}
                         >
-                          Drag Up to Reveal
+                          {t("oneDevice.dragUpToReveal")}
                         </p>
                       </div>
                     </div>
@@ -476,10 +477,12 @@ function OneDeviceGame() {
                         {currentCharacter.name}
                       </p>
                       <p className="text-sm sm:text-base md:text-lg text-cyan-200 mt-1 sm:mt-2 font-light text-center px-2">
-                        {currentCharacter.description}
+                        {t(
+                          `oneDevice.characterDescriptions.${currentCharacter.name}`,
+                        )}
                       </p>
                       <p className="text-sm sm:text-base md:text-lg text-cyan-300 mt-1 sm:mt-2 font-light">
-                        Team:{" "}
+                        {t("oneDevice.team")}{" "}
                         <span
                           className={
                             currentCharacter.team === "evil"
@@ -487,7 +490,7 @@ function OneDeviceGame() {
                               : "text-emerald-400"
                           }
                         >
-                          {currentCharacter.team}
+                          {t(`game.${currentCharacter.team}`)}
                         </span>
                       </p>
                       {visiblePlayers && visiblePlayers.length > 0 && (
@@ -496,7 +499,7 @@ function OneDeviceGame() {
                             className="text-sm sm:text-base md:text-lg font-bold text-cyan-400 mb-2"
                             style={{ fontFamily: "MedievalSharp" }}
                           >
-                            You can see:
+                            {t("oneDevice.youCanSee")}
                           </p>
                           <div className="space-y-2">
                             {visiblePlayers.map((visible) => {
@@ -510,9 +513,13 @@ function OneDeviceGame() {
                                   key={visible.playerSessionKey}
                                   className="text-xs sm:text-sm md:text-base text-cyan-200 font-medium"
                                 >
-                                  {visiblePlayer?.name || "Unknown"} -{" "}
+                                  {visiblePlayer?.name ||
+                                    t("oneDevice.unknown")}{" "}
+                                  -{" "}
                                   <span className="text-red-500 font-bold">
-                                    {visible.role}
+                                    {t(
+                                      `oneDevice.visibleRoles.${visible.role}`,
+                                    )}
                                   </span>
                                 </p>
                               );
@@ -529,20 +536,20 @@ function OneDeviceGame() {
                   className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 px-4 z-20"
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Pass device to the next knight
+                  {t("oneDevice.passDeviceToNext")}
                 </p>
               </div>
             </div>
 
             {/* Button at the Bottom */}
-            <div className="fixed bottom-10 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent py-2 sm:py-3 md:py-4 flex justify-center">
+            <div className="fixed bottom-10 left-0 right-0 py-2 sm:py-3 md:py-4 flex justify-center">
               {currentPlayerIndex < players.length - 1 && (
                 <button
                   onClick={handleNextPlayer}
                   className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(6,182,212,0.5)] border border-cyan-500/50"
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Next Knight
+                  {t("oneDevice.nextKnight")}
                 </button>
               )}
 
@@ -552,7 +559,7 @@ function OneDeviceGame() {
                   className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(168,85,247,0.5)] border border-purple-500/50"
                   style={{ fontFamily: "MedievalSharp" }}
                 >
-                  🗡️ Begin Quest
+                  🗡️ {t("oneDevice.beginQuest")}
                 </button>
               )}
             </div>
@@ -672,7 +679,7 @@ function OneDeviceGame() {
                       className="text-lg sm:text-2xl font-bold text-cyan-200"
                       style={{ fontFamily: "MedievalSharp" }}
                     >
-                      Quest Leader:{" "}
+                      {t("oneDevice.questLeader")}{" "}
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
                         {
                           players.find(
@@ -837,7 +844,7 @@ function OneDeviceGame() {
                     className="text-lg sm:text-xl font-bold text-cyan-400 mb-1 text-center"
                     style={{ fontFamily: "MedievalSharp" }}
                   >
-                    Quest History
+                    {t("oneDevice.questHistory")}
                   </h3>
                   <div className="space-y-2">
                     {phaseHistory.map((item, index) => (
@@ -850,7 +857,7 @@ function OneDeviceGame() {
                             className="text-sm sm:text-md font-semibold text-cyan-200"
                             style={{ fontFamily: "MedievalSharp" }}
                           >
-                            Phase {item.phaseNumber}:
+                            {t("oneDevice.phase")} {item.phaseNumber}:
                           </span>
                           <span
                             className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold ${
@@ -859,7 +866,9 @@ function OneDeviceGame() {
                                 : "bg-red-500 text-white"
                             }`}
                           >
-                            {item.result === "success" ? "Success" : "Fail"}
+                            {item.result === "success"
+                              ? t("modals.success")
+                              : t("modals.fail")}
                           </span>
                         </div>
                         <div className="flex gap-2 flex-shrink-0">
@@ -879,8 +888,8 @@ function OneDeviceGame() {
               </div>
             </div>
             {showQuestVoteModal && (
-              <div className="flex bg-black/98 fixed top-0 left-0 w-full h-full items-center justify-center z-50">
-                <div className="bg-black/98 border-2 border-cyan-500/50 rounded-lg p-6 w-50 max-w-md relative shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+              <div className="flex bg-black/60 fixed top-0 left-0 w-full h-full items-center justify-center z-50">
+                <div className="bg-black border-2 border-cyan-500/50 rounded-lg p-6 w-50 max-w-md relative shadow-[0_0_30px_rgba(6,182,212,0.4)]">
                   <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400"></div>
                   <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
                   <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>

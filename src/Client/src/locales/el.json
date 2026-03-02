@@ -43,6 +43,8 @@
     "exit": "Έξοδος",
     "role": "Ρόλος",
     "chat": "Chat",
+    "pick": "Διάλεξε ",
+    "players": "παίκτες",
     "max_players": "Max",
     "submit": "Υποβολή"
   },
@@ -136,9 +138,48 @@
   },
   "chat": {
     "title": "Chat",
-    "general": "General",
+    "general": "Γενικά",
     "send": "Αποστολή",
     "placeholder": "Μήνυμα...",
     "evil": "Κακοί"
+  },
+  "oneDevice": {
+    "knightsAssembled": "Μαχητές Συγκεντρωμένοι",
+    "questSettings": "Ρυθμίσεις Αποστολής",
+    "heroes": "Ήρωες",
+    "rules": "Κανόνες",
+    "modes": "Λειτουργίες",
+    "comingSoon": "Έρχεται σύντομα...",
+    "dragUpToReveal": "Σύρετε επάνω για να αποκαλύψετε",
+    "youCanSee": "Μπορείτε να δείτε:",
+    "passDeviceToNext": "Περάστε τη συσκευή στον επόμενο μαχητή",
+    "nextKnight": "Επόμενος Μαχητής",
+    "beginQuest": "Έναρξη Αποστολής",
+    "questLeader": "Αρχηγός Αποστολής:",
+    "questHistory": "Ιστορικό Αποστολών",
+    "phase": "Φάση",
+    "unknown": "Άγνωστος",
+    "knightsRoster": "Κατάλογος Μαχητών",
+    "warriorsRequired": "5 - 10 μαχητές απαιτούνται",
+    "current": "Τρέχον:",
+    "enterKnightName": "Εισάγετε όνομα μαχητή...",
+    "add": "Προσθήκη",
+    "leaveRoomConfirm": "Φύγετε από το δωμάτιο; Αυτό θα σας αφαιρέσει από το παιχνίδι.",
+    "team": "Ομάδα:",
+    "characterDescriptions": {
+      "Seer": "Βλέπει τους κακούς παίκτες",
+      "Guardian": "Ξέρει ποιοι είναι ο Seer και η Seraphina",
+      "Knight": "Πιστός Ιππότης",
+      "Draven": "Άγνωστος στον Seer",
+      "Seraphina": "Φαίνεται ως Seer στον Guardian",
+      "Kaelen": "Άγνωστος στους κακούς. Δεν ξέρει τους κακούς",
+      "Shade": "Μπορεί να σκοτώσει τον Seer στο τέλος",
+      "Thrall": "Σκοτεινός Ιππότης"
+    },
+    "visibleRoles": {
+      "evil": "ΚΑΚΟΣ",
+      "Seer/Seraphina": "Seer/Seraphina"
+    }
   }
+
 }

@@ -11,8 +11,14 @@ function OneDeviceLobby() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { name, isLeader, newRoomName } = location.state || {};
-  
-  const [players, setPlayers] = useState([name, "Player 2", "Player 3", "Player 4", "Player 5"]);
+
+  const [players, setPlayers] = useState([
+    name,
+    "Player 2",
+    "Player 3",
+    "Player 4",
+    "Player 5",
+  ]);
   const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
   const [selectedRoles, setSelectedRoles] = useState(new Set());
   const [fadeOut, setFadeOut] = useState(false);
@@ -45,9 +51,7 @@ function OneDeviceLobby() {
     };
 
     const handlePopState = () => {
-      const leave = window.confirm(
-        "Leave the room? This will remove you from the game.",
-      );
+      const leave = window.confirm(t("oneDevice.leaveRoomConfirm"));
       if (leave) {
         socket.emit("exit", { roomSessionKey, playerSessionKey });
         sessionStorage.removeItem("roomSessionKey");
@@ -119,11 +123,13 @@ function OneDeviceLobby() {
       animate={{ opacity: fadeOut ? 0 : 1 }}
       transition={{ duration: 0.8 }}
       className="relative flex items-center justify-center min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)" }}
+      style={{
+        backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
+      }}
     >
       <div className="absolute inset-0 bg-black/80"></div>
       <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-purple-950/20"></div>
-      
+
       <div className="relative z-10 bg-black/95 border-2 border-cyan-500/50 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] p-8 w-[90%] max-w-md text-white">
         <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
         <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
@@ -131,24 +137,41 @@ function OneDeviceLobby() {
         <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
 
         <div className="flex justify-center mb-6">
-          <img src="/images/Sabotage3.png" alt="Logo" className="w-[60%] drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]" onError={(e) => (e.target.src = "/images/default.jpg")} />
+          <img
+            src="/images/Sabotage3.png"
+            alt="Logo"
+            className="w-[60%] drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+            onError={(e) => (e.target.src = "/images/default.jpg")}
+          />
         </div>
 
         <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-6"></div>
 
-        <h2 className="text-2xl text-center mb-2 text-cyan-300" style={{ fontFamily: "MedievalSharp" }}>
+        <h2
+          className="text-2xl text-center mb-2 text-cyan-300"
+          style={{ fontFamily: "MedievalSharp" }}
+        >
           {t("lobby.welcome")}
         </h2>
-        
-        <div className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400" style={{ fontFamily: "MedievalSharp" }}>
+
+        <div
+          className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+          style={{ fontFamily: "MedievalSharp" }}
+        >
           {name}
         </div>
 
         <div className="text-center bg-black/60 border border-cyan-500/30 rounded py-3 mb-6">
-          <div className="text-cyan-400/70 text-xs uppercase tracking-widest" style={{ fontFamily: "MedievalSharp" }}>
+          <div
+            className="text-cyan-400/70 text-xs uppercase tracking-widest"
+            style={{ fontFamily: "MedievalSharp" }}
+          >
             {t("lobby.room")}
           </div>
-          <div className="text-xl font-bold text-cyan-400 mt-1" style={{ fontFamily: "MedievalSharp" }}>
+          <div
+            className="text-xl font-bold text-cyan-400 mt-1"
+            style={{ fontFamily: "MedievalSharp" }}
+          >
             {newRoomName}
           </div>
         </div>
@@ -163,7 +186,10 @@ function OneDeviceLobby() {
               className={`w-full py-4 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 rounded border border-purple-500/50 font-bold text-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all ${pressedButton === "players" ? "scale-95" : ""}`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              ⚔️ Knights Assembled <span className="bg-cyan-500 text-black px-2 py-0.5 rounded-full text-sm ml-2 font-bold">{players?.length || 0}</span>
+              ⚔️ {t("oneDevice.knightsAssembled")}{" "}
+              <span className="bg-cyan-500 text-black px-2 py-0.5 rounded-full text-sm ml-2 font-bold">
+                {players?.length || 0}
+              </span>
             </button>
           )}
 
@@ -176,7 +202,7 @@ function OneDeviceLobby() {
               className={`w-full py-4 bg-gradient-to-r from-slate-900/80 to-slate-800/80 hover:from-slate-800/80 hover:to-slate-700/80 rounded border border-cyan-500/50 font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all ${pressedButton === "settings" ? "scale-95" : ""}`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              ⚙️ Quest Settings
+              ⚙️ {t("oneDevice.questSettings")}
             </button>
           )}
 
@@ -221,7 +247,7 @@ function OneDeviceLobby() {
           setPlayers={setPlayers}
         />
       )}
-      
+
       {showSettings && (
         <Settings
           isLeader={isCurrentLeader}
