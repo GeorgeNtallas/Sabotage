@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import socket from "../socket";
@@ -9,34 +8,22 @@ import Settings from "../components/ui/Settings";
 
 function OneDeviceLobby() {
   const location = useLocation();
-  const { name, isLeader, newRoomName } = location.state || {};
-  const [players, setPlayers] = useState([
-    name,
-    "Player 2",
-    "Player 3",
-    "Player 4",
-    "Player 5",
-  ]);
-  const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
   const navigate = useNavigate();
-  const [selectedRoles, setSelectedRoles] = useState(new Set());
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  const [fadeOut, setFadeOut] = useState(false);
   const { t } = useTranslation();
-
-  const medievalFontStyle = {
-    fontFamily: "MedievalSharp",
-    fontWeight: 400,
-  };
-  // Loc, roomId
-
-  const [isPlayersModalOpen, setIsPlayersModalOpen] = useState(false); // isPlayersModalOpen
-  const [closePlayersModal, setClosePlayersModal] = useState(false);
+  const { name, isLeader, newRoomName } = location.state || {};
+  
+  const [players, setPlayers] = useState([name, "Player 2", "Player 3", "Player 4", "Player 5"]);
+  const [lobbyLeaderId, setLobbyLeaderId] = useState(null);
+  const [selectedRoles, setSelectedRoles] = useState(new Set());
+  const [fadeOut, setFadeOut] = useState(false);
+  const [isPlayersModalOpen, setIsPlayersModalOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pressedButton, setPressedButton] = useState(null);
 
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
+  const isCurrentLeader = lobbyLeaderId === playerSessionKey;
+  const canStart = players.length >= 1;
 
   const toggleRole = (role) => {
     setSelectedRoles((prev) => {
@@ -45,12 +32,6 @@ function OneDeviceLobby() {
       return newSet;
     });
   };
-
-  useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   // Handle browser/tab close or back navigation
   useEffect(() => {
@@ -132,99 +113,73 @@ function OneDeviceLobby() {
     });
   };
 
-  const handlePlayersClick = () => {
-    setIsPlayersModalOpen(true);
-  };
-
-  const isCurrentLeader = lobbyLeaderId === playerSessionKey;
-  const canStart = players.length >= 1;
-
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 1 }}
-        animate={{ opacity: fadeOut ? 0 : 1 }}
-        transition={{ duration: 0.8 }}
-        className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center"
-        style={{
-          backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black/40 z-0"></div>
+    <motion.div
+      initial={{ opacity: 1 }}
+      animate={{ opacity: fadeOut ? 0 : 1 }}
+      transition={{ duration: 0.8 }}
+      className="relative flex items-center justify-center min-h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url(/images/wp7007763-dark-castle-wallpapers.jpg)" }}
+    >
+      <div className="absolute inset-0 bg-black/80"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-purple-950/20"></div>
+      
+      <div className="relative z-10 bg-black/95 border-2 border-cyan-500/50 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] p-8 w-[90%] max-w-md text-white">
+        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
+        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
 
-        <div className="relative z-10 mb-10 bg-black/60 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl p-8 w-[80%] max-w-sm text-white flex flex-col">
-          {/* Logo */}
-          <div className="flex justify-center mb-4">
-            <img
-              src="/images/Sabotage3.png"
-              alt="Leader"
-              className="w-[55%] max-w-[200px]"
-              onError={(e) => (e.target.src = "/images/default.jpg")}
-            />
+        <div className="flex justify-center mb-6">
+          <img src="/images/Sabotage3.png" alt="Logo" className="w-[60%] drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]" onError={(e) => (e.target.src = "/images/default.jpg")} />
+        </div>
+
+        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-6"></div>
+
+        <h2 className="text-2xl text-center mb-2 text-cyan-300" style={{ fontFamily: "MedievalSharp" }}>
+          {t("lobby.welcome")}
+        </h2>
+        
+        <div className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400" style={{ fontFamily: "MedievalSharp" }}>
+          {name}
+        </div>
+
+        <div className="text-center bg-black/60 border border-cyan-500/30 rounded py-3 mb-6">
+          <div className="text-cyan-400/70 text-xs uppercase tracking-widest" style={{ fontFamily: "MedievalSharp" }}>
+            {t("lobby.room")}
           </div>
-
-          {/* Welcome */}
-          <h2
-            className="text-3xl font-extrabold text-center mb-3"
-            style={medievalFontStyle}
-          >
-            {t("lobby.welcome")} <span className="text-indigo-400">{name}</span>
-          </h2>
-
-          {/* Room */}
-          <div
-            className="text-center text-slate-300 font-semibold mb-6"
-            style={medievalFontStyle}
-          >
-            {t("lobby.room")}:{" "}
-            <span className="text-indigo-400 font-mono">{newRoomName}</span>
+          <div className="text-xl font-bold text-cyan-400 mt-1" style={{ fontFamily: "MedievalSharp" }}>
+            {newRoomName}
           </div>
+        </div>
 
-          {/* PLAYERS BUTTON */}
+        <div className="space-y-3">
           {!(isLeader && players?.includes(playerSessionKey)) && (
             <button
-              onClick={() => {
-                handlePlayersClick();
-              }}
+              onClick={() => setIsPlayersModalOpen(true)}
               onMouseDown={() => setPressedButton("players")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              onTouchStart={() => setPressedButton("players")}
-              onTouchEnd={() => setPressedButton(null)}
-              className={`w-full py-3 bg-gradient-to-r bg-rose-700 hover:from-rose-800 hover:via-rose-700 hover:to-rose-800 transition rounded-md font-bold border border-green-950 text-white mb-4 text-base ${
-                pressedButton === "players" ? "scale-95 brightness-75" : ""
-              }`}
-              style={{
-                fontFamily: "MedievalSharp",
-                fontWeight: 1000,
-              }}
+              className={`w-full py-4 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 rounded border border-purple-500/50 font-bold text-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all ${pressedButton === "players" ? "scale-95" : ""}`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              Players
-              <span> {players?.length || 0}</span>
+              ⚔️ Knights Assembled <span className="bg-cyan-500 text-black px-2 py-0.5 rounded-full text-sm ml-2 font-bold">{players?.length || 0}</span>
             </button>
           )}
 
-          {/* SETTINGS BUTTON (Leader Only) */}
           {isLeader && (
             <button
               onClick={() => setShowSettings(true)}
               onMouseDown={() => setPressedButton("settings")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              onTouchStart={() => setPressedButton("settings")}
-              onTouchEnd={() => setPressedButton(null)}
-              className={`w-full py-3 bg-gradient-to-r bg-gray-700 hover:bg-gray-800 transition-all rounded-md font-bold text-base mb-4 ${
-                pressedButton === "settings" ? "scale-95 brightness-75" : ""
-              }`}
-              style={medievalFontStyle}
+              className={`w-full py-4 bg-gradient-to-r from-slate-900/80 to-slate-800/80 hover:from-slate-800/80 hover:to-slate-700/80 rounded border border-cyan-500/50 font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all ${pressedButton === "settings" ? "scale-95" : ""}`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              Settings
+              ⚙️ Quest Settings
             </button>
           )}
 
-          {/* START GAME BUTTON */}
           {isLeader && (
             <button
               onClick={handleStartGame}
@@ -232,62 +187,53 @@ function OneDeviceLobby() {
               onMouseDown={() => setPressedButton("start")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              onTouchStart={() => setPressedButton("start")}
-              onTouchEnd={() => setPressedButton(null)}
-              className={`w-full py-3 rounded-md font-bold text-base transition-all border ${
+              className={`w-full py-4 rounded border font-bold text-lg shadow-lg transition-all ${
                 canStart
-                  ? "bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 border-green-950 text-white"
-                  : "bg-green-900/40 cursor-not-allowed border-green-900/40 text-gray-400"
-              } ${pressedButton === "start" && canStart ? "scale-95 brightness-75" : ""}`}
-              style={{
-                fontFamily: "MedievalSharp",
-                fontWeight: 1000,
-              }}
+                  ? "bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                  : "bg-zinc-900/50 border-zinc-700/50 text-zinc-600 cursor-not-allowed"
+              } ${pressedButton === "start" && canStart ? "scale-95" : ""}`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              {t("lobby.startGame")}
+              🗡️ {t("lobby.startGame")} 🗡️
             </button>
           )}
 
-          {/* EXIT BUTTON */}
           <button
             onClick={handleExitClick}
             onMouseDown={() => setPressedButton("exit")}
             onMouseUp={() => setPressedButton(null)}
             onMouseLeave={() => setPressedButton(null)}
-            onTouchStart={() => setPressedButton("exit")}
-            onTouchEnd={() => setPressedButton(null)}
-            className={`w-full py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white mt-4 text-base ${
-              pressedButton === "exit" ? "scale-95 brightness-75" : ""
-            }`}
-            style={{
-              fontFamily: "MedievalSharp",
-              fontWeight: 1000,
-            }}
+            className={`w-full py-4 bg-gradient-to-r from-red-900/80 to-red-800/80 hover:from-red-800/80 hover:to-red-700/80 rounded border border-red-500/50 font-bold text-lg shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all ${pressedButton === "exit" ? "scale-95" : ""}`}
+            style={{ fontFamily: "MedievalSharp" }}
           >
-            {t("lobby.exit")}
+            🚪 {t("lobby.exit")}
           </button>
         </div>
 
-        {/* EnterPlayersModal */}
+        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mt-6"></div>
+      </div>
+
+      {isPlayersModalOpen && (
         <EnterPlayersModal
           isOpen={isPlayersModalOpen}
           onClose={() => setIsPlayersModalOpen(false)}
           players={players}
           setPlayers={setPlayers}
         />
-        {showSettings && (
-          <Settings
-            isLeader={isCurrentLeader}
-            readyPlayers={players}
-            selectedRoles={selectedRoles}
-            toggleRole={toggleRole}
-            showSettings={showSettings}
-            setShowSettings={setShowSettings}
-            isMobile={true}
-          />
-        )}
-      </motion.div>
-    </>
+      )}
+      
+      {showSettings && (
+        <Settings
+          isLeader={isCurrentLeader}
+          readyPlayers={players}
+          selectedRoles={selectedRoles}
+          toggleRole={toggleRole}
+          showSettings={showSettings}
+          setShowSettings={setShowSettings}
+          isMobile={true}
+        />
+      )}
+    </motion.div>
   );
 }
 

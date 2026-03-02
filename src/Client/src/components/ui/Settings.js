@@ -33,58 +33,66 @@ const Settings = ({
       showSettings && (
         <AnimatePresence>
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/95 flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowSettings(false)}
           >
             <motion.div
-              className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl border-2 border-slate-600 shadow-2xl w-[90%] max-w-md flex flex-col text-white"
+              className="bg-black/98 border-2 border-cyan-500/50 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] w-[90%] max-w-md flex flex-col text-white relative"
               initial={{ scale: 0.8, y: 50 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: 50 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center p-4 border-b border-slate-600">
-                <h2 className="text-xl font-bold text-white">Settings</h2>
+              <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
+              <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
+              
+              <div className="flex justify-between items-center p-4 border-b border-cyan-500/30">
+                <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400" style={{ fontFamily: "MedievalSharp" }}>⚙️ Quest Settings</h2>
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="text-gray-400 hover:text-white text-2xl font-bold"
+                  className="text-cyan-400 hover:text-cyan-300 text-3xl font-bold"
                 >
                   &times;
                 </button>
               </div>
-              <div className="flex border-b border-slate-600">
+              <div className="flex border-b border-cyan-500/30">
                 <button
                   onClick={() => setActiveTab("characters")}
                   className={`flex-1 py-3 font-semibold transition ${
                     activeTab === "characters"
-                      ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                      : "text-gray-400 hover:text-white"
+                      ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                      : "text-cyan-400/50 hover:text-cyan-400/80"
                   }`}
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Characters
+                  Heroes
                 </button>
                 <button
                   onClick={() => setActiveTab("gameSettings")}
                   className={`flex-1 py-3 font-semibold transition ${
                     activeTab === "gameSettings"
-                      ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                      : "text-gray-400 hover:text-white"
+                      ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                      : "text-cyan-400/50 hover:text-cyan-400/80"
                   }`}
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Game Settings
+                  Rules
                 </button>
                 <button
                   onClick={() => setActiveTab("gameModes")}
                   className={`flex-1 py-3 font-semibold transition ${
                     activeTab === "gameModes"
-                      ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                      : "text-gray-400 hover:text-white"
+                      ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.3)]"
+                      : "text-cyan-400/50 hover:text-cyan-400/80"
                   }`}
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Game Modes
+                  Modes
                 </button>
               </div>
               <div className="p-4">
@@ -94,21 +102,19 @@ const Settings = ({
                       <button
                         key={character.name}
                         onClick={() => toggleRole(character.name)}
-                        className={`flex flex-col items-center p-2 rounded-lg border-2 transition ${
+                        className={`flex flex-col items-center p-2 rounded-lg border transition ${
                           isChecked(character.name)
-                            ? "border-amber-500 bg-slate-600/50"
-                            : "border-slate-500 bg-slate-800/30 hover:border-slate-400"
+                            ? "border-cyan-500 bg-cyan-950/40 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                            : "border-zinc-700 bg-zinc-900/50 hover:border-cyan-500/50"
                         }`}
                       >
                         <img
                           src={character.icon}
                           alt={character.name}
-                          className="w-16 h-16 rounded-full mb-2"
-                          onError={(e) =>
-                            (e.target.src = "/images/default.jpg")
-                          }
+                          className="w-16 h-16 rounded-full mb-2 border border-cyan-500/30"
+                          onError={(e) => (e.target.src = "/images/default.jpg")}
                         />
-                        <span className="text-sm font-semibold">
+                        <span className="text-xs font-semibold text-cyan-200" style={{ fontFamily: "MedievalSharp" }}>
                           {character.name}
                         </span>
                       </button>
@@ -116,13 +122,13 @@ const Settings = ({
                   </div>
                 )}
                 {activeTab === "gameSettings" && (
-                  <div className="text-center text-gray-400 py-8">
-                    Coming soon...
+                  <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
+                    🏰 Coming soon...
                   </div>
                 )}
                 {activeTab === "gameModes" && (
-                  <div className="text-center text-gray-400 py-8">
-                    Coming soon...
+                  <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
+                    ⚔️ Coming soon...
                   </div>
                 )}
               </div>
@@ -136,42 +142,50 @@ const Settings = ({
   return (
     <div>
       {isLeader && (
-        <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl border-2 border-slate-600 shadow-2xl w-[350px] h-[400px] flex flex-col text-white">
-          <div className="p-4 border-b border-slate-600">
-            <h2 className="text-xl font-bold text-white text-center">
-              Settings
+        <div className="bg-black/98 border-2 border-cyan-500/50 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] w-[350px] h-[400px] flex flex-col text-white relative">
+          <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400"></div>
+          <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
+          <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400"></div>
+          
+          <div className="p-4 border-b border-cyan-500/30">
+            <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-center" style={{ fontFamily: "MedievalSharp" }}>
+              ⚙️ Quest Settings
             </h2>
           </div>
-          <div className="flex border-b border-slate-600">
+          <div className="flex border-b border-cyan-500/30">
             <button
               onClick={() => setActiveTab("characters")}
               className={`flex-1 py-3 font-semibold transition ${
                 activeTab === "characters"
-                  ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500"
+                  : "text-cyan-400/50 hover:text-cyan-400/80"
               }`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              Characters
+              Heroes
             </button>
             <button
               onClick={() => setActiveTab("gameSettings")}
               className={`flex-1 py-3 font-semibold transition ${
                 activeTab === "gameSettings"
-                  ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500"
+                  : "text-cyan-400/50 hover:text-cyan-400/80"
               }`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              Game Settings
+              Rules
             </button>
             <button
               onClick={() => setActiveTab("gameModes")}
               className={`flex-1 py-3 font-semibold transition ${
                 activeTab === "gameModes"
-                  ? "bg-slate-700 text-white border-b-2 border-amber-500"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-zinc-900/50 text-cyan-400 border-b-2 border-cyan-500"
+                  : "text-cyan-400/50 hover:text-cyan-400/80"
               }`}
+              style={{ fontFamily: "MedievalSharp" }}
             >
-              Game Modes
+              Modes
             </button>
           </div>
           <div className="p-4">
@@ -181,19 +195,19 @@ const Settings = ({
                   <button
                     key={character.name}
                     onClick={() => toggleRole(character.name)}
-                    className={`flex flex-col items-center p-2 rounded-lg border-2 transition ${
+                    className={`flex flex-col items-center p-2 rounded-lg border transition ${
                       isChecked(character.name)
-                        ? "border-amber-500 bg-slate-600/50"
-                        : "border-slate-500 bg-slate-800/30 hover:border-slate-400"
+                        ? "border-cyan-500 bg-cyan-950/40 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                        : "border-zinc-700 bg-zinc-900/50 hover:border-cyan-500/50"
                     }`}
                   >
                     <img
                       src={character.icon}
                       alt={character.name}
-                      className="w-16 h-16 rounded-full mb-2"
+                      className="w-16 h-16 rounded-full mb-2 border border-cyan-500/30"
                       onError={(e) => (e.target.src = "/images/default.jpg")}
                     />
-                    <span className="text-sm font-semibold">
+                    <span className="text-xs font-semibold text-cyan-200" style={{ fontFamily: "MedievalSharp" }}>
                       {character.name}
                     </span>
                   </button>
@@ -201,13 +215,13 @@ const Settings = ({
               </div>
             )}
             {activeTab === "gameSettings" && (
-              <div className="text-center text-gray-400 py-8">
-                Coming soon...
+              <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
+                🏰 Coming soon...
               </div>
             )}
             {activeTab === "gameModes" && (
-              <div className="text-center text-gray-400 py-8">
-                Coming soon...
+              <div className="text-center text-cyan-400/50 py-8" style={{ fontFamily: "MedievalSharp" }}>
+                ⚔️ Coming soon...
               </div>
             )}
           </div>

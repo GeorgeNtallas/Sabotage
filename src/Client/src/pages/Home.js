@@ -202,8 +202,12 @@ function Home() {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-black/40 z-0"></div>
-      <div className="mb-10 bg-black/60 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl p-4 sm:p-8 w-[85%] max-w-sm text-white flex flex-col ">
+      <div className="absolute inset-0 bg-black/60 z-0"></div>
+      <div className="mb-10 bg-black/95 backdrop-blur-lg border-2 border-cyan-500/50 rounded-xl shadow-[0_0_30px_rgba(6,182,212,0.3)] p-4 sm:p-8 w-[85%] max-w-sm text-white flex flex-col relative">
+        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
+        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
         <div className="flex justify-center">
           <img
             src="/images/Sabotage3.png"
@@ -217,10 +221,10 @@ function Home() {
         <div className="flex mb-4 sm:mb-5 mt-4 sm:mt-5">
           <button
             onClick={() => setActiveTab("login")}
-            className={`flex-1 py-2 px-4 rounded-l-md font-bold transition ${
+            className={`flex-1 py-2 px-4 rounded-l-md font-bold transition border-2 ${
               activeTab === "login"
-                ? "bg-rose-600 text-white"
-                : "bg-gray-800 text-gray-300 hover:text-white"
+                ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                : "bg-zinc-900 text-gray-300 hover:text-cyan-300 border-zinc-800"
             }`}
             style={medievalFontStyle}
           >
@@ -228,10 +232,10 @@ function Home() {
           </button>
           <button
             onClick={() => setActiveTab("quickplay")}
-            className={`flex-1 py-2 px-4 rounded-r-md font-bold transition ${
+            className={`flex-1 py-2 px-4 rounded-r-md font-bold transition border-2 ${
               activeTab === "quickplay"
-                ? "bg-rose-600 text-white"
-                : "bg-gray-800 text-gray-300 hover:text-white"
+                ? "bg-gradient-to-r from-cyan-600 to-purple-600 text-white border-cyan-500/50 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
+                : "bg-zinc-900 text-gray-300 hover:text-cyan-300 border-zinc-800"
             }`}
             style={medievalFontStyle}
           >
@@ -245,10 +249,10 @@ function Home() {
             <div className="flex">
               <button
                 onClick={() => setGameAction("join")}
-                className={`flex-1 py-1 px-2 rounded-l-md text-sm font-bold transition ${
+                className={`flex-1 py-1 px-2 rounded-l-md text-sm font-bold transition border ${
                   gameAction === "join"
-                    ? "bg-purple-800 text-white"
-                    : "bg-gray-700 text-gray-300 hover:text-white"
+                    ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                    : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                 }`}
                 style={medievalFontStyle}
               >
@@ -256,10 +260,10 @@ function Home() {
               </button>
               <button
                 onClick={() => setGameAction("create")}
-                className={`flex-1 py-1 px-2 rounded-r-md text-sm font-bold transition ${
+                className={`flex-1 py-1 px-2 rounded-r-md text-sm font-bold transition border ${
                   gameAction === "create"
-                    ? "bg-purple-800 text-white"
-                    : "bg-gray-700 text-gray-300 hover:text-white"
+                    ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                    : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                 }`}
                 style={medievalFontStyle}
               >
@@ -276,17 +280,17 @@ function Home() {
             <input
               type="text"
               placeholder={t("home.email")}
-              className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+              className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
               style={medievalFontStyle}
             />
             <input
               type="text"
               placeholder={t("home.password")}
-              className="w-full p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+              className="w-full p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
               style={medievalFontStyle}
             />
             <button
-              className="w-full py-2.5 sm:py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white mt-6 sm:mt-8 text-sm sm:text-base"
+              className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition rounded-md font-bold border-2 border-cyan-500/50 text-white mt-6 sm:mt-8 text-sm sm:text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)]"
               style={{
                 fontFamily: "MedievalSharp",
                 fontWeight: 1000,
@@ -295,7 +299,7 @@ function Home() {
               {t("home.login")}
             </button>
             <button
-              className="w-full py-2.5 sm:py-3 bg-gradient-to-r bg-red-700 hover:bg-red-800 hover:via-red-700 hover:to-red-800 transition rounded-md font-bold border border-red-900 text-white mt-4 sm:mt-6 text-sm sm:text-base"
+              className="w-full py-2.5 sm:py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 transition rounded-md font-bold border-2 border-purple-500/50 text-white mt-4 sm:mt-6 text-sm sm:text-base shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]"
               style={{
                 fontFamily: "MedievalSharp",
                 fontWeight: 1000,
@@ -317,7 +321,7 @@ function Home() {
                 <input
                   type="text"
                   placeholder={t("home.yourName")}
-                  className="w-full mt-3 mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                  className="w-full mt-3 mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
                   style={medievalFontStyle}
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
@@ -326,7 +330,7 @@ function Home() {
                 <input
                   type="text"
                   placeholder={t("home.roomNamePassword")}
-                  className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                  className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
                   style={medievalFontStyle}
                   value={roomNamePassword}
                   onChange={(e) => setroomNamePassword(e.target.value)}
@@ -338,7 +342,7 @@ function Home() {
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("join")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`w-full py-2.5 sm:py-3 bg-gradient-to-r bg-green-700 hover:from-green-800 hover:via-green-700 hover:to-green-800 transition rounded-md font-bold border border-green-950 text-white mt-4 sm:mt-5 text-sm sm:text-base ${
+                  className={`w-full py-2.5 sm:py-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition rounded-md font-bold border-2 border-cyan-500/50 text-white mt-4 sm:mt-5 text-sm sm:text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] ${
                     pressedButton === "join" ? "scale-95 brightness-75" : ""
                   }`}
                   style={{
@@ -358,7 +362,7 @@ function Home() {
                   placeholder={t("home.yourName")}
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
-                  className="w-full mt-3 mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                  className="w-full mt-3 mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
                   style={medievalFontStyle}
                   maxLength={10}
                 />
@@ -367,7 +371,7 @@ function Home() {
                   placeholder={t("home.roomName")}
                   value={roomName}
                   onChange={(e) => setRoomName(e.target.value)}
-                  className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-indigo-500/15 border border-white/40 placeholder-white/60 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                  className="w-full mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-md bg-black/80 border-2 border-cyan-500/50 placeholder-cyan-300/40 text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 text-sm sm:text-base"
                   style={medievalFontStyle}
                 />
                 <div className="flex mt-1 mb-3 sm:mb-4">
@@ -376,12 +380,12 @@ function Home() {
                       setIsPublic(true);
                       setOneDevice(false);
                     }}
-                    className={`flex-1 py-2 px-4 text-sm rounded-l-md font-bold transition ${
+                    className={`flex-1 py-2 px-4 text-sm rounded-l-md font-bold transition border ${
                       oneDevice
-                        ? "bg-gray-800 text-gray-300 hover:text-white"
+                        ? "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                         : isPublic
-                          ? "bg-purple-800 text-white"
-                          : "bg-gray-800 text-gray-300 hover:text-white"
+                          ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                          : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                     }`}
                     style={medievalFontStyle}
                   >
@@ -392,12 +396,12 @@ function Home() {
                       setIsPublic(false);
                       setOneDevice(false);
                     }}
-                    className={`flex-1 py-2 px-4 text-sm font-bold transition ${
+                    className={`flex-1 py-2 px-4 text-sm font-bold transition border ${
                       oneDevice
-                        ? "bg-gray-800 text-gray-300 hover:text-white"
+                        ? "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                         : !isPublic
-                          ? "bg-purple-800 text-white"
-                          : "bg-gray-800 text-gray-300 hover:text-white"
+                          ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                          : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                     }`}
                     style={medievalFontStyle}
                   >
@@ -408,10 +412,10 @@ function Home() {
                       setOneDevice(true);
                       setIsPublic(false);
                     }}
-                    className={`flex-2 py-2 px-4 text-sm rounded-r-md font-bold transition sm:hidden ${
+                    className={`flex-2 py-2 px-4 text-sm rounded-r-md font-bold transition border sm:hidden ${
                       oneDevice
-                        ? "bg-purple-800 text-white"
-                        : "bg-gray-800 text-gray-300 hover:text-white"
+                        ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                        : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
                     }`}
                     style={medievalFontStyle}
                   >
@@ -425,7 +429,7 @@ function Home() {
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("create")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`w-full mt-5 py-2.5 sm:py-3 bg-gradient-to-r bg-green-700 hover:bg-green-800 transition rounded-md font-bold border border-green-950 text-white text-sm sm:text-base ${
+                  className={`w-full mt-5 py-2.5 sm:py-3 bg-gradient-to-r from-cyan-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 transition rounded-md font-bold border-2 border-cyan-500/50 text-white text-sm sm:text-base shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] ${
                     pressedButton === "create" ? "scale-95 brightness-75" : ""
                   }`}
                   style={{
@@ -442,14 +446,14 @@ function Home() {
         <div className="flex justify-between items-end z-10 pb-safe mt-2">
           <button
             onClick={() => setShowRules(true)}
-            className="pb-safe bg-gray-700 hover:bg-gray-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold z-10 border border-gray-800 text-sm sm:text-base"
+            className="pb-safe bg-zinc-900 hover:bg-zinc-800 text-cyan-300 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold z-10 border-2 border-cyan-500/50 text-sm sm:text-base hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] transition"
             style={medievalFontStyle}
           >
             {t("home.rules")}
           </button>
           <button
             onClick={() => setShowRoomsModal(true)}
-            className="pb-safe bg-purple-800 hover:bg-purple-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold z-10 border border-purple-800 text-sm sm:text-base"
+            className="pb-safe bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold z-10 border-2 border-purple-500/50 text-sm sm:text-base shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] transition"
             style={medievalFontStyle}
           >
             {t("home.rooms")}

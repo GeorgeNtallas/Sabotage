@@ -402,10 +402,15 @@ function OneDeviceGame() {
               backgroundRepeat: "no-repeat",
             }}
           >
+            <div className="absolute inset-0 bg-black/60"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-purple-950/20"></div>
             <div className="flex-1 overflow-y-auto pb-20 sm:pb-24">
               <div className="flex flex-col items-center space-y-2 sm:space-y-3">
                 {/* Player's Name */}
-                <h2 className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center text-2xl sm:text-3xl font-bold text-white px-4">
+                <h2
+                  className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 px-4 z-20"
+                  style={{ fontFamily: "MedievalSharp" }}
+                >
                   {currentPlayer.name}
                 </h2>
 
@@ -421,23 +426,21 @@ function OneDeviceGame() {
                     }}
                   >
                     <div
-                      className="absolute w-full z-20 bg-black text-white p-2 sm:p-3 rounded-lg shadow-lg border-2 sm:border-4 border-indigo-900 flex flex-col items-center justify-end"
+                      className="absolute w-full z-20 bg-black/95 text-white p-2 sm:p-3 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] border-2 border-cyan-500/50 flex flex-col items-center justify-end"
                       style={{
                         height: "100%",
                         minHeight: `${maxModalHeight}px`,
-                        backgroundImage:
-                          "url(/images/haunted-house-gothic-style.jpg)",
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
                       }}
                     >
-                      <div className="absolute inset-0 bg-black/60 z-10"></div>
+                      <div className="absolute inset-0 bg-black/80 z-10"></div>
                       <div className="text-center z-20">
-                        <div className="text-4xl sm:text-5xl md:text-7xl mb-3 sm:mb-4 z-20">
+                        <div className="text-4xl sm:text-5xl md:text-7xl mb-3 sm:mb-4 z-20 text-cyan-400">
                           ↑
                         </div>
-                        <p className="text-center text-sm sm:text-base md:text-lg font-medium text-gray-200 mb-3 sm:mb-4 z-20">
+                        <p
+                          className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 mb-3 sm:mb-4 z-20"
+                          style={{ fontFamily: "MedievalSharp" }}
+                        >
                           Drag Up to Reveal
                         </p>
                       </div>
@@ -446,37 +449,53 @@ function OneDeviceGame() {
 
                   {/* Modal for Character Display */}
                   <div
-                    className="bg-gradient-to-b from-slate-700 via-slate-950 to-black text-white p-2 rounded-lg shadow-lg w-full border-2 sm:border-4 border-indigo-900 flex flex-col items-center justify-center space-y-3 sm:space-y-4"
-                    style={{ minHeight: `${maxModalHeight}px` }}
+                    className="border-2 border-cyan-500/50 text-white p-2 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 relative overflow-hidden"
+                    style={{
+                      minHeight: `${maxModalHeight}px`,
+                      background:
+                        "linear-gradient(135deg, #0a0e1a 0%, #0d1117 25%, #0a0e1a 50%, #0d1117 75%, #0a0e1a 100%), repeating-linear-gradient(0deg, rgba(6,182,212,0.1) 0px, transparent 1px, transparent 40px, rgba(6,182,212,0.1) 41px), repeating-linear-gradient(90deg, rgba(168,85,247,0.05) 0px, transparent 1px, transparent 40px, rgba(168,85,247,0.05) 41px)",
+                    }}
                   >
+                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/30 via-black/50 to-purple-950/30"></div>
+                    <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400"></div>
+                    <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400"></div>
+
                     <div className="relative w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4">
                       <img
                         src={`/images/${currentCharacter.name}Icon.png`}
                         alt="Character"
-                        className="w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full mb-2 sm:mb-3 md:mb-4 border-2 border-cyan-600"
+                        className="w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full mb-2 sm:mb-3 md:mb-4 border-2 border-cyan-500"
                         onError={(e) => (e.target.src = "/images/default.jpg")}
                       />
-                      <p className="text-lg sm:text-xl md:text-2xl font-bold text-cyan-400">
+                      <p
+                        className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+                        style={{ fontFamily: "MedievalSharp" }}
+                      >
                         {currentCharacter.name}
                       </p>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-300 mt-1 sm:mt-2 font-light text-center px-2">
+                      <p className="text-sm sm:text-base md:text-lg text-cyan-200 mt-1 sm:mt-2 font-light text-center px-2">
                         {currentCharacter.description}
                       </p>
-                      <p className="text-sm sm:text-base md:text-lg text-gray-300 mt-1 sm:mt-2 font-light">
+                      <p className="text-sm sm:text-base md:text-lg text-cyan-300 mt-1 sm:mt-2 font-light">
                         Team:{" "}
                         <span
                           className={
                             currentCharacter.team === "evil"
                               ? "text-red-500"
-                              : "text-cyan-400"
+                              : "text-emerald-400"
                           }
                         >
                           {currentCharacter.team}
                         </span>
                       </p>
                       {visiblePlayers && visiblePlayers.length > 0 && (
-                        <div className="mt-2 sm:mt-3 md:mt-4 w-full bg-slate-800 p-2 sm:p-3 rounded-lg">
-                          <p className="text-sm sm:text-base md:text-lg font-bold text-yellow-300 mb-2">
+                        <div className="mt-2 sm:mt-3 md:mt-4 w-full bg-zinc-900/50 border border-cyan-500/30 p-2 sm:p-3 rounded-lg">
+                          <p
+                            className="text-sm sm:text-base md:text-lg font-bold text-cyan-400 mb-2"
+                            style={{ fontFamily: "MedievalSharp" }}
+                          >
                             You can see:
                           </p>
                           <div className="space-y-2">
@@ -489,7 +508,7 @@ function OneDeviceGame() {
                               return (
                                 <p
                                   key={visible.playerSessionKey}
-                                  className="text-xs sm:text-sm md:text-base text-white font-medium"
+                                  className="text-xs sm:text-sm md:text-base text-cyan-200 font-medium"
                                 >
                                   {visiblePlayer?.name || "Unknown"} -{" "}
                                   <span className="text-red-500 font-bold">
@@ -506,8 +525,11 @@ function OneDeviceGame() {
                 </div>
 
                 {/* Instruction Text */}
-                <p className="text-center text-sm sm:text-base md:text-lg font-medium text-gray-300 px-4">
-                  Pass device to the next player
+                <p
+                  className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 px-4 z-20"
+                  style={{ fontFamily: "MedievalSharp" }}
+                >
+                  Pass device to the next knight
                 </p>
               </div>
             </div>
@@ -517,18 +539,20 @@ function OneDeviceGame() {
               {currentPlayerIndex < players.length - 1 && (
                 <button
                   onClick={handleNextPlayer}
-                  className="w-32 sm:w-36 md:w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base"
+                  className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(6,182,212,0.5)] border border-cyan-500/50"
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Next Player
+                  Next Knight
                 </button>
               )}
 
               {currentPlayerIndex === players.length - 1 && (
                 <button
                   onClick={handleStartGame}
-                  className="w-32 sm:w-36 md:w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base"
+                  className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(168,85,247,0.5)] border border-purple-500/50"
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
-                  Start Game
+                  🗡️ Begin Quest
                 </button>
               )}
             </div>
@@ -573,14 +597,18 @@ function OneDeviceGame() {
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("exit")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`px-3 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
+                  className={`px-3 py-2 bg-gradient-to-r from-red-900/80 to-red-800/80 hover:from-red-800/80 hover:to-red-700/80 transition rounded-md font-bold border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.4)] ${
                     pressedButton === "exit" ? "scale-95 brightness-75" : ""
                   }`}
+                  style={{ fontFamily: "MedievalSharp" }}
                 >
                   {t("game.exit")}
                 </button>
-                <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 opacity-95 rounded-lg p-2 sm:p-3 text-center">
-                  <h3 className="text-center text-xs sm:text-base font-semibold mb-1 sm:mb-2">
+                <div className="bg-black/95 border border-cyan-500/30 rounded-lg p-2 sm:p-3 text-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                  <h3
+                    className="text-center text-xs sm:text-base font-semibold mb-1 sm:mb-2 text-cyan-400"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
                     {t("game.phase")} {phase} - {t("game.round")} {round}
                   </h3>
                   <div className="flex justify-center gap-2">
@@ -637,12 +665,15 @@ function OneDeviceGame() {
 
               {/* Big UI for Round Leader and Players */}
               <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 mt-4 sm:mt-8">
-                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-xl shadow-lg p-3 sm:p-6 ">
+                <div className="bg-black/95 border border-cyan-500/30 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.3)] p-3 sm:p-6 ">
                   {/* Round Leader */}
                   <div className="text-center">
-                    <p className="text-lg sm:text-2xl font-bold text-white">
-                      Leader:{" "}
-                      <span className="text-cyan-400">
+                    <p
+                      className="text-lg sm:text-2xl font-bold text-cyan-200"
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
+                      Quest Leader:{" "}
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
                         {
                           players.find(
                             (player) =>
@@ -651,9 +682,12 @@ function OneDeviceGame() {
                         }
                       </span>
                     </p>
-                    <p className="text-sm sm:text-md text-cyan-300 mt-1 sm:mt-2">
+                    <p
+                      className="text-sm sm:text-md text-cyan-300 mt-1 sm:mt-2"
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
                       {t("game.pick")}
-                      <span className="text-cyan-500">
+                      <span className="text-cyan-400 font-bold">
                         {missionTeamSizes[phase - 1]}
                       </span>{" "}
                       {t("game.players")}
@@ -675,9 +709,12 @@ function OneDeviceGame() {
                                 key={player.playerSessionKey}
                                 className="col-span-2 flex justify-center "
                               >
-                                <div className="flex items-center justify-between p-2 bg-slate-700 rounded-lg border border-slate-600 w-full max-w-[calc(50%-0.375rem)]">
+                                <div className="flex items-center justify-between p-2 bg-zinc-900/50 border border-cyan-500/30 rounded-lg w-full max-w-[calc(50%-0.375rem)]">
                                   {/* Player Name */}
-                                  <span className="text-white font-medium">
+                                  <span
+                                    className="text-cyan-200 font-medium"
+                                    style={{ fontFamily: "MedievalSharp" }}
+                                  >
                                     {player.name}
                                   </span>
                                   {/* Switch */}
@@ -719,10 +756,13 @@ function OneDeviceGame() {
                           return (
                             <div
                               key={player.playerSessionKey}
-                              className="flex items-center justify-between p-2 bg-slate-700 rounded-lg border border-slate-600"
+                              className="flex items-center justify-between p-2 bg-zinc-900/50 border border-cyan-500/30 rounded-lg"
                             >
                               {/* Player Name */}
-                              <span className="text-white font-medium">
+                              <span
+                                className="text-cyan-200 font-medium"
+                                style={{ fontFamily: "MedievalSharp" }}
+                              >
                                 {player.name}
                               </span>
                               {/* Switch */}
@@ -775,16 +815,16 @@ function OneDeviceGame() {
                       onMouseLeave={() => setPressedButton(null)}
                       onTouchStart={() => setPressedButton("submit")}
                       onTouchEnd={() => setPressedButton(null)}
-                      className={`w-36 sm:w-48 px-3 sm:px-4 py-2 text-sm sm:text-base text-white rounded-xl
-                        ${
-                          selectedPlayers.length !== missionTeamSizes[phase - 1]
-                            ? "bg-blue-600/25 backdrop-blur-md border-blue-400/20 cursor-not-allowed"
-                            : `bg-gradient-to-r from-blue-600 via-blue-700 to-blue-600 hover:bg-gradient-to-r hover:from-blue-700 hover:via-blue-800 hover:to-blue-700 ${
-                                pressedButton === "submit"
-                                  ? "scale-95 brightness-75"
-                                  : ""
-                              }`
-                        }`}
+                      className={`w-36 sm:w-48 px-3 sm:px-4 py-2 text-sm sm:text-base text-white rounded-xl font-bold shadow-lg ${
+                        selectedPlayers.length !== missionTeamSizes[phase - 1]
+                          ? "bg-zinc-800/50 border border-zinc-700/50 cursor-not-allowed"
+                          : `bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 border border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.5)] ${
+                              pressedButton === "submit"
+                                ? "scale-95 brightness-75"
+                                : ""
+                            }`
+                      }`}
+                      style={{ fontFamily: "MedievalSharp" }}
                     >
                       {t("game.submit")}
                     </button>
@@ -792,18 +832,24 @@ function OneDeviceGame() {
                 </div>
                 {/* Phase History */}
 
-                <div className="mt-2 sm:mt-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-lg p-2 sm:p-3 ">
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-1 text-center">
-                    Phase History
+                <div className="mt-2 sm:mt-3 bg-black/95 border border-cyan-500/30 rounded-lg p-2 sm:p-3 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                  <h3
+                    className="text-lg sm:text-xl font-bold text-cyan-400 mb-1 text-center"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
+                    Quest History
                   </h3>
                   <div className="space-y-2">
                     {phaseHistory.map((item, index) => (
                       <div
                         key={index}
-                        className="bg-slate-700 rounded-lg p-1 border border-slate-600 flex items-center gap-2 sm:gap-4 overflow-x-auto"
+                        className="bg-zinc-900/50 border border-cyan-500/30 rounded-lg p-1 flex items-center gap-2 sm:gap-4 overflow-x-auto"
                       >
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-sm sm:text-md font-semibold text-white">
+                          <span
+                            className="text-sm sm:text-md font-semibold text-cyan-200"
+                            style={{ fontFamily: "MedievalSharp" }}
+                          >
                             Phase {item.phaseNumber}:
                           </span>
                           <span
@@ -820,7 +866,7 @@ function OneDeviceGame() {
                           {item.voters.map((voter, voterIndex) => (
                             <span
                               key={voterIndex}
-                              className="bg-slate-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs"
+                              className="bg-zinc-800 border border-cyan-500/30 text-cyan-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs"
                             >
                               {voter}
                             </span>
@@ -833,9 +879,17 @@ function OneDeviceGame() {
               </div>
             </div>
             {showQuestVoteModal && (
-              <div className="flex bg-black/80 fixed top-0 left-0 w-full h-full items-center justify-center z-50">
-                <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-50 max-w-md">
-                  <h3 className="text-xl text-center font-bold mb-4 text-white">
+              <div className="flex bg-black/98 fixed top-0 left-0 w-full h-full items-center justify-center z-50">
+                <div className="bg-black/98 border-2 border-cyan-500/50 rounded-lg p-6 w-50 max-w-md relative shadow-[0_0_30px_rgba(6,182,212,0.4)]">
+                  <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400"></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400"></div>
+
+                  <h3
+                    className="text-xl text-center font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
                     {t("modals.proceedToQuest")}
                   </h3>
                   <div className="space-y-2 mb-4">
@@ -850,11 +904,12 @@ function OneDeviceGame() {
                         onMouseLeave={() => setPressedButton(null)}
                         onTouchStart={() => setPressedButton("yes")}
                         onTouchEnd={() => setPressedButton(null)}
-                        className={`px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg ${
+                        className={`px-4 py-2 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 text-white rounded-lg font-bold shadow-[0_0_15px_rgba(6,182,212,0.5)] border border-cyan-500/50 ${
                           pressedButton === "yes"
                             ? "scale-95 brightness-75"
                             : ""
                         }`}
+                        style={{ fontFamily: "MedievalSharp" }}
                       >
                         {t("modals.yes")}
                       </button>
@@ -868,9 +923,10 @@ function OneDeviceGame() {
                         onMouseLeave={() => setPressedButton(null)}
                         onTouchStart={() => setPressedButton("no")}
                         onTouchEnd={() => setPressedButton(null)}
-                        className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
+                        className={`px-4 py-2 bg-gradient-to-r from-slate-900/80 to-slate-800/80 hover:from-slate-800/80 hover:to-slate-700/80 text-white rounded-lg font-bold shadow-lg border border-slate-700/50 ${
                           pressedButton === "no" ? "scale-95 brightness-75" : ""
                         }`}
+                        style={{ fontFamily: "MedievalSharp" }}
                       >
                         {t("modals.no")}
                       </button>
@@ -905,7 +961,10 @@ function OneDeviceGame() {
                     exit={{ opacity: 0, y: 20 }}
                     transition={{ duration: 0.5, ease: "easeInOut" }}
                   >
-                    <h3 className="text-3xl font-bold text-white text-center">
+                    <h3
+                      className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 text-center"
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
                       {
                         players.find(
                           (player) =>

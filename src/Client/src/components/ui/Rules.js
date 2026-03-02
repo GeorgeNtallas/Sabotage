@@ -16,18 +16,22 @@ function Rules({ showRules, setShowRules }) {
   return (
     <Animation show={showRules}>
       <div className="fixed inset-8 flex items-center justify-center z-50">
-        <div className="bg-zinc-900 rounded-xl p-5 w-[600px] h-[600px] text-black flex flex-col relative">
+        <div className="bg-black/95 rounded-xl p-5 w-[600px] h-[600px] text-black flex flex-col relative border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+          <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+          <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
+          <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
           <div className="flex justify-between items-center mb-4">
             <div></div>
             <h2
-              className="text-xl text-gray-200 font-bold"
+              className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
               style={medievalFontStyle}
             >
               {t("info.rulesAndTips")}
             </h2>
             <button
               onClick={() => setShowRules(false)}
-              className="text-white hover:text-red-400 text-2xl font-bold"
+              className="text-cyan-300 hover:text-red-400 text-2xl font-bold"
             >
               x
             </button>
@@ -37,50 +41,50 @@ function Rules({ showRules, setShowRules }) {
           <div className="flex gap-1 mb-4 flex-wrap justify-center">
             <button
               onClick={() => setRulesSection("goal")}
-              className={`px-3 py-2 text-sm rounded transition ${
+              className={`px-3 py-2 text-sm rounded transition border-2 ${
                 rulesSection === "goal"
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                  ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                  : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
               }`}
             >
               {t("info.goal")}
             </button>
             <button
               onClick={() => setRulesSection("howto")}
-              className={`px-3 py-2 text-sm rounded transition ${
+              className={`px-3 py-2 text-sm rounded transition border-2 ${
                 rulesSection === "howto"
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                  ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                  : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
               }`}
             >
               {t("info.howToPlay")}
             </button>
             <button
               onClick={() => setRulesSection("Stips")}
-              className={`px-3 py-2 text-sm rounded transition ${
+              className={`px-3 py-2 text-sm rounded transition border-2 ${
                 rulesSection === "Stips"
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                  ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                  : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
               }`}
             >
               {t("info.strategyTips")}
             </button>
             <button
               onClick={() => setRulesSection("tips")}
-              className={`px-3 py-2 text-sm rounded transition ${
+              className={`px-3 py-2 text-sm rounded transition border-2 ${
                 rulesSection === "tips"
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                  ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                  : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
               }`}
             >
               {t("info.tips")}
             </button>
             <button
               onClick={() => setRulesSection("characters")}
-              className={`px-3 py-2 text-sm rounded transition ${
+              className={`px-3 py-2 text-sm rounded transition border-2 ${
                 rulesSection === "characters"
-                  ? "bg-red-600 text-white"
-                  : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                  ? "bg-cyan-950/40 text-cyan-300 border-cyan-500/50"
+                  : "bg-zinc-900 text-gray-400 hover:text-cyan-300 border-zinc-800"
               }`}
             >
               {t("info.allCharacters")}
@@ -88,10 +92,10 @@ function Rules({ showRules, setShowRules }) {
           </div>
 
           {/* Rules content */}
-          <div className="space-y-4 text-sm text-gray-200 flex-1 overflow-y-auto">
+          <div className="space-y-4 text-sm text-cyan-100 flex-1 overflow-y-auto">
             {rulesSection === "goal" && (
               <div>
-                <h2 className="text-lg font-bold text-red-600 mb-2">
+                <h2 className="text-lg font-bold text-cyan-400 mb-2">
                   {t("rules.goalTitle")}
                 </h2>
                 <p className="mb-3 leading-relaxed">{t("rules.goalText")}</p>
@@ -101,11 +105,11 @@ function Rules({ showRules, setShowRules }) {
 
             {rulesSection === "howto" && (
               <div>
-                <h2 className="text-lg font-bold text-red-600 mb-2">
+                <h2 className="text-lg font-bold text-cyan-400 mb-2">
                   {t("rules.gameplayTitle")}
                 </h2>
                 <div className="mb-3">
-                  <h3 className="text-base font-semibold text-purple-600 mb-1">
+                  <h3 className="text-base font-semibold text-purple-400 mb-1">
                     {t("rules.teamBuildingTitle")}
                   </h3>
                   <p className="leading-relaxed mb-2">
@@ -113,7 +117,7 @@ function Rules({ showRules, setShowRules }) {
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-purple-600 mb-1">
+                  <h3 className="text-base font-semibold text-purple-400 mb-1">
                     {t("rules.questTitle")}
                   </h3>
                   <p className="leading-relaxed">{t("rules.questText")}</p>
@@ -123,7 +127,7 @@ function Rules({ showRules, setShowRules }) {
 
             {rulesSection === "Stips" && (
               <div>
-                <h2 className="text-lg font-bold text-red-600 mb-2">
+                <h2 className="text-lg font-bold text-cyan-400 mb-2">
                   {t("rules.strategyTitle")}
                 </h2>
                 <p className="leading-relaxed mb-3">
@@ -135,7 +139,7 @@ function Rules({ showRules, setShowRules }) {
 
             {rulesSection === "tips" && (
               <div>
-                <h2 className="text-lg font-bold text-red-600 mb-2">
+                <h2 className="text-lg font-bold text-cyan-400 mb-2">
                   {t("info.tips")}
                 </h2>
                 <p className="leading-relaxed mb-2">{t("tips.avoidComplex")}</p>
@@ -153,42 +157,42 @@ function Rules({ showRules, setShowRules }) {
 
             {rulesSection === "characters" && (
               <div>
-                <h2 className="text-lg font-bold text-blue-600 mb-2">
+                <h2 className="text-lg font-bold text-cyan-400 mb-2">
                   {t("characters.goodCharacters")}
                 </h2>
                 <div className="leading-relaxed mb-2">
-                  <span className="text-blue-600 font-semibold">Seer:</span>{" "}
+                  <span className="text-cyan-400 font-semibold">Seer:</span>{" "}
                   {t("characters.seer")}
                 </div>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-blue-600 font-semibold">Guardian:</span>{" "}
+                  <span className="text-cyan-400 font-semibold">Guardian:</span>{" "}
                   {t("characters.guardian")}
                 </p>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-blue-600 font-semibold">Knights:</span>{" "}
+                  <span className="text-cyan-400 font-semibold">Knights:</span>{" "}
                   {t("characters.knights")}
                 </p>
-                <h2 className="text-lg font-bold text-red-600 mb-2">
+                <h2 className="text-lg font-bold text-purple-400 mb-2">
                   {t("characters.evilCharacters")}
                 </h2>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-red-600 font-semibold">Draven:</span>{" "}
+                  <span className="text-purple-400 font-semibold">Draven:</span>{" "}
                   {t("characters.draven")}
                 </p>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-red-600 font-semibold">Seraphina:</span>{" "}
+                  <span className="text-purple-400 font-semibold">Seraphina:</span>{" "}
                   {t("characters.seraphina")}
                 </p>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-red-600 font-semibold">Kaelen:</span>{" "}
+                  <span className="text-purple-400 font-semibold">Kaelen:</span>{" "}
                   {t("characters.kaelen")}
                 </p>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-red-600 font-semibold">Shade:</span>{" "}
+                  <span className="text-purple-400 font-semibold">Shade:</span>{" "}
                   {t("characters.shade")}
                 </p>
                 <p className="leading-relaxed mb-2">
-                  <span className="text-red-600 font-semibold">Thrall:</span>{" "}
+                  <span className="text-purple-400 font-semibold">Thrall:</span>{" "}
                   {t("characters.thrall")}
                 </p>
               </div>
