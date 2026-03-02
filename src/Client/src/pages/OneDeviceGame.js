@@ -373,8 +373,8 @@ function OneDeviceGame() {
       if (visible > maxVisible) maxVisible = visible;
     });
 
-    const baseHeight = 400;
-    const perPlayerHeight = 40;
+    const baseHeight = 350;
+    const perPlayerHeight = 20;
     setMaxModalHeight(baseHeight + maxVisible * perPlayerHeight);
   }, [players, characters]);
 
@@ -394,7 +394,7 @@ function OneDeviceGame() {
               duration: 0.5,
               ease: "easeInOut",
             }}
-            className="w-full h-full "
+            className="w-full min-h-screen flex flex-col"
             style={{
               backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
               backgroundSize: "cover",
@@ -402,130 +402,134 @@ function OneDeviceGame() {
               backgroundRepeat: "no-repeat",
             }}
           >
-            <div className="flex flex-col items-center space-y-3">
-              {/* Player's Name */}
-              <h2 className="mt-10 mb-10 text-center text-3xl font-bold text-white">
-                {currentPlayer.name}
-              </h2>
+            <div className="flex-1 overflow-y-auto pb-20 sm:pb-24">
+              <div className="flex flex-col items-center space-y-2 sm:space-y-3">
+                {/* Player's Name */}
+                <h2 className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center text-2xl sm:text-3xl font-bold text-white px-4">
+                  {currentPlayer.name}
+                </h2>
 
-              <div className="relative">
-                <Draggable
-                  axis="y"
-                  bounds={{ top: -450, bottom: 0 }}
-                  position={{ x: 0, y: 0 }}
-                  onStop={(e, data) => {
-                    if (data.y < 0) {
-                      data.node.style.transform = "translate(0px, 0px)";
-                    }
-                  }}
-                >
-                  <div
-                    className="absolute w-80 z-20 text-white p-3 rounded-lg shadow-lg border-4 border-indigo-900 flex flex-col items-center justify-end"
-                    style={{
-                      height: "100%",
-                      backgroundImage:
-                        "url(/images/haunted-house-gothic-style.jpg)",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
+                <div className="relative w-full max-w-[75%] sm:max-w-xs">
+                  <Draggable
+                    axis="y"
+                    bounds={{ top: -maxModalHeight, bottom: 0 }}
+                    position={{ x: 0, y: 0 }}
+                    onStop={(e, data) => {
+                      if (data.y < 0) {
+                        data.node.style.transform = "translate(0px, 0px)";
+                      }
                     }}
                   >
-                    <div className="absolute inset-0 bg-black/60 z-10"></div>
-                    <div className="text-center z-20">
-                      <div className="text-7xl mb-4 z-20">↑</div>
-                      <p className="text-center text-lg font-medium text-gray-200 mb-4 z-20">
-                        Drag Up to Reveal
+                    <div
+                      className="absolute w-full z-20 bg-black text-white p-2 sm:p-3 rounded-lg shadow-lg border-2 sm:border-4 border-indigo-900 flex flex-col items-center justify-end"
+                      style={{
+                        height: "100%",
+                        minHeight: `${maxModalHeight}px`,
+                        backgroundImage:
+                          "url(/images/haunted-house-gothic-style.jpg)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-black/60 z-10"></div>
+                      <div className="text-center z-20">
+                        <div className="text-4xl sm:text-5xl md:text-7xl mb-3 sm:mb-4 z-20">
+                          ↑
+                        </div>
+                        <p className="text-center text-sm sm:text-base md:text-lg font-medium text-gray-200 mb-3 sm:mb-4 z-20">
+                          Drag Up to Reveal
+                        </p>
+                      </div>
+                    </div>
+                  </Draggable>
+
+                  {/* Modal for Character Display */}
+                  <div
+                    className="bg-gradient-to-b from-slate-700 via-slate-950 to-black text-white p-2 rounded-lg shadow-lg w-full border-2 sm:border-4 border-indigo-900 flex flex-col items-center justify-center space-y-3 sm:space-y-4"
+                    style={{ minHeight: `${maxModalHeight}px` }}
+                  >
+                    <div className="relative w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4">
+                      <img
+                        src={`/images/${currentCharacter.name}Icon.png`}
+                        alt="Character"
+                        className="w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full mb-2 sm:mb-3 md:mb-4 border-2 border-cyan-600"
+                        onError={(e) => (e.target.src = "/images/default.jpg")}
+                      />
+                      <p className="text-lg sm:text-xl md:text-2xl font-bold text-cyan-400">
+                        {currentCharacter.name}
                       </p>
+                      <p className="text-sm sm:text-base md:text-lg text-gray-300 mt-1 sm:mt-2 font-light text-center px-2">
+                        {currentCharacter.description}
+                      </p>
+                      <p className="text-sm sm:text-base md:text-lg text-gray-300 mt-1 sm:mt-2 font-light">
+                        Team:{" "}
+                        <span
+                          className={
+                            currentCharacter.team === "evil"
+                              ? "text-red-500"
+                              : "text-cyan-400"
+                          }
+                        >
+                          {currentCharacter.team}
+                        </span>
+                      </p>
+                      {visiblePlayers && visiblePlayers.length > 0 && (
+                        <div className="mt-2 sm:mt-3 md:mt-4 w-full bg-slate-800 p-2 sm:p-3 rounded-lg">
+                          <p className="text-sm sm:text-base md:text-lg font-bold text-yellow-300 mb-2">
+                            You can see:
+                          </p>
+                          <div className="space-y-2">
+                            {visiblePlayers.map((visible) => {
+                              const visiblePlayer = players.find(
+                                (p) =>
+                                  p.playerSessionKey ===
+                                  visible.playerSessionKey,
+                              );
+                              return (
+                                <p
+                                  key={visible.playerSessionKey}
+                                  className="text-xs sm:text-sm md:text-base text-white font-medium"
+                                >
+                                  {visiblePlayer?.name || "Unknown"} -{" "}
+                                  <span className="text-red-500 font-bold">
+                                    {visible.role}
+                                  </span>
+                                </p>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </Draggable>
-
-                {/* Modal for Character Display */}
-                <div
-                  className="bg-gradient-to-b from-slate-700 via-slate-950 to-black text-white p-2 rounded-lg shadow-lg w-80 border-4 border-indigo-900 flex flex-col items-center justify-center space-y-4"
-                  style={{ minHeight: `${maxModalHeight}px` }}
-                >
-                  <div className="relative w-full flex flex-col items-center justify-center p-4">
-                    <img
-                      src={`/images/${currentCharacter.name}Icon.png`}
-                      alt="Character"
-                      className="w-28 h-28 rounded-full mb-4 border-2 border-cyan-600"
-                      onError={(e) => (e.target.src = "/images/default.jpg")}
-                    />
-                    <p className="text-2xl font-bold text-cyan-400">
-                      {currentCharacter.name}
-                    </p>
-                    <p className="text-lg text-gray-300 mt-2 font-light text-center">
-                      {currentCharacter.description}
-                    </p>
-                    <p className="text-lg text-gray-300 mt-2 font-light">
-                      Team:{" "}
-                      <span
-                        className={
-                          currentCharacter.team === "evil"
-                            ? "text-red-500"
-                            : "text-cyan-400"
-                        }
-                      >
-                        {currentCharacter.team}
-                      </span>
-                    </p>
-                    {visiblePlayers && visiblePlayers.length > 0 && (
-                      <div className="mt-4 w-full bg-slate-800 p-3 rounded-lg">
-                        <p className="text-lg font-bold text-yellow-300 mb-2">
-                          You can see:
-                        </p>
-                        <div className="space-y-2">
-                          {visiblePlayers.map((visible) => {
-                            const visiblePlayer = players.find(
-                              (p) =>
-                                p.playerSessionKey === visible.playerSessionKey,
-                            );
-                            return (
-                              <p
-                                key={visible.playerSessionKey}
-                                className="text-base text-white font-medium"
-                              >
-                                {visiblePlayer?.name || "Unknown"} -{" "}
-                                <span className="text-red-500 font-bold">
-                                  {visible.role}
-                                </span>
-                              </p>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
+
+                {/* Instruction Text */}
+                <p className="text-center text-sm sm:text-base md:text-lg font-medium text-gray-300 px-4">
+                  Pass device to the next player
+                </p>
               </div>
+            </div>
 
-              {/* Instruction Text */}
-              <p className="text-center text-lg font-medium text-gray-300">
-                Pass device to the next player
-              </p>
-
-              {/* Button at the Bottom */}
+            {/* Button at the Bottom */}
+            <div className="fixed bottom-10 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent py-2 sm:py-3 md:py-4 flex justify-center">
               {currentPlayerIndex < players.length - 1 && (
-                <div className="fixed bottom-12">
-                  <button
-                    onClick={handleNextPlayer}
-                    className="w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-md font-bold"
-                  >
-                    Next Player
-                  </button>
-                </div>
+                <button
+                  onClick={handleNextPlayer}
+                  className="w-32 sm:w-36 md:w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base"
+                >
+                  Next Player
+                </button>
               )}
 
               {currentPlayerIndex === players.length - 1 && (
-                <div className="fixed bottom-12">
-                  <button
-                    onClick={handleStartGame}
-                    className="w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-md font-bold"
-                  >
-                    Start Game
-                  </button>
-                </div>
+                <button
+                  onClick={handleStartGame}
+                  className="w-32 sm:w-36 md:w-40 bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base"
+                >
+                  Start Game
+                </button>
               )}
             </div>
           </motion.div>
@@ -551,17 +555,17 @@ function OneDeviceGame() {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <div className="flex justify-center items-center h-16 w-full">
+            <div className="flex justify-center items-center h-12 sm:h-16 w-full">
               <img
                 src="/images/Sabotage3.png"
                 alt="Leader"
-                className="w-44 mr-3"
+                className="w-32 sm:w-44 mr-3"
                 onError={(e) => (e.target.src = "/images/default.jpg")}
               />
             </div>
 
             <div className="relative z-10 space-y-4">
-              <div className="flex justify-between items-center h-16 w-full px-4 mt-5">
+              <div className="flex justify-between items-center h-12 sm:h-16 w-full px-2 sm:px-4 mt-3 sm:mt-5">
                 <button
                   onClick={() => handleExitClick()}
                   onMouseDown={() => setPressedButton("exit")}
@@ -569,14 +573,14 @@ function OneDeviceGame() {
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("exit")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`px-3 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
+                  className={`px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
                     pressedButton === "exit" ? "scale-95 brightness-75" : ""
                   }`}
                 >
                   {t("game.exit")}
                 </button>
-                <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 opacity-95 rounded-lg p-3 text-center">
-                  <h3 className="text-center font-semibold mb-2">
+                <div className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 opacity-95 rounded-lg p-2 sm:p-3 text-center">
+                  <h3 className="text-center text-xs sm:text-base font-semibold mb-1 sm:mb-2">
                     {t("game.phase")} {phase} - {t("game.round")} {round}
                   </h3>
                   <div className="flex justify-center gap-2">
@@ -596,7 +600,7 @@ function OneDeviceGame() {
                       return (
                         <motion.div
                           key={phaseNum}
-                          className={`w-6 h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
+                          className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full ${circleColor} flex items-center justify-center text-white text-xs font-bold`}
                           animate={
                             phaseNum === phase
                               ? {
@@ -632,11 +636,11 @@ function OneDeviceGame() {
               </div>
 
               {/* Big UI for Round Leader and Players */}
-              <div className="w-full max-w-4xl mx-auto px-4 mt-8">
-                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-xl shadow-lg p-6 ">
+              <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 mt-4 sm:mt-8">
+                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-xl shadow-lg p-3 sm:p-6 ">
                   {/* Round Leader */}
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-lg sm:text-2xl font-bold text-white">
                       Leader:{" "}
                       <span className="text-cyan-400">
                         {
@@ -647,7 +651,7 @@ function OneDeviceGame() {
                         }
                       </span>
                     </p>
-                    <p className="text-md text-cyan-300 mt-2">
+                    <p className="text-sm sm:text-md text-cyan-300 mt-1 sm:mt-2">
                       {t("game.pick")}
                       <span className="text-cyan-500">
                         {missionTeamSizes[phase - 1]}
@@ -758,7 +762,7 @@ function OneDeviceGame() {
                     </div>
                   </div>
                   {/* Submit Button - Bottom Center */}
-                  <div className="mt-5 flex justify-center">
+                  <div className="mt-3 sm:mt-5 flex justify-center">
                     <button
                       disabled={
                         selectedPlayers.length !== missionTeamSizes[phase - 1]
@@ -771,7 +775,7 @@ function OneDeviceGame() {
                       onMouseLeave={() => setPressedButton(null)}
                       onTouchStart={() => setPressedButton("submit")}
                       onTouchEnd={() => setPressedButton(null)}
-                      className={`w-48 px-4 py-2  text-white rounded-xl
+                      className={`w-36 sm:w-48 px-3 sm:px-4 py-2 text-sm sm:text-base text-white rounded-xl
                         ${
                           selectedPlayers.length !== missionTeamSizes[phase - 1]
                             ? "bg-blue-600/25 backdrop-blur-md border-blue-400/20 cursor-not-allowed"
@@ -788,22 +792,22 @@ function OneDeviceGame() {
                 </div>
                 {/* Phase History */}
 
-                <div className="mt-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-lg p-3 ">
-                  <h3 className="text-xl font-bold text-white mb-1 text-center">
+                <div className="mt-2 sm:mt-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 opacity-95 rounded-lg p-2 sm:p-3 ">
+                  <h3 className="text-lg sm:text-xl font-bold text-white mb-1 text-center">
                     Phase History
                   </h3>
                   <div className="space-y-2">
                     {phaseHistory.map((item, index) => (
                       <div
                         key={index}
-                        className="bg-slate-700 rounded-lg p-1 border border-slate-600 flex items-center gap-4 overflow-x-auto"
+                        className="bg-slate-700 rounded-lg p-1 border border-slate-600 flex items-center gap-2 sm:gap-4 overflow-x-auto"
                       >
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-md font-semibold text-white">
+                          <span className="text-sm sm:text-md font-semibold text-white">
                             Phase {item.phaseNumber}:
                           </span>
                           <span
-                            className={`px-3 py-1 rounded-full text-sm font-bold ${
+                            className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold ${
                               item.result === "success"
                                 ? "bg-green-500 text-white"
                                 : "bg-red-500 text-white"
@@ -816,7 +820,7 @@ function OneDeviceGame() {
                           {item.voters.map((voter, voterIndex) => (
                             <span
                               key={voterIndex}
-                              className="bg-slate-600 text-white px-2 py-1 rounded text-xs"
+                              className="bg-slate-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-xs"
                             >
                               {voter}
                             </span>
