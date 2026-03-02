@@ -4,7 +4,7 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
   const [newPlayer, setNewPlayer] = useState("");
 
   const addPlayer = () => {
-    if (newPlayer.trim() && players.length < 13) {
+    if (newPlayer.trim() && players.length < 10) {
       setPlayers([...players, newPlayer.trim()]);
       setNewPlayer("");
     }
@@ -34,7 +34,7 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
         </button>
         <div className="pt-8 pb-4">
           <h1 className="text-2xl font-bold mb-3 text-center">Add Players</h1>
-          <p className="text-gray-400 mb-1 text-center">5 - 13 players</p>
+          <p className="text-gray-400 mb-1 text-center">5 - 10 players</p>
           <p className="text-green-500 text-center">
             Players - {players.length}
           </p>

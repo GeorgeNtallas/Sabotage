@@ -573,7 +573,7 @@ function OneDeviceGame() {
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("exit")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
+                  className={`px-3 py-2 bg-gradient-to-r bg-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-500 transition rounded-md font-bold ${
                     pressedButton === "exit" ? "scale-95 brightness-75" : ""
                   }`}
                 >
