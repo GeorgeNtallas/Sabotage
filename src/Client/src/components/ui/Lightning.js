@@ -35,7 +35,7 @@ const Lightning = () => {
           8,
         );
         this.opacity = 1;
-        this.fadeSpeed = 0.02 + Math.random() * 0.03;
+        this.fadeSpeed = 0.008 + Math.random() * 0.008;
         this.branchProbability = 0.4;
         this.branches = this.generateBranches();
         this.width = Math.random() * 3 + 2;
@@ -146,8 +146,8 @@ const Lightning = () => {
 
     let bolts = [];
     let lastBoltTime = 0;
-    const minInterval = 5000; // Minimum 3 seconds between bolts
-    const maxInterval = 12000; // Maximum 8 seconds between bolts
+    const minInterval = 8000; // Minimum 8 seconds between bolts
+    const maxInterval = 18000; // Maximum 18 seconds between bolts
 
     const animate = (timestamp) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
