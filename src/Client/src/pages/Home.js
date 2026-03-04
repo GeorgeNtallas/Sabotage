@@ -50,10 +50,13 @@ function Home() {
       alert("Please enter player name");
       return;
     }
-    setNotify({
-      show: true,
-      message: "Waking up the server... this may take a minute",
-    });
+    setTimeout(() => {
+      setNotify({
+        show: true,
+        message: "Waking up the server... this may take a minute",
+      });
+    }, 3000);
+
     socket.emit(
       "create_room",
       playerName,
@@ -68,7 +71,10 @@ function Home() {
         isLeader,
         error,
       }) => {
-        setNotify({ show: false, message: "" });
+        setTimeout(() => {
+          setNotify({ show: false, message: "" });
+        }, 3000);
+
         if (error) {
           alert(error);
           return;
@@ -102,10 +108,12 @@ function Home() {
   };
 
   const handleJoin = () => {
-    setNotify({
-      show: true,
-      message: "Waking up the server... this may take a minute",
-    });
+    setTimeout(() => {
+      setNotify({
+        show: true,
+        message: "Waking up the server... this may take a minute",
+      });
+    }, 3000);
     socket.emit(
       "join_room",
       { name: playerName, input: roomNamePassword },
@@ -120,7 +128,9 @@ function Home() {
         isPublic,
         error,
       }) => {
-        setNotify({ show: false, message: "" });
+        setTimeout(() => {
+          setNotify({ show: false, message: "" });
+        }, 3000);
         if (error) {
           alert(error);
           return;
