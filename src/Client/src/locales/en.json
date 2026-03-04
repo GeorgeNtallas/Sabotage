@@ -59,7 +59,9 @@
     "no": "No",
     "exitGame": "Exit Game?",
     "success": "Success",
-    "fail": "Fail"
+    "fail": "Fail",
+    "chooseYourDestiny": "Choose Your Destiny",
+    "questVoteHint": "Choose your destiny carefully!"
   },
   "info": {
     "phase": "Phase",

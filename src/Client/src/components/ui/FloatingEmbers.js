@@ -24,16 +24,14 @@ const FloatingEmbers = () => {
 
       reset() {
         this.x = Math.random() * canvas.width;
-        this.y = canvas.height + Math.random() * 50;
-        this.size = Math.random() * 4 + 2;
-        this.speedY = Math.random() * 1.5 + 0.5;
-        this.speedX = (Math.random() - 0.5) * 0.8;
-        this.opacity = Math.random() * 0.5 + 0.3;
-        this.fadeSpeed = Math.random() * 0.003 + 0.002;
+        this.y = canvas.height + Math.random() * 100;
+        this.size = Math.random() * 8 + 4;
+        this.speedY = Math.random() * 1.5 + 0.2;
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.opacity = Math.random() * 0.4 + 0.3;
+        this.fadeSpeed = Math.random() * 0.001 + 0.0005;
         this.wobble = Math.random() * Math.PI * 2;
-        this.wobbleSpeed = Math.random() * 0.02 + 0.01;
-        // Reset when reaching 70% of screen height
-        this.maxHeight = canvas.height * 0.7;
+        this.wobbleSpeed = Math.random() * 0.01 + 0.005;
 
         // Ember colors - purple to violet to magenta (mystical)
         const colors = [
@@ -50,14 +48,18 @@ const FloatingEmbers = () => {
         this.y -= this.speedY;
         this.wobble += this.wobbleSpeed;
         this.x += this.speedX + Math.sin(this.wobble) * 0.3;
-        this.opacity -= this.fadeSpeed;
-        this.size *= 0.998;
 
-        if (
-          this.opacity <= 0 ||
-          this.y < canvas.height - this.maxHeight ||
-          this.size < 0.5
-        ) {
+        // Fade out as it approaches the top
+        if (this.y < canvas.height * 0.3) {
+          this.opacity = Math.max(
+            0,
+            (this.y / (canvas.height * 0.3)) * (Math.random() * 0.4 + 0.3),
+          );
+        }
+
+        this.size *= 0.999;
+
+        if (this.opacity <= 0 || this.y < -50 || this.size < 0.5) {
           this.reset();
         }
       }
@@ -108,10 +110,10 @@ const FloatingEmbers = () => {
     }
 
     // Create initial embers
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 25; i++) {
       const ember = new Ember();
-      ember.y = Math.random() * canvas.height;
-      ember.opacity = Math.random() * 0.6 + 0.2;
+      ember.y = canvas.height + Math.random() * canvas.height * 0.5;
+      ember.opacity = Math.random() * 0.5 + 0.2;
       embers.push(ember);
     }
 

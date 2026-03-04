@@ -39,7 +39,7 @@ export default function AnimatedWindow({
       {/* Trigger button */}
       <button
         onClick={handleToggle}
-        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 transition rounded-md font-bold relative z-[40]"
+        className="px-3 py-2 bg-purple-900 hover:bg-purple-800 transition rounded-md font-bold relative z-[40] border border-purple-500/50"
       >
         {triggerLabel}
       </button>
@@ -73,15 +73,21 @@ export default function AnimatedWindow({
             }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
           >
-            <div className="w-[90%] max-h ml-5 mt-10  justify-center flex flex-col rounded-2xl shadow-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700 overflow-hidden pointer-events-auto">
+            <div
+              className="w-[90%] max-h ml-5 mt-10  justify-center flex flex-col rounded-2xl shadow-2xl bg-black/95 border border-purple-500/50 overflow-hidden pointer-events-auto"
+              style={{
+                background:
+                  "linear-gradient(135deg, #1a0e1a 0%, #130d18 25%, #1a0e1a 50%, #130d18 75%, #1a0e1a 100%)",
+              }}
+            >
               {/* Tab buttons */}
-              <div className="flex gap-2 p-2 border-b border-slate-700 bg-slate-800">
+              <div className="flex gap-2 p-2 border-b border-purple-500/30 bg-black/50">
                 <button
                   onClick={() => setActiveTab("option1")}
                   className={`flex-1 py-2 rounded font-semibold transition ${
                     activeTab === "option1"
-                      ? "bg-emerald-700 text-white"
-                      : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+                      ? "bg-purple-900 text-white"
+                      : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                   }`}
                 >
                   {t("info.phasesInfo")}
@@ -90,8 +96,8 @@ export default function AnimatedWindow({
                   onClick={() => setActiveTab("option2")}
                   className={`flex-1 py-2 rounded font-semibold transition ${
                     activeTab === "option2"
-                      ? "bg-emerald-700 text-white"
-                      : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+                      ? "bg-purple-900 text-white"
+                      : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                   }`}
                 >
                   {t("info.characters")}
@@ -100,8 +106,8 @@ export default function AnimatedWindow({
                   onClick={() => setActiveTab("option3")}
                   className={`flex-1 py-2 rounded font-semibold transition ${
                     activeTab === "option3"
-                      ? "bg-emerald-700 text-white"
-                      : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+                      ? "bg-purple-900 text-white"
+                      : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                   }`}
                 >
                   {t("info.rulesAndTips")}
@@ -109,7 +115,7 @@ export default function AnimatedWindow({
               </div>
 
               {/* Content area */}
-              <div className="flex-1 p-5 text-gray-200">
+              <div className="flex-1 p-5 text-purple-200">
                 {activeTab === "option1" && (
                   <div>
                     <h2 className="text-lg text-center font-bold text-purple-400 mb-2">
@@ -140,7 +146,7 @@ export default function AnimatedWindow({
                           return (
                             <div
                               key={phase}
-                              className="w-[94%] bg-slate-700 rounded p-2"
+                              className="w-[94%] bg-purple-950/50 rounded p-2"
                             >
                               <div className="flex justify-between items-center px-3">
                                 <div className="flex items-center gap-2">
@@ -158,7 +164,7 @@ export default function AnimatedWindow({
                                 </div>
                               </div>
                               {voterNames.length > 0 && (
-                                <div className="mt-1 text-xs text-gray-300 text-center">
+                                <div className="mt-1 text-xs text-purple-300 text-center">
                                   {voterNames.join(", ")}
                                 </div>
                               )}
@@ -177,7 +183,7 @@ export default function AnimatedWindow({
                         <button
                           key={character.name}
                           onClick={() => setSelectedCharacter(character)}
-                          className="w-16 h-16 rounded-full bg-gray-800 shadow-lg hover:scale-110 transition flex items-center justify-center overflow-hidden"
+                          className="w-16 h-16 rounded-full bg-black/80 shadow-lg hover:scale-110 transition flex items-center justify-center overflow-hidden border border-purple-500/30"
                         >
                           <img
                             src={`/images/${character.name}Icon.png`}
@@ -193,7 +199,7 @@ export default function AnimatedWindow({
 
                     {/* Info panel */}
                     {selectedCharacter && (
-                      <div className="bg-gray-900 text-white p-4 rounded-xl shadow-lg max-w-md text-center">
+                      <div className="bg-black/80 text-white p-4 rounded-xl shadow-lg max-w-md text-center border border-purple-500/30">
                         <h3 className="text-2xl font-bold text-amber-400 mb-2">
                           {selectedCharacter.name}
                         </h3>
@@ -207,7 +213,7 @@ export default function AnimatedWindow({
                           {t("game.team")}:{" "}
                           {t(`game.${selectedCharacter.team}`)}
                         </p>
-                        <p className="text-gray-300">
+                        <p className="text-purple-300">
                           {t(
                             `characters.descriptions.${selectedCharacter.name}`,
                           )}
@@ -224,8 +230,8 @@ export default function AnimatedWindow({
                         onClick={() => setRulesSection("goal")}
                         className={`px-2 py-1 text-xs rounded transition ${
                           rulesSection === "goal"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                            ? "bg-purple-900 text-white"
+                            : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                         }`}
                       >
                         {t("info.goal")}
@@ -234,8 +240,8 @@ export default function AnimatedWindow({
                         onClick={() => setRulesSection("howto")}
                         className={`px-2 py-1 text-xs rounded transition ${
                           rulesSection === "howto"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                            ? "bg-purple-900 text-white"
+                            : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                         }`}
                       >
                         {t("info.howToPlay")}
@@ -244,8 +250,8 @@ export default function AnimatedWindow({
                         onClick={() => setRulesSection("Stips")}
                         className={`px-2 py-1 text-xs rounded transition ${
                           rulesSection === "Stips"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                            ? "bg-purple-900 text-white"
+                            : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                         }`}
                       >
                         {t("info.strategyTips")}
@@ -254,8 +260,8 @@ export default function AnimatedWindow({
                         onClick={() => setRulesSection("tips")}
                         className={`px-2 py-1 text-xs rounded transition ${
                           rulesSection === "tips"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                            ? "bg-purple-900 text-white"
+                            : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                         }`}
                       >
                         {t("info.tips")}
@@ -264,8 +270,8 @@ export default function AnimatedWindow({
                         onClick={() => setRulesSection("characters")}
                         className={`px-2 py-1 text-xs rounded transition ${
                           rulesSection === "characters"
-                            ? "bg-red-600 text-white"
-                            : "bg-slate-600 text-gray-300 hover:bg-slate-500"
+                            ? "bg-purple-900 text-white"
+                            : "bg-purple-950 text-purple-300 hover:bg-purple-900"
                         }`}
                       >
                         {t("info.allCharacters")}
