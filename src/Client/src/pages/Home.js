@@ -23,6 +23,7 @@ function Home() {
   const [showRules, setShowRules] = useState(false);
   const [showRoomsModal, setShowRoomsModal] = useState(false);
   const [pressedButton, setPressedButton] = useState(null);
+  const [notify, setNotify] = useState({ show: false, message: "" });
   const [flameGlow, setFlameGlow] = useState(0);
   sessionStorage.removeItem("roomSessionKey");
 
@@ -49,6 +50,10 @@ function Home() {
       alert("Please enter player name");
       return;
     }
+    setNotify({
+      show: true,
+      message: "Waking up the server... this may take a minute",
+    });
     socket.emit(
       "create_room",
       playerName,
@@ -63,6 +68,7 @@ function Home() {
         isLeader,
         error,
       }) => {
+        setNotify({ show: false, message: "" });
         if (error) {
           alert(error);
           return;
@@ -96,6 +102,10 @@ function Home() {
   };
 
   const handleJoin = () => {
+    setNotify({
+      show: true,
+      message: "Waking up the server... this may take a minute",
+    });
     socket.emit(
       "join_room",
       { name: playerName, input: roomNamePassword },
@@ -110,10 +120,12 @@ function Home() {
         isPublic,
         error,
       }) => {
+        setNotify({ show: false, message: "" });
         if (error) {
           alert(error);
           return;
         }
+
         if (requiresPassword) {
           setPendingRoomName(roomName);
           setShowPasswordModal(true);
@@ -569,6 +581,7 @@ function Home() {
       </div>
 
       {/* Modals */}
+      <Notify message={notify.message} show={notify.show} />
       <Notify
         message="Login section is under construction"
         show={activeTab === "login"}

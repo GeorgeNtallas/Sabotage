@@ -5,8 +5,29 @@ const Notify = ({ message, show }) => {
 
   return (
     <div className="fixed top-2 left-1/2 transform -translate-x-1/2 w-[85%] max-w-sm min-w-[320px] z-10 animate-fadeIn">
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 backdrop-blur-sm border border-amber-600/50 rounded-lg shadow-2xl px-5 py-3 flex items-center justify-center gap-3">
-        <div className="flex-shrink-0 animate-blink">
+      <div
+        className="bg-black/90 backdrop-blur-lg border border-amber-600/50 rounded-lg shadow-[0_0_20px_rgba(200,100,50,0.3)] px-5 py-3 flex items-center justify-center gap-3 relative overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(30, 20, 10, 0.95) 0%, rgba(20, 15, 10, 0.98) 100%)",
+        }}
+      >
+        {/* Corner decorations */}
+        <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-t-2 border-l-2 border-amber-500"></div>
+        <div className="absolute -top-0.5 -right-0.5 w-2 h-2 border-t-2 border-r-2 border-amber-500"></div>
+        <div className="absolute -bottom-0.5 -left-0.5 w-2 h-2 border-b-2 border-l-2 border-amber-500"></div>
+        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-b-2 border-r-2 border-amber-500"></div>
+
+        {/* Glow effect behind icon */}
+        <div
+          className="absolute w-8 h-8 rounded-full blur-md pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle, rgba(255, 150, 50, 0.3) 0%, transparent 70%)",
+          }}
+        ></div>
+
+        <div className="flex-shrink-0 animate-pulse">
           <svg
             className="w-5 h-5 text-amber-500"
             fill="currentColor"
