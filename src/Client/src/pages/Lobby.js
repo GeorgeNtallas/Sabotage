@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import socket from "../socket";
-import Chat from "../components/ui/Chat";
+import FloatingEmbers from "../components/ui/FloatingEmbers";
 import DesktopLobbyView from "../components/res_design/DesktopLobbyView";
 import MobileLobbyView from "../components/res_design/MobileLobbyView";
 
@@ -220,6 +220,7 @@ function Lobby() {
 
   return (
     <>
+      <FloatingEmbers />
       <motion.div
         initial={{ opacity: 1 }}
         animate={{ opacity: fadeOut ? 0 : 1 }}
@@ -246,6 +247,7 @@ function Lobby() {
             showChat={showChat}
             selectedRoles={selectedRoles}
             toggleRole={toggleRole}
+            roomSessionKey={roomSessionKey}
           />
         ) : (
           <MobileLobbyView
@@ -270,14 +272,6 @@ function Lobby() {
             toggleRole={toggleRole}
           />
         )}
-        <Chat
-          show={showChat}
-          onClose={() => !isDesktop && setShowChat(false)}
-          character={{ team: "good" }}
-          playerSessionKey={playerSessionKey}
-          roomSessionKey={roomSessionKey}
-          isDesktop={isDesktop}
-        />
       </motion.div>
     </>
   );

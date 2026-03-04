@@ -26,7 +26,8 @@
     "exit": "Έξοδος",
     "startGame": "Έναρξη Παιχνιδιού",
     "include": "Συμπερίληψη",
-    "chat": "Chat"
+    "chat": "Chat",
+    "awaitingStart": "Αναμονή για έναρξη..."
   },
   "game": {
     "waitingForCharacter": "Αναμονή για ανάθεση χαρακτήρων...",

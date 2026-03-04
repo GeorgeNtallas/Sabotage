@@ -9,6 +9,8 @@ import Draggable from "react-draggable";
 import GameOver from "../components/ui/GameOver";
 import AnimatedWindow from "../components/ui/Info";
 import { use } from "i18next";
+import FloatingEmbers from "../components/ui/FloatingEmbers";
+import SparkParticles from "../components/ui/SparkParticles";
 
 function OneDeviceGame() {
   const location = useLocation();
@@ -386,6 +388,7 @@ function OneDeviceGame() {
         transition={{ duration: 1 }}
         className="w-full h-full bg-black"
       >
+        <FloatingEmbers />
         {!game_started && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -396,20 +399,29 @@ function OneDeviceGame() {
             }}
             className="w-full h-screen flex flex-col"
             style={{
-              backgroundImage: "url(/images/haunted-house-gothic-style.jpg)",
+              backgroundImage:
+                "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
-              backgroundAttachment: "fixed",
             }}
           >
-            <div className="absolute inset-0 bg-black/60"></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-purple-950/20"></div>
-            <div className="flex-1 overflow-y-auto pb-20 sm:pb-24">
+            <div className="absolute inset-0 bg-black/80"></div>
+            {/* Dark overlay with purple tint for medieval feel */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-purple-950/20 to-black/60 z-0"></div>
+            {/* Ambient fog effect at bottom */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1/3 z-[1] pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(60, 20, 80, 0.4) 0%, transparent 100%)",
+              }}
+            ></div>
+            <div className="flex-1 overflow-y-auto pb-20 sm:pb-24 z-10">
               <div className="flex flex-col items-center space-y-2 sm:space-y-3">
                 {/* Player's Name */}
                 <h2
-                  className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 px-4 z-20"
+                  className="mt-4 sm:mt-6 mb-4 sm:mb-6 text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-purple-500 px-4 z-20"
                   style={{ fontFamily: "MedievalSharp" }}
                 >
                   {currentPlayer.name}
@@ -427,7 +439,7 @@ function OneDeviceGame() {
                     }}
                   >
                     <div
-                      className="absolute w-full z-20 bg-black/95 text-white p-2 sm:p-3 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] border-2 border-cyan-500/50 flex flex-col items-center justify-end"
+                      className="absolute w-full z-20 bg-black/95 text-white p-2 sm:p-3 rounded-lg shadow-[0_0_30px_rgba(150,50,150,0.4)] border-2 border-purple-500/50 flex flex-col items-center justify-end"
                       style={{
                         height: "100%",
                         minHeight: `${maxModalHeight}px`,
@@ -435,11 +447,11 @@ function OneDeviceGame() {
                     >
                       <div className="absolute inset-0 bg-black/80 z-10"></div>
                       <div className="text-center z-20">
-                        <div className="text-4xl sm:text-5xl md:text-7xl mb-3 sm:mb-4 z-20 text-cyan-400">
+                        <div className="text-4xl sm:text-5xl md:text-7xl mb-3 sm:mb-4 z-20 text-purple-400">
                           ↑
                         </div>
                         <p
-                          className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 mb-3 sm:mb-4 z-20"
+                          className="text-center text-sm sm:text-base md:text-lg font-medium text-purple-300 mb-3 sm:mb-4 z-20"
                           style={{ fontFamily: "MedievalSharp" }}
                         >
                           {t("oneDevice.dragUpToReveal")}
@@ -450,38 +462,38 @@ function OneDeviceGame() {
 
                   {/* Modal for Character Display */}
                   <div
-                    className="border-2 border-cyan-500/50 text-white p-2 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.4)] w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 relative overflow-hidden"
+                    className="border-2 border-purple-500/50 text-white p-2 rounded-lg shadow-[0_0_30px_rgba(150,50,150,0.4)] w-full flex flex-col items-center justify-center space-y-3 sm:space-y-4 relative overflow-hidden"
                     style={{
                       minHeight: `${maxModalHeight}px`,
                       background:
-                        "linear-gradient(135deg, #0a0e1a 0%, #0d1117 25%, #0a0e1a 50%, #0d1117 75%, #0a0e1a 100%), repeating-linear-gradient(0deg, rgba(6,182,212,0.1) 0px, transparent 1px, transparent 40px, rgba(6,182,212,0.1) 41px), repeating-linear-gradient(90deg, rgba(168,85,247,0.05) 0px, transparent 1px, transparent 40px, rgba(168,85,247,0.05) 41px)",
+                        "linear-gradient(135deg, #1a0e1a 0%, #130d18 25%, #1a0e1a 50%, #130d18 75%, #1a0e1a 100%), repeating-linear-gradient(0deg, rgba(150,50,150,0.1) 0px, transparent 1px, transparent 40px, rgba(150,50,150,0.1) 41px), repeating-linear-gradient(90deg, rgba(150,50,150,0.05) 0px, transparent 1px, transparent 40px, rgba(150,50,150,0.05) 41px)",
                     }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/30 via-black/50 to-purple-950/30"></div>
-                    <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-cyan-400"></div>
-                    <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-cyan-400"></div>
-                    <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-cyan-400"></div>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-cyan-400"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-950/30 via-black/50 to-fuchsia-950/30"></div>
+                    <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-purple-400"></div>
+                    <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-purple-400"></div>
+                    <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-purple-400"></div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-purple-400"></div>
 
                     <div className="relative w-full flex flex-col items-center justify-center p-2 sm:p-3 md:p-4">
                       <img
                         src={`/images/${currentCharacter.name}Icon.png`}
                         alt="Character"
-                        className="w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full mb-2 sm:mb-3 md:mb-4 border-2 border-cyan-500"
+                        className="w-32 h-32 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full mb-2 sm:mb-3 md:mb-4 border-2 border-purple-500"
                         onError={(e) => (e.target.src = "/images/default.jpg")}
                       />
                       <p
-                        className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+                        className="text-lg sm:text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-fuchsia-400"
                         style={{ fontFamily: "MedievalSharp" }}
                       >
                         {currentCharacter.name}
                       </p>
-                      <p className="text-sm sm:text-base md:text-lg text-cyan-200 mt-1 sm:mt-2 font-light text-center px-2">
+                      <p className="text-sm sm:text-base md:text-lg text-purple-200 mt-1 sm:mt-2 font-light text-center px-2">
                         {t(
                           `oneDevice.characterDescriptions.${currentCharacter.name}`,
                         )}
                       </p>
-                      <p className="text-sm sm:text-base md:text-lg text-cyan-300 mt-1 sm:mt-2 font-light">
+                      <p className="text-sm sm:text-base md:text-lg text-purple-300 mt-1 sm:mt-2 font-light">
                         {t("oneDevice.team")}{" "}
                         <span
                           className={
@@ -533,7 +545,7 @@ function OneDeviceGame() {
 
                 {/* Instruction Text */}
                 <p
-                  className="text-center text-sm sm:text-base md:text-lg font-medium text-cyan-300 px-4 z-20"
+                  className="text-center text-sm sm:text-base md:text-lg font-medium text-purple-300 px-4 z-20"
                   style={{ fontFamily: "MedievalSharp" }}
                 >
                   {t("oneDevice.passDeviceToNext")}
@@ -542,13 +554,21 @@ function OneDeviceGame() {
             </div>
 
             {/* Button at the Bottom */}
-            <div className="fixed bottom-10 left-0 right-0 py-2 sm:py-3 md:py-4 flex justify-center">
+            <div className="fixed bottom-10 left-0 right-0 py-3 sm:py-4 flex justify-center z-10">
               {currentPlayerIndex < players.length - 1 && (
                 <button
                   onClick={handleNextPlayer}
-                  className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(6,182,212,0.5)] border border-cyan-500/50"
+                  onMouseDown={() => setPressedButton("next")}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton("next")}
+                  onTouchEnd={() => setPressedButton(null)}
+                  className={`w-1/2 py-3 sm:py-4 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 rounded-sm border border-purple-600/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,150,0.4)] transition-all relative overflow-hidden group ${
+                    pressedButton === "next" ? "scale-[0.98] brightness-75" : ""
+                  }`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
                   {t("oneDevice.nextKnight")}
                 </button>
               )}
@@ -556,9 +576,19 @@ function OneDeviceGame() {
               {currentPlayerIndex === players.length - 1 && (
                 <button
                   onClick={handleStartGame}
-                  className="w-32 sm:w-36 md:w-40 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 text-white py-2 px-3 sm:px-4 rounded-md font-bold text-xs sm:text-sm md:text-base shadow-[0_0_15px_rgba(168,85,247,0.5)] border border-purple-500/50"
+                  onMouseDown={() => setPressedButton("start")}
+                  onMouseUp={() => setPressedButton(null)}
+                  onMouseLeave={() => setPressedButton(null)}
+                  onTouchStart={() => setPressedButton("start")}
+                  onTouchEnd={() => setPressedButton(null)}
+                  className={`w-1/2 py-3 sm:py-4 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 rounded-sm border border-purple-600/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,150,0.4)] transition-all relative overflow-hidden group ${
+                    pressedButton === "start"
+                      ? "scale-[0.98] brightness-75"
+                      : ""
+                  }`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
                   🗡️ {t("oneDevice.beginQuest")}
                 </button>
               )}
@@ -567,9 +597,10 @@ function OneDeviceGame() {
         )}
         {game_started && (
           <div
-            className="relative w-full bg-gray-900 text-white"
+            className="relative w-full bg-black text-white"
             style={{
-              backgroundImage: "url(/images/mythical.jpg)",
+              backgroundImage:
+                "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
               backgroundSize: "cover",
               backgroundPosition: "center",
               minHeight: "100dvh",
@@ -579,14 +610,29 @@ function OneDeviceGame() {
               overflowY: "auto",
               overflowX: "hidden",
               WebkitOverflowScrolling: "touch",
-              opacity: "inherit",
             }}
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
           >
-            <div className="flex justify-center items-center h-12 sm:h-16 w-full">
+            <div className="absolute inset-0 bg-black/80"></div>
+            {/* Dark overlay with purple tint for medieval feel */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-purple-950/20 to-black/60 z-0"></div>
+
+            {/* Ambient fog effect at bottom */}
+            <div
+              className="absolute bottom-0 left-0 right-0 h-1/3 z-[1] pointer-events-none"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(60, 20, 80, 0.4) 0%, transparent 100%)",
+              }}
+            ></div>
+
+            {/* Floating Embers */}
+            <FloatingEmbers />
+
+            <div className="flex justify-center items-center h-12 sm:h-16 w-full relative z-10">
               <img
                 src="/images/Sabotage3.png"
                 alt="Leader"
@@ -700,109 +746,78 @@ function OneDeviceGame() {
                       {t("game.players")}
                     </p>
                   </div>
-                  {/* Other Players with Switches */}
+                  {/* Other Players with Clickable Cards */}
                   <div className="space-y-2">
-                    <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                       {players
                         .filter((player) => player.playerSessionKey)
-                        .map((player, index, array) => {
-                          const isLastItem = index === array.length - 1;
-                          const isOddCount = array.length % 2 === 1;
-                          const shouldCenter = isLastItem && isOddCount;
-
-                          if (shouldCenter) {
-                            return (
-                              <div
-                                key={player.playerSessionKey}
-                                className="col-span-2 flex justify-center "
-                              >
-                                <div className="flex items-center justify-between p-2 bg-zinc-900/50 border border-cyan-500/30 rounded-lg w-full max-w-[calc(50%-0.375rem)]">
-                                  {/* Player Name */}
-                                  <span
-                                    className="text-cyan-200 font-medium"
-                                    style={{ fontFamily: "MedievalSharp" }}
-                                  >
-                                    {player.name}
-                                  </span>
-                                  {/* Switch */}
-                                  <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                      type="checkbox"
-                                      className="sr-only peer"
-                                      checked={selectedPlayers.includes(
-                                        player.playerSessionKey,
-                                      )}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          if (
-                                            selectedPlayers.length <
-                                            missionTeamSizes[phase - 1]
-                                          ) {
-                                            setSelectedPlayers([
-                                              ...selectedPlayers,
-                                              player.playerSessionKey,
-                                            ]);
-                                          }
-                                        } else {
-                                          setSelectedPlayers(
-                                            selectedPlayers.filter(
-                                              (id) =>
-                                                id !== player.playerSessionKey,
-                                            ),
-                                          );
-                                        }
-                                      }}
-                                    />
-                                    <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
-                                  </label>
-                                </div>
-                              </div>
-                            );
-                          }
+                        .map((player) => {
+                          const isSelected = selectedPlayers.includes(
+                            player.playerSessionKey,
+                          );
+                          const maxReached =
+                            selectedPlayers.length >=
+                            missionTeamSizes[phase - 1];
+                          const isDisabled = maxReached && !isSelected;
 
                           return (
                             <div
                               key={player.playerSessionKey}
-                              className="flex items-center justify-between p-2 bg-zinc-900/50 border border-cyan-500/30 rounded-lg"
+                              onClick={() => {
+                                if (isDisabled) return;
+                                if (isSelected) {
+                                  setSelectedPlayers(
+                                    selectedPlayers.filter(
+                                      (id) => id !== player.playerSessionKey,
+                                    ),
+                                  );
+                                } else if (
+                                  selectedPlayers.length <
+                                  missionTeamSizes[phase - 1]
+                                ) {
+                                  setSelectedPlayers([
+                                    ...selectedPlayers,
+                                    player.playerSessionKey,
+                                  ]);
+                                }
+                              }}
+                              className={`relative p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
+                                isSelected
+                                  ? "bg-purple-900/60 border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.6)] scale-105"
+                                  : isDisabled
+                                    ? "bg-zinc-900/30 border-zinc-700/30 cursor-not-allowed opacity-50"
+                                    : "bg-zinc-900/50 border-purple-500/30 hover:border-purple-400 hover:bg-purple-900/30 hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                              }`}
                             >
+                              {/* Checkmark overlay for selected */}
+                              {isSelected && (
+                                <div className="absolute top-1 right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                                  <svg
+                                    className="w-3 h-3 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={3}
+                                      d="M5 13l4 4L19 7"
+                                    />
+                                  </svg>
+                                </div>
+                              )}
                               {/* Player Name */}
                               <span
-                                className="text-cyan-200 font-medium"
+                                className={`block text-center font-medium ${
+                                  isSelected
+                                    ? "text-purple-200"
+                                    : "text-cyan-200"
+                                }`}
                                 style={{ fontFamily: "MedievalSharp" }}
                               >
                                 {player.name}
                               </span>
-                              {/* Switch */}
-                              <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  className="sr-only peer"
-                                  checked={selectedPlayers.includes(
-                                    player.playerSessionKey,
-                                  )}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      if (
-                                        selectedPlayers.length <
-                                        missionTeamSizes[phase - 1]
-                                      ) {
-                                        setSelectedPlayers([
-                                          ...selectedPlayers,
-                                          player.playerSessionKey,
-                                        ]);
-                                      }
-                                    } else {
-                                      setSelectedPlayers(
-                                        selectedPlayers.filter(
-                                          (id) =>
-                                            id !== player.playerSessionKey,
-                                        ),
-                                      );
-                                    }
-                                  }}
-                                />
-                                <div className="w-11 h-6 bg-slate-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
-                              </label>
                             </div>
                           );
                         })}

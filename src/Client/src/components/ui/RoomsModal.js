@@ -39,18 +39,24 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-black/80 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl p-6 w-[600px] max-h-[500px] text-white">
+      <div className="bg-black/95 backdrop-blur-lg border-2 border-amber-600/50 rounded-xl shadow-[0_0_30px_rgba(200,100,50,0.3)] p-6 w-[600px] min-w-[320px] max-h-[500px] text-white relative">
+        {/* Corner decorations - amber style */}
+        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-amber-500"></div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-amber-500"></div>
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-amber-500"></div>
+        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-amber-500"></div>
+
         <div className="flex justify-between items-center mb-4">
           <div></div>
           <h2
-            className="text-xl font-bold text-white"
+            className="text-xl font-bold text-amber-500"
             style={medievalFontStyle}
           >
             Available Rooms
           </h2>
           <button
             onClick={onClose}
-            className="text-white hover:text-red-400 text-2xl font-bold"
+            className="text-amber-500 hover:text-red-400 text-2xl font-bold transition"
           >
             x
           </button>
@@ -59,40 +65,40 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
         <div className="overflow-y-auto h-[320px]">
           {loading ? (
             <div className="text-center py-8">
-              <div className="text-white/60">Loading rooms...</div>
+              <div className="text-amber-100/60">Loading rooms...</div>
             </div>
           ) : rooms.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-white/60">No rooms available</div>
+              <div className="text-amber-100/60">No rooms available</div>
             </div>
           ) : (
             <div className="space-y-3">
               {rooms.map((room) => (
                 <div
                   key={room.roomSessionKey}
-                  className="bg-indigo-500/15 border border-white/20 rounded-lg p-4"
+                  className="bg-stone-900/60 border border-amber-800/30 rounded-lg p-4 hover:border-amber-600/50 transition"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <h3
-                        className="font-bold text-white"
+                        className="font-bold text-amber-400"
                         style={medievalFontStyle}
                       >
                         {room.roomName || `Room ${room.roomPassword}`}
                       </h3>
-                      <span className="text-xs px-2 py-1 rounded-full bg-purple-800/50 text-white">
+                      <span className="text-xs px-2 py-1 rounded-full bg-amber-900/50 text-amber-300 border border-amber-700/30">
                         {room.isPublic ? "Public" : "Private"}
                       </span>
                       {!room.isPublic && (
-                        <span className="text-yellow-400">🔒</span>
+                        <span className="text-amber-500">🔒</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
                       <span
                         className={`text-xs px-2 py-1 rounded-full ${
                           room.joinable
-                            ? "bg-green-800/50 text-green-200"
-                            : "bg-red-800/50 text-red-200"
+                            ? "bg-green-900/50 text-green-300 border border-green-700/30"
+                            : "bg-red-900/50 text-red-300 border border-red-700/30"
                         }`}
                       >
                         {room.joinable ? "Joinable" : "In Game"}
@@ -100,7 +106,7 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
                       {room.joinable && (
                         <button
                           onClick={() => handleJoinRoom(room)}
-                          className="px-3 py-1 bg-green-700 hover:bg-green-600 rounded text-xs font-bold transition"
+                          className="px-3 py-1 bg-gradient-to-r from-red-900 via-red-800 to-amber-900 hover:from-red-800 hover:via-red-700 hover:to-amber-800 rounded text-xs font-bold text-amber-100 border border-amber-700/50 transition"
                           style={medievalFontStyle}
                         >
                           Join
@@ -108,8 +114,8 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
                       )}
                     </div>
                   </div>
-                  <div className="text-sm text-white/80">
-                    <span className="font-semibold">
+                  <div className="text-sm text-amber-100/80">
+                    <span className="font-semibold text-amber-400">
                       Players ({room.playerCount}):
                     </span>
                     <div className="mt-1 flex flex-wrap gap-1">
@@ -118,8 +124,8 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
                           key={index}
                           className={`px-2 py-1 rounded text-xs ${
                             player.online
-                              ? "bg-green-800/30 text-green-200"
-                              : "bg-gray-800/30 text-gray-400"
+                              ? "bg-green-900/30 text-green-300 border border-green-700/20"
+                              : "bg-stone-800/30 text-stone-500 border border-stone-700/20"
                           }`}
                         >
                           {player.name}
@@ -136,7 +142,7 @@ function RoomsModal({ show, onClose, onJoinRoom }) {
         <div className="mt-4 flex justify-center">
           <button
             onClick={fetchRooms}
-            className="px-4 py-2 bg-purple-800 hover:bg-purple-700 rounded font-bold transition"
+            className="px-4 py-2 bg-gradient-to-r from-red-900 via-red-800 to-amber-900 hover:from-red-800 hover:via-red-700 hover:to-amber-800 rounded font-bold text-amber-100 border border-amber-700/50 transition"
             style={medievalFontStyle}
           >
             Refresh

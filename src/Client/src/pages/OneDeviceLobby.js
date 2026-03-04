@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import socket from "../socket";
 import EnterPlayersModal from "../components/ui/EnterPlayersModal";
 import Settings from "../components/ui/Settings";
+import FloatingEmbers from "../components/ui/FloatingEmbers";
 
 function OneDeviceLobby() {
   const location = useLocation();
@@ -128,51 +129,111 @@ function OneDeviceLobby() {
       }}
     >
       <div className="absolute inset-0 bg-black/80"></div>
-      <div className="absolute inset-0 bg-gradient-to-b from-cyan-950/20 via-transparent to-purple-950/20"></div>
+      {/* Dark overlay with purple tint for medieval feel */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-purple-950/20 to-black/60 z-0"></div>
 
-      <div className="relative z-10 bg-black/95 border-2 border-cyan-500/50 rounded-lg shadow-[0_0_30px_rgba(6,182,212,0.3)] p-8 w-[90%] max-w-md text-white">
-        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
-        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-cyan-400"></div>
-        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-cyan-400"></div>
-        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
+      {/* Ambient fog effect at bottom */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-1/3 z-[1] pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to top, rgba(60, 20, 80, 0.4) 0%, transparent 100%)",
+        }}
+      ></div>
 
-        <div className="flex justify-center mb-6">
+      {/* Floating Embers - Magical glowing orbs rising */}
+      <FloatingEmbers />
+
+      <div className="relative z-10 bg-black/95 backdrop-blur-lg border-2 border-purple-600/50 rounded-xl shadow-[0_0_30px_rgba(150,50,150,0.3)] p-6 sm:p-8 w-[90%] max-w-sm min-w-[320px] text-white">
+        {/* Corner decorations - purple style */}
+        <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-purple-500"></div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-purple-500"></div>
+        <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-purple-500"></div>
+        <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-purple-500"></div>
+
+        <div className="flex justify-center mb-4 relative">
+          {/* Purple glow behind logo */}
+          <div
+            className="absolute w-28 h-28 rounded-full blur-3xl pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(150, 50, 150, 0.4) 0%, transparent 70%)",
+              animation: "pulse 2s ease-in-out infinite",
+            }}
+          ></div>
           <img
             src="/images/Sabotage3.png"
             alt="Logo"
-            className="w-[60%] drop-shadow-[0_0_15px_rgba(6,182,212,0.8)]"
+            className="w-[60%] max-w-[200px] drop-shadow-lg relative z-10"
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
         </div>
 
-        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mb-6"></div>
+        {/* Ornamental divider */}
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <div className="h-px bg-gradient-to-r from-transparent via-purple-600 to-transparent w-14"></div>
+          <div className="text-purple-500 text-lg">⚔</div>
+          <div className="h-px bg-gradient-to-r from-transparent via-purple-600 to-transparent w-14"></div>
+        </div>
 
         <h2
-          className="text-2xl text-center mb-2 text-cyan-300"
+          className="text-xl text-center mb-2 text-purple-400"
           style={{ fontFamily: "MedievalSharp" }}
         >
           {t("lobby.welcome")}
         </h2>
 
         <div
-          className="text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400"
+          className="text-2xl font-bold text-center mb-4 text-purple-300"
           style={{ fontFamily: "MedievalSharp" }}
         >
           {name}
         </div>
 
-        <div className="text-center bg-black/60 border border-cyan-500/30 rounded py-3 mb-6">
+        <div className="text-center bg-black/60 border border-purple-500/30 rounded py-3 mb-4">
           <div
-            className="text-cyan-400/70 text-xs uppercase tracking-widest"
+            className="text-purple-400/70 text-xs uppercase tracking-widest"
             style={{ fontFamily: "MedievalSharp" }}
           >
             {t("lobby.room")}
           </div>
           <div
-            className="text-xl font-bold text-cyan-400 mt-1"
+            className="text-lg font-bold text-purple-400 mt-1"
             style={{ fontFamily: "MedievalSharp" }}
           >
             {newRoomName}
+          </div>
+        </div>
+
+        {/* Professional Players List */}
+        <div className="bg-black/60 border border-purple-500/30 rounded-lg p-2 mb-3">
+          <h3
+            className="text-xs font-semibold text-purple-400 mb-2 flex items-center justify-center gap-1"
+            style={{ fontFamily: "MedievalSharp" }}
+          >
+            {t("lobby.players")} ({players?.length || 0})
+          </h3>
+          <div
+            className={`${(players?.length || 0) >= 5 ? "grid grid-cols-2 gap-1.5" : "space-y-1.5"} max-h-[120px] overflow-y-auto pr-1`}
+          >
+            {(players || []).map((player, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-1.5 rounded-lg border bg-zinc-900/50 border-purple-500/20"
+              >
+                <div className="flex items-center gap-1.5">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 bg-purple-900/50 border border-purple-600 text-purple-300">
+                    {player.charAt(0).toUpperCase()}
+                  </div>
+                  <span
+                    className="text-sm font-semibold text-purple-200 truncate"
+                    style={{ fontFamily: "MedievalSharp" }}
+                  >
+                    {player}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -183,11 +244,16 @@ function OneDeviceLobby() {
               onMouseDown={() => setPressedButton("players")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              className={`w-full py-4 bg-gradient-to-r from-purple-900/80 to-purple-800/80 hover:from-purple-800/80 hover:to-purple-700/80 rounded border border-purple-500/50 font-bold text-lg shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all ${pressedButton === "players" ? "scale-95" : ""}`}
+              onTouchStart={() => setPressedButton("players")}
+              onTouchEnd={() => setPressedButton(null)}
+              className={`w-full py-3 sm:py-4 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 rounded-sm border border-purple-600/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,150,0.4)] transition-all relative overflow-hidden group ${
+                pressedButton === "players" ? "scale-[0.98] brightness-75" : ""
+              }`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              ⚔️ {t("oneDevice.knightsAssembled")}{" "}
-              <span className="bg-cyan-500 text-black px-2 py-0.5 rounded-full text-sm ml-2 font-bold">
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              {t("oneDevice.knightsAssembled")}{" "}
+              <span className="bg-purple-500 text-black px-2 py-0.5 rounded-full text-xs ml-2 font-bold">
                 {players?.length || 0}
               </span>
             </button>
@@ -199,10 +265,15 @@ function OneDeviceLobby() {
               onMouseDown={() => setPressedButton("settings")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              className={`w-full py-4 bg-gradient-to-r from-slate-900/80 to-slate-800/80 hover:from-slate-800/80 hover:to-slate-700/80 rounded border border-cyan-500/50 font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all ${pressedButton === "settings" ? "scale-95" : ""}`}
+              onTouchStart={() => setPressedButton("settings")}
+              onTouchEnd={() => setPressedButton(null)}
+              className={`w-full py-3 sm:py-4 bg-gradient-to-r from-stone-800 via-stone-900 to-stone-800 hover:from-stone-700 hover:via-stone-800 hover:to-stone-700 rounded-sm border border-stone-600/50 font-bold text-base transition-all relative overflow-hidden group ${
+                pressedButton === "settings" ? "scale-[0.98] brightness-75" : ""
+              }`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              ⚙️ {t("oneDevice.questSettings")}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              {t("oneDevice.questSettings")}
             </button>
           )}
 
@@ -213,14 +284,15 @@ function OneDeviceLobby() {
               onMouseDown={() => setPressedButton("start")}
               onMouseUp={() => setPressedButton(null)}
               onMouseLeave={() => setPressedButton(null)}
-              className={`w-full py-4 rounded border font-bold text-lg shadow-lg transition-all ${
+              className={`w-full py-3 sm:py-4 rounded-sm border font-bold text-base shadow-lg transition-all relative overflow-hidden group ${
                 canStart
-                  ? "bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.5)]"
-                  : "bg-zinc-900/50 border-zinc-700/50 text-zinc-600 cursor-not-allowed"
-              } ${pressedButton === "start" && canStart ? "scale-95" : ""}`}
+                  ? "bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 border-purple-600/50 shadow-[0_4px_20px_rgba(150,50,150,0.5)] text-purple-200"
+                  : "bg-stone-900/50 border-stone-700/50 text-stone-600 cursor-not-allowed"
+              } ${pressedButton === "start" && canStart ? "scale-[0.98] brightness-75" : ""}`}
               style={{ fontFamily: "MedievalSharp" }}
             >
-              🗡️ {t("lobby.startGame")} 🗡️
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+              {t("lobby.startGame")}
             </button>
           )}
 
@@ -229,14 +301,24 @@ function OneDeviceLobby() {
             onMouseDown={() => setPressedButton("exit")}
             onMouseUp={() => setPressedButton(null)}
             onMouseLeave={() => setPressedButton(null)}
-            className={`w-full py-4 bg-gradient-to-r from-red-900/80 to-red-800/80 hover:from-red-800/80 hover:to-red-700/80 rounded border border-red-500/50 font-bold text-lg shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all ${pressedButton === "exit" ? "scale-95" : ""}`}
+            onTouchStart={() => setPressedButton("exit")}
+            onTouchEnd={() => setPressedButton(null)}
+            className={`w-full py-3 sm:py-4 bg-gradient-to-r from-red-900 via-red-800 to-amber-900 hover:from-red-800 hover:via-red-700 hover:to-amber-800 rounded-sm border border-red-700/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,50,0.4)] transition-all relative overflow-hidden group ${
+              pressedButton === "exit" ? "scale-[0.98] brightness-75" : ""
+            }`}
             style={{ fontFamily: "MedievalSharp" }}
           >
-            🚪 {t("lobby.exit")}
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-red-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
+            {t("lobby.exit")}
           </button>
         </div>
 
-        <div className="h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent mt-6"></div>
+        {/* Ornamental divider */}
+        <div className="flex items-center justify-center gap-2 mt-5">
+          <div className="h-px bg-gradient-to-r from-transparent via-purple-600 to-transparent w-14"></div>
+          <div className="text-purple-500 text-lg">⚔</div>
+          <div className="h-px bg-gradient-to-r from-transparent via-purple-600 to-transparent w-14"></div>
+        </div>
       </div>
 
       {isPlayersModalOpen && (
@@ -259,6 +341,20 @@ function OneDeviceLobby() {
           isMobile={true}
         />
       )}
+
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { 
+            opacity: 0.6; 
+            transform: scale(1);
+          }
+          50% { 
+            opacity: 1; 
+            transform: scale(1.1);
+          }
+        }
+      `}</style>
     </motion.div>
   );
 }

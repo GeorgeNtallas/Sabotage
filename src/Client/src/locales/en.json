@@ -26,7 +26,8 @@
     "exit": "Exit",
     "startGame": "Start Game",
     "include": "Include",
-    "chat": "Chat"
+    "chat": "Chat",
+    "awaitingStart": "Awaiting start..."
   },
   "game": {
     "waitingForCharacter": "Waiting for character assignment...",
