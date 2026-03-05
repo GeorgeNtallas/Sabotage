@@ -21,6 +21,7 @@ function Lobby() {
   const [selectedRoles, setSelectedRoles] = useState(new Set());
   const [showChat, setShowChat] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [chatMessages, setChatMessages] = useState([]);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [fadeOut, setFadeOut] = useState(false);
   const { t } = useTranslation();
@@ -91,7 +92,11 @@ function Lobby() {
   }, [roomSessionKey, playerSessionKey]);
 
   useEffect(() => {
-    const handleChatMessage = () => {
+    const handleChatMessage = ({ playerName, message, senderSessionKey }) => {
+      setChatMessages((prev) => [
+        ...prev,
+        { playerName, message, senderSessionKey },
+      ]);
       if (!showChat && !isDesktop) {
         setUnreadMessages((prev) => prev + 1);
       }
@@ -248,6 +253,8 @@ function Lobby() {
             selectedRoles={selectedRoles}
             toggleRole={toggleRole}
             roomSessionKey={roomSessionKey}
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
           />
         ) : (
           <MobileLobbyView
@@ -259,6 +266,7 @@ function Lobby() {
             lobbyLeaderId={lobbyLeaderId}
             readyPlayers={readyPlayers}
             playerSessionKey={playerSessionKey}
+            roomSessionKey={roomSessionKey}
             isCurrentLeader={isCurrentLeader}
             canStart={canStart}
             pressedButton={pressedButton}
@@ -269,6 +277,10 @@ function Lobby() {
             handleStartGame={handleStartGame}
             unreadMessages={unreadMessages}
             selectedRoles={selectedRoles}
+            showChat={showChat}
+            setShowChat={setShowChat}
+            chatMessages={chatMessages}
+            setChatMessages={setChatMessages}
             toggleRole={toggleRole}
           />
         )}

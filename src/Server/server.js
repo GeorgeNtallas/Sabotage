@@ -1688,10 +1688,10 @@ io.on("connection", (socket) => {
         roomObj.players = players;
 
         io.to(roomSessionKey).emit("exit_to_lobby", {
-          leader: leader || null,
-          isPublic: isPublic || null,
-          password: password || null,
-          roomName: roomName || null,
+          leader: leader,
+          isPublic: isPublic,
+          password: password,
+          roomName: roomName,
           readyList: [],
         });
 

@@ -23,6 +23,8 @@ function DesktopLobbyView({
   selectedRoles,
   toggleRole,
   roomSessionKey,
+  chatMessages,
+  setChatMessages,
 }) {
   const { t } = useTranslation();
   const [showSettings, setShowSettings] = useState(false);
@@ -56,6 +58,8 @@ function DesktopLobbyView({
             playerSessionKey={playerSessionKey}
             roomSessionKey={roomSessionKey}
             isDesktop={true}
+            messages={chatMessages}
+            onMessagesChange={setChatMessages}
           />
         </div>
 

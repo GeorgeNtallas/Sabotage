@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Settings from "../ui/Settings";
+import Chat from "../ui/Chat";
 
 function MobileLobbyView({
   name,
@@ -11,6 +12,7 @@ function MobileLobbyView({
   lobbyLeaderId,
   readyPlayers,
   playerSessionKey,
+  roomSessionKey,
   isCurrentLeader,
   canStart,
   pressedButton,
@@ -22,6 +24,10 @@ function MobileLobbyView({
   unreadMessages,
   selectedRoles,
   toggleRole,
+  showChat,
+  setShowChat,
+  chatMessages,
+  setChatMessages,
 }) {
   const { t } = useTranslation();
   const [showSettings, setShowSettings] = useState(false);
@@ -96,7 +102,7 @@ function MobileLobbyView({
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-2 mb-4 bg-black/60 border border-purple-500/30 rounded py-2 px-3">
+        <div className="flex items-center justify-center gap-2 mb-3 bg-black/60 border border-purple-500/30 rounded py-2 px-3">
           <div
             className="text-purple-400/70 text-xs uppercase tracking-widest"
             style={{ fontFamily: "MedievalSharp" }}
@@ -115,6 +121,10 @@ function MobileLobbyView({
             className="w-5 h-5"
             onError={(e) => (e.target.src = "/images/default.jpg")}
           />
+
+          {!isPublic && (
+            <span className="text-purple-400/70 text-sm">({roomPassword})</span>
+          )}
         </div>
 
         {/* Professional Players List */}
@@ -326,6 +336,18 @@ function MobileLobbyView({
           showSettings={showSettings}
           setShowSettings={setShowSettings}
           isMobile={true}
+        />
+      )}
+
+      {showChat && (
+        <Chat
+          show={showChat}
+          onClose={() => setShowChat(false)}
+          playerSessionKey={playerSessionKey}
+          roomSessionKey={roomSessionKey}
+          isDesktop={false}
+          messages={chatMessages}
+          onMessagesChange={setChatMessages}
         />
       )}
 
