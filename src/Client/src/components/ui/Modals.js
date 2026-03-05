@@ -33,12 +33,12 @@ const Modals = ({
     return (
       <Animation show={ShowVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-80 max-w-md">
+          <div className="bg-black/90 rounded-lg p-6 w-80 max-w-md border-2 border-purple-500/50 shadow-[0_0_30px_rgba(150,50,150,0.4)]">
             <div className="mb-5">
-              <h3 className="text-xl font-bold text-white text-center ">
+              <h3 className="text-xl font-bold text-purple-300 text-center ">
                 {t("modals.voteQuestTeam")}
               </h3>
-              <div className="font-semibold text-white text-center">
+              <div className="font-semibold text-purple-200 text-center">
                 {t("modals.choose")} {missionTeamSizes}
               </div>
             </div>
@@ -66,12 +66,12 @@ const Modals = ({
                       } else {
                         setSelectedPlayers(
                           selectedPlayers.filter(
-                            (id) => id !== player.playerSessionKey
-                          )
+                            (id) => id !== player.playerSessionKey,
+                          ),
                         );
                       }
                     }}
-                    className="appearance-none h-5 w-5 border-2 border-blue-500 rounded-full checked:bg-blue-500 checked:border-transparent transition duration-200 cursor-pointer "
+                    className="appearance-none h-5 w-5 border-2 border-purple-500 rounded-full checked:bg-purple-500 checked:border-transparent transition duration-200 cursor-pointer "
                   />
                   {player.name}
                 </label>
@@ -91,17 +91,19 @@ const Modals = ({
                   setShowPlayersVote(false);
                   setSelectedPlayers([]);
                 }}
-                onMouseDown={() => setPressedButton('submit')}
+                onMouseDown={() => setPressedButton("submit")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('submit')}
+                onTouchStart={() => setPressedButton("submit")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
                     ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
-                    : `bg-amber-600  hover:bg-amber-700 ${
-                        pressedButton === 'submit' ? 'scale-95 brightness-75' : ''
+                    : `bg-amber-800  hover:bg-amber-900 ${
+                        pressedButton === "submit"
+                          ? "scale-95 brightness-75"
+                          : ""
                       }`
                 }`}
               >
@@ -113,13 +115,13 @@ const Modals = ({
                   setShowVoteModal(false);
                   setSelectedPlayers([]);
                 }}
-                onMouseDown={() => setPressedButton('cancel')}
+                onMouseDown={() => setPressedButton("cancel")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('cancel')}
+                onTouchStart={() => setPressedButton("cancel")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
-                  pressedButton === 'cancel' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "cancel" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("modals.cancel")}
@@ -134,12 +136,12 @@ const Modals = ({
     return (
       <Animation show={showLeaderVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-80 max-w-md">
+          <div className="bg-black/90 rounded-lg p-6 w-80 max-w-md border-2 border-purple-500/50 shadow-[0_0_30px_rgba(150,50,150,0.4)]">
             <div className="mb-5">
-              <h3 className="text-xl font-bold text-white text-center ">
+              <h3 className="text-xl font-bold text-purple-300 text-center ">
                 {t("modals.selectQuestTeam")}
               </h3>
-              <div className="font-semibold text-white text-center">
+              <div className="font-semibold text-purple-200 text-center">
                 {t("modals.choose")} {missionTeamSizes}
               </div>
             </div>
@@ -167,12 +169,12 @@ const Modals = ({
                       } else {
                         setSelectedPlayers(
                           selectedPlayers.filter(
-                            (id) => id !== player.playerSessionKey
-                          )
+                            (id) => id !== player.playerSessionKey,
+                          ),
                         );
                       }
                     }}
-                    className="appearance-none h-5 w-5 border-2 border-blue-500 rounded-full checked:bg-blue-500 checked:border-transparent transition duration-200 cursor-pointer "
+                    className="appearance-none h-5 w-5 border-2 border-purple-500 rounded-full checked:bg-purple-500 checked:border-transparent transition duration-200 cursor-pointer "
                   />
                   {player.name}
                 </label>
@@ -193,17 +195,19 @@ const Modals = ({
                     selectedPlayers,
                   });
                 }}
-                onMouseDown={() => setPressedButton('submit')}
+                onMouseDown={() => setPressedButton("submit")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('submit')}
+                onTouchStart={() => setPressedButton("submit")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2  text-white rounded-lg
                 ${
                   selectedPlayers.length !== missionTeamSizes
                     ? "bg-amber-600/25 backdrop-blur-md border-amber-400/20 cursor-not-allowed"
                     : `bg-amber-600  hover:bg-amber-700 ${
-                        pressedButton === 'submit' ? 'scale-95 brightness-75' : ''
+                        pressedButton === "submit"
+                          ? "scale-95 brightness-75"
+                          : ""
                       }`
                 }`}
               >
@@ -215,13 +219,13 @@ const Modals = ({
                   setShowLeaderVoteModal(false);
                   setSelectedPlayers([]);
                 }}
-                onMouseDown={() => setPressedButton('cancel')}
+                onMouseDown={() => setPressedButton("cancel")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('cancel')}
+                onTouchStart={() => setPressedButton("cancel")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
-                  pressedButton === 'cancel' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "cancel" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("modals.cancel")}
@@ -236,8 +240,8 @@ const Modals = ({
       // Players vote to proceed
       <Animation show={showQuestVoteModal}>
         <div className="flex items-center justify-center z-50">
-          <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 rounded-lg p-6 w-50 max-w-md">
-            <h3 className="text-xl text-center font-bold mb-4 text-white">
+          <div className="bg-black/90 rounded-lg p-6 w-50 max-w-md border-2 border-purple-500/50 shadow-[0_0_30px_rgba(150,50,150,0.4)]">
+            <h3 className="text-xl text-center font-bold mb-4 text-purple-300">
               {t("modals.proceedToQuest")}
             </h3>
             <div className="space-y-2 mb-4">
@@ -254,13 +258,13 @@ const Modals = ({
                     setShowQuestVoteModal(false);
                     setShowQuestVoteButton(false);
                   }}
-                  onMouseDown={() => setPressedButton('yes')}
+                  onMouseDown={() => setPressedButton("yes")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('yes')}
+                  onTouchStart={() => setPressedButton("yes")}
                   onTouchEnd={() => setPressedButton(null)}
                   className={`px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg ${
-                    pressedButton === 'yes' ? 'scale-95 brightness-75' : ''
+                    pressedButton === "yes" ? "scale-95 brightness-75" : ""
                   }`}
                 >
                   {t("modals.yes")}
@@ -277,13 +281,13 @@ const Modals = ({
                     setShowQuestVoteModal(false);
                     setShowQuestVoteButton(false);
                   }}
-                  onMouseDown={() => setPressedButton('no')}
+                  onMouseDown={() => setPressedButton("no")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
-                  onTouchStart={() => setPressedButton('no')}
+                  onTouchStart={() => setPressedButton("no")}
                   onTouchEnd={() => setPressedButton(null)}
                   className={`px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg ${
-                    pressedButton === 'no' ? 'scale-95 brightness-75' : ''
+                    pressedButton === "no" ? "scale-95 brightness-75" : ""
                   }`}
                 >
                   {t("modals.no")}
@@ -298,8 +302,8 @@ const Modals = ({
     return (
       // Player exiting game
       <Animation show={showExit}>
-        <div className="bg-gradient-to-r from-gray-800 via-slate-700 to-slate-800 rounded-lg p-6 w-50 max-w-md">
-          <h3 className="text-xl text-center font-bold mb-4 text-white">
+        <div className="bg-black/90 rounded-lg p-6 w-50 max-w-md border-2 border-purple-500/50 shadow-[0_0_30px_rgba(150,50,150,0.4)]">
+          <h3 className="text-xl text-center font-bold mb-4 text-purple-300">
             {t("modals.exitGame")}
           </h3>
           <div className="space-y-2 mb-4">
@@ -314,13 +318,13 @@ const Modals = ({
                   sessionStorage.removeItem("roomSessionKey");
                   navigate(`/`);
                 }}
-                onMouseDown={() => setPressedButton('exit-yes')}
+                onMouseDown={() => setPressedButton("exit-yes")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('exit-yes')}
+                onTouchStart={() => setPressedButton("exit-yes")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded ${
-                  pressedButton === 'exit-yes' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "exit-yes" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("modals.yes")}
@@ -329,13 +333,13 @@ const Modals = ({
                 onClick={() => {
                   setShowExit(false);
                 }}
-                onMouseDown={() => setPressedButton('exit-no')}
+                onMouseDown={() => setPressedButton("exit-no")}
                 onMouseUp={() => setPressedButton(null)}
                 onMouseLeave={() => setPressedButton(null)}
-                onTouchStart={() => setPressedButton('exit-no')}
+                onTouchStart={() => setPressedButton("exit-no")}
                 onTouchEnd={() => setPressedButton(null)}
                 className={`px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded ${
-                  pressedButton === 'exit-no' ? 'scale-95 brightness-75' : ''
+                  pressedButton === "exit-no" ? "scale-95 brightness-75" : ""
                 }`}
               >
                 {t("modals.no")}

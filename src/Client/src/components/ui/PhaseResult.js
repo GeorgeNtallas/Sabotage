@@ -43,7 +43,7 @@ const PhaseResult = ({
         },
         index === shuffled.length - 1
           ? index * 1500 + 5000 + 4000
-          : index * 1500 + 4000 // 4 seconds of blinking
+          : index * 1500 + 4000, // 4 seconds of blinking
       );
     });
 
@@ -67,13 +67,21 @@ const PhaseResult = ({
     <AnimatePresence>
       {show && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-100 flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{
+            backgroundImage:
+              "url(/images/wp7007763-dark-castle-wallpapers.jpg)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="flex gap-4">
+          <div className="absolute inset-0 bg-black/80 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-purple-950/30 to-black/60 z-0"></div>
+          <div className="relative z-10 flex gap-4">
             {shuffled.map((card) => (
               <ReactCardFlip
                 key={card.id}

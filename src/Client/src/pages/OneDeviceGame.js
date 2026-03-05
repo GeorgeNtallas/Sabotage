@@ -678,7 +678,7 @@ function OneDeviceGame() {
                         if (result) {
                           circleColor =
                             result === "success"
-                              ? "bg-emerald-400"
+                              ? "bg-emerald-500"
                               : "bg-red-500";
                         }
                       }
