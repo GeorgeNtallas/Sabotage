@@ -51,7 +51,6 @@ const GameOver = ({ winner, roomSessionKey }) => {
 
   const handleExit = () => {
     socket.emit("exit_game", { roomSessionKey });
-    navigate("/");
   };
 
   return (

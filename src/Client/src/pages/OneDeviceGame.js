@@ -146,6 +146,11 @@ function OneDeviceGame() {
       setSelectedPlayers([]);
       pickNewRoundLeader();
       setRound((prevRound) => prevRound + 1);
+      if (round >= 5) {
+        // Show game over screen, Evil wins
+        setGameResult("Evil");
+        setShowGameOver(true);
+      }
       setfadeGen(true);
     }, 1000);
   };
@@ -175,6 +180,7 @@ function OneDeviceGame() {
 
   const nextPhase = () => {
     // Use functional update to ensure we're working with the latest phaseResults state
+    setRound(1);
     setPhaseResults((prevPhaseResults) => {
       const phaseResult = votes.fail >= 1 ? "fail" : "success";
       const newPhaseResults = [...prevPhaseResults, phaseResult];
@@ -987,6 +993,7 @@ function OneDeviceGame() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
               >
+                <SparkParticles />
                 {/* Dark overlay */}
                 <div className="absolute inset-0 bg-black/80"></div>
                 {/* Purple tint overlay */}
@@ -1027,16 +1034,26 @@ function OneDeviceGame() {
                 </AnimatePresence>
 
                 {/* Title */}
-                <h2
-                  className="absolute top-44 left-0 right-0 text-center text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-purple-500 z-20"
-                  style={{ fontFamily: "MedievalSharp" }}
-                >
-                  {t("modals.chooseYourDestiny")}
-                </h2>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentVotingPlayerIndex}
+                    className="absolute top-44 left-0 right-0 text-center z-20"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  >
+                    <h2
+                      className=" text-2xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-purple-500"
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
+                      {t("modals.chooseYourDestiny")}
+                    </h2>
+                  </motion.div>
+                </AnimatePresence>
 
                 {/* Vote Buttons with Animation */}
                 <AnimatePresence mode="wait">
-                  <SparkParticles />
                   <motion.div
                     key={currentVotingPlayerIndex}
                     className="flex flex-col md:flex-row gap-8 z-20"
@@ -1047,6 +1064,7 @@ function OneDeviceGame() {
                   >
                     {buttonOrder.map((voteType) => {
                       const isSuccess = voteType === "success";
+
                       return (
                         <button
                           key={voteType}
@@ -1105,12 +1123,23 @@ function OneDeviceGame() {
                 </AnimatePresence>
 
                 {/* Decorative text */}
-                <p
-                  className="absolute bottom-32 left-0 right-0 text-center text-purple-300/70 text-sm z-20"
-                  style={{ fontFamily: "MedievalSharp" }}
-                >
-                  {t("modals.questVoteHint")}
-                </p>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentVotingPlayerIndex}
+                    className="absolute bottom-32 left-0 right-0 text-center z-20"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  >
+                    <p
+                      className=" font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-purple-500 "
+                      style={{ fontFamily: "MedievalSharp" }}
+                    >
+                      {t("modals.questVoteHint")}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
               </motion.div>
             )}
           </div>

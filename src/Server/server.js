@@ -1010,6 +1010,7 @@ io.on("connection", (socket) => {
           let room = await loadRoom(roomSessionKey);
           if (!room) {
             // Create new room if it doesn't exist
+            const newRoomSessionKey = crypto.randomUUID();
             console.log("Creating new room");
             room = initializeRoom(newRoomSessionKey);
             roomSessionKey = newRoomSessionKey;
