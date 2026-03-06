@@ -1676,7 +1676,7 @@ io.on("connection", (socket) => {
 
         const leader = room.leader;
         const isPublic = room.isPublic;
-        const password = room.password;
+        const password = room.roomPassword;
         const roomName = room.roomName;
         const players = room.players;
 
