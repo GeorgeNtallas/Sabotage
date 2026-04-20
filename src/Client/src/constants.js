@@ -5,8 +5,9 @@
 // API & Socket Configuration
 export const API_CONFIG = {
   SOCKET_URL:
-    `http://${window.location.hostname}:4000` ||
-    process.env.REACT_APP_SERVER_URL,
+    process.env.REACT_APP_SERVER_URL ||
+    `http://${window.location.hostname}:4000`,
+
   SOCKET_TRANSPORTS: ["websocket"],
 };
 
