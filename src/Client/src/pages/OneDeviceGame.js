@@ -23,12 +23,14 @@ function OneDeviceGame() {
   const [modalScrollPosition, setModalScrollPosition] = useState(0);
   const [fadeGen, setfadeGen] = useState(false);
   const [fadePlayer, setfadePlayer] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const { t } = useTranslation();
 
   // Show elements
   const [showExit, setShowExit] = useState(false);
   const [showQuestVoteModal, setShowQuestVoteModal] = useState(false);
   const [showPlayersVoteModal, setShowPlayersVoteModal] = useState(false);
+  const [isVoting, setIsVoting] = useState(false);
   const [showResultScreen, setShowResultScreen] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   // Others
@@ -64,12 +66,62 @@ function OneDeviceGame() {
   const [shuffled, setShuffled] = useState([]);
   const [maxModalHeight, setMaxModalHeight] = useState(0);
 
+  // Zealot tracking
+  const [zealotVotes, setZealotVotes] = useState([]);
+
   const roomSessionKey = sessionStorage.getItem("roomSessionKey");
   const playerSessionKey = sessionStorage.getItem("playerSessionKey");
+
+  // Handle browser/tab close or back navigation
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      // best-effort notify server; browser may still close
+      socket.emit("exit", { roomSessionKey, playerSessionKey });
+      sessionStorage.removeItem("roomSessionKey");
+      // show native confirmation (message ignored by modern browsers)
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    const handlePopState = () => {
+      const leave = window.confirm(t("oneDevice.leaveRoomConfirm"));
+      if (leave) {
+        socket.emit("exit", { roomSessionKey, playerSessionKey });
+        sessionStorage.removeItem("roomSessionKey");
+        navigate("/", { replace: true });
+      } else {
+        // user cancelled — restore router location including state to prevent losing `location.state`
+        navigate(location.pathname + location.search, {
+          replace: true,
+          state: location.state,
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+
+    // ensure a history entry exists so popstate fires when back pressed
+    window.history.pushState(null, "", window.location.href);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [roomSessionKey, playerSessionKey]);
+
   useEffect(() => {
     setfadeGen(true);
     setfadePlayer(true);
   }, []);
+
+  useEffect(() => {
+    if (!game_started) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [currentPlayerIndex]);
 
   // Game over
   useEffect(() => {
@@ -110,7 +162,9 @@ function OneDeviceGame() {
 
   // Next player
   const handleNextPlayer = () => {
+    if (isAnimating) return;
     if (!game_started) {
+      setIsAnimating(true);
       setfadePlayer(false);
 
       setTimeout(() => {
@@ -119,12 +173,18 @@ function OneDeviceGame() {
 
         // Fade back in
         setfadePlayer(true);
+
+        setTimeout(() => {
+          setIsAnimating(false);
+        }, 500);
       }, 500); // must match transition duration
     } else {
     }
   };
 
   const handleStartGame = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setfadeGen(false);
 
     setTimeout(() => {
@@ -136,6 +196,10 @@ function OneDeviceGame() {
       // Fade back in
       setGameStarted(true);
       setfadeGen(true);
+
+      setTimeout(() => {
+        setIsAnimating(false);
+      }, 500);
     }, 1000); // must match transition duration
   };
 
@@ -160,6 +224,7 @@ function OneDeviceGame() {
     setCurrentVotingPlayerIndex(0);
     randomizeButtonOrder(); // Randomize button order before showing modal
     setShowPlayersVoteModal(true);
+    setIsVoting(true);
   };
 
   const showResults = (voters) => {
@@ -173,8 +238,10 @@ function OneDeviceGame() {
 
     setVotes({ success: successVotes, fail: failVotes });
     setShowPlayersVoteModal(false);
+
     setTimeout(() => {
       setShowResultScreen(true);
+      setIsVoting(false);
     }, 3000);
   };
 
@@ -205,6 +272,12 @@ function OneDeviceGame() {
       const goodWins =
         newPhaseResults.filter((r) => r === "success").length >= 3;
 
+      // Check for Zealot
+      const hasZealot = Object.values(characters || {}).some(
+        (c) => c?.name === "Zealot",
+      );
+      const zealotRequirementMet = zealotVotes.length >= 2;
+
       if (!evilWins && !goodWins) {
         // Continue to next phase
         setPhase((prevPhase) => prevPhase + 1);
@@ -215,12 +288,18 @@ function OneDeviceGame() {
         setShuffled([]);
         setFlippedCards([]);
         setCurrentFlipping(-1);
+        setIsVoting(false);
       } else {
         // Game over logic
         if (evilWins) {
           setGameResult("evil");
         } else if (goodWins) {
-          setGameResult("good");
+          // Zealot check: if Zealot exists and hasn't met requirement, evil wins
+          if (hasZealot && !zealotRequirementMet) {
+            setGameResult("evil");
+          } else {
+            setGameResult("good");
+          }
         }
 
         setShowResultScreen(false);
@@ -321,7 +400,14 @@ function OneDeviceGame() {
 
   // Get current player info
   const currentPlayer = players[currentPlayerIndex];
-  const currentCharacter = characters[currentPlayer.playerSessionKey];
+
+  if (!currentPlayer) {
+    return null;
+  }
+
+  const currentCharacter = currentPlayer
+    ? characters[currentPlayer.playerSessionKey]
+    : null;
 
   // Calculate visible role based on viewer and target characters
   const calculateVisibleRole = (viewerCharacter, targetCharacter) => {
@@ -330,17 +416,30 @@ function OneDeviceGame() {
     const target = targetCharacter.name;
     const targetTeam = targetCharacter.team;
 
-    if (viewer === "Seer" && targetTeam === "evil" && target !== "Draven")
+    if (
+      viewer === "Seer" &&
+      targetTeam === "evil" &&
+      target !== "Draven" &&
+      target !== "Illusionist"
+    )
       return "evil";
     if (viewer === "Guardian" && (target === "Seer" || target === "Seraphina"))
       return "Seer/Seraphina";
     if (
-      ["Seraphina", "Shade", "Thrall", "Draven"].includes(viewer) &&
+      ["Shade", "Thrall", "Draven", "Illusionist"].includes(viewer) &&
       target !== "Kaelen" &&
       targetTeam === "evil"
     )
       return "evil";
-    // Kaelen is evil and doesn't see any players
+
+    if (
+      viewer === "Seraphina" &&
+      targetTeam === "evil" &&
+      target !== "Kaelen" &&
+      target !== "Illusionist"
+    )
+      return "evil";
+
     if (viewer === "Kaelen") return "";
     return "";
   };
@@ -566,14 +665,17 @@ function OneDeviceGame() {
               {currentPlayerIndex < players.length - 1 && (
                 <button
                   onClick={handleNextPlayer}
+                  disabled={isAnimating}
                   onMouseDown={() => setPressedButton("next")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("next")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`w-1/2 py-3 sm:py-4 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 rounded-sm border border-purple-600/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,150,0.4)] transition-all relative overflow-hidden group ${
-                    pressedButton === "next" ? "scale-[0.98] brightness-75" : ""
-                  }`}
+                  className={`w-1/2 py-3 sm:py-4 rounded-sm font-bold text-base transition-all relative overflow-hidden group ${
+                    isAnimating
+                      ? "bg-zinc-800/50 border-zinc-700/50 cursor-not-allowed opacity-50"
+                      : "bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 border border-purple-600/50 shadow-[0_4px_15px_rgba(150,50,150,0.4)]"
+                  } ${pressedButton === "next" && !isAnimating ? "scale-[0.98] brightness-75" : ""}`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
@@ -584,16 +686,17 @@ function OneDeviceGame() {
               {currentPlayerIndex === players.length - 1 && (
                 <button
                   onClick={handleStartGame}
+                  disabled={isAnimating}
                   onMouseDown={() => setPressedButton("start")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("start")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`w-1/2 py-3 sm:py-4 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 rounded-sm border border-purple-600/50 font-bold text-base shadow-[0_4px_15px_rgba(150,50,150,0.4)] transition-all relative overflow-hidden group ${
-                    pressedButton === "start"
-                      ? "scale-[0.98] brightness-75"
-                      : ""
-                  }`}
+                  className={`w-1/2 py-3 sm:py-4 rounded-sm font-bold text-base transition-all relative overflow-hidden group ${
+                    isAnimating
+                      ? "bg-zinc-800/50 border-zinc-700/50 cursor-not-allowed opacity-50"
+                      : "bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 border border-purple-600/50 shadow-[0_4px_15px_rgba(150,50,150,0.4)]"
+                  } ${pressedButton === "start" && !isAnimating ? "scale-[0.98] brightness-75" : ""}`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
                   <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
@@ -654,14 +757,17 @@ function OneDeviceGame() {
               <div className="flex justify-between items-center h-12 sm:h-16 w-full px-2 sm:px-4 mt-3 sm:mt-5">
                 <button
                   onClick={() => handleExitClick()}
+                  disabled={isVoting}
                   onMouseDown={() => setPressedButton("exit")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
                   onTouchStart={() => setPressedButton("exit")}
                   onTouchEnd={() => setPressedButton(null)}
-                  className={`px-3 py-2 bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 transition rounded-md font-bold border border-purple-500/50 shadow-[0_0_15px_rgba(150,50,150,0.4)] ${
-                    pressedButton === "exit" ? "scale-95 brightness-75" : ""
-                  }`}
+                  className={`px-3 py-2 rounded-md font-bold border shadow-[0_0_15px_rgba(150,50,150,0.4)] transition ${
+                    isVoting
+                      ? "bg-zinc-800/50 border-zinc-700/50 cursor-not-allowed opacity-50"
+                      : "bg-gradient-to-r from-purple-900 via-purple-800 to-violet-900 hover:from-purple-800 hover:via-purple-700 hover:to-violet-800 border-purple-500/50"
+                  } ${pressedButton === "exit" && !isVoting ? "scale-95 brightness-75" : ""}`}
                   style={{ fontFamily: "MedievalSharp" }}
                 >
                   {t("game.exit")}
@@ -718,6 +824,7 @@ function OneDeviceGame() {
                   gameCharacters={Object.values(characters)}
                   phaseVoters={phaseVoters}
                   players={players}
+                  disabled={isVoting}
                   onMouseDown={() => setPressedButton("menu")}
                   onMouseUp={() => setPressedButton(null)}
                   onMouseLeave={() => setPressedButton(null)}
@@ -770,7 +877,8 @@ function OneDeviceGame() {
                           const maxReached =
                             selectedPlayers.length >=
                             missionTeamSizes[phase - 1];
-                          const isDisabled = maxReached && !isSelected;
+                          const isDisabled =
+                            (maxReached && !isSelected) || isVoting;
                           const isLastPlayer =
                             index === filteredPlayers.length - 1;
                           const isOddCount = filteredPlayers.length % 2 === 1;
@@ -846,7 +954,8 @@ function OneDeviceGame() {
                   <div className="mt-3 sm:mt-5 flex justify-center">
                     <button
                       disabled={
-                        selectedPlayers.length !== missionTeamSizes[phase - 1]
+                        selectedPlayers.length !==
+                          missionTeamSizes[phase - 1] || isVoting
                       }
                       onClick={() => {
                         setShowQuestVoteModal(true);
@@ -857,10 +966,11 @@ function OneDeviceGame() {
                       onTouchStart={() => setPressedButton("submit")}
                       onTouchEnd={() => setPressedButton(null)}
                       className={`w-36 sm:w-48 px-3 sm:px-4 py-2 text-sm sm:text-base text-white rounded-xl font-bold shadow-lg ${
-                        selectedPlayers.length !== missionTeamSizes[phase - 1]
-                          ? "bg-zinc-800/50 border border-zinc-700/50 cursor-not-allowed"
+                        selectedPlayers.length !==
+                          missionTeamSizes[phase - 1] || isVoting
+                          ? "bg-zinc-800/50 border border-zinc-700/50 cursor-not-allowed opacity-50"
                           : `bg-gradient-to-r from-cyan-900/80 to-cyan-800/80 hover:from-cyan-800/80 hover:to-cyan-700/80 border border-cyan-500/50 shadow-[0_0_20px_rgba(6,182,212,0.5)] ${
-                              pressedButton === "submit"
+                              pressedButton === "submit" && !isVoting
                                 ? "scale-95 brightness-75"
                                 : ""
                             }`
@@ -1072,6 +1182,17 @@ function OneDeviceGame() {
                             randomizeButtonOrder();
                             setCurrentVotingPlayerIndex((prevIndex) => {
                               const playerToVote = selectedPlayers[prevIndex];
+
+                              // Track Zealot votes
+                              const playerChar = characters[playerToVote];
+                              if (playerChar?.name === "Zealot") {
+                                setZealotVotes((prev) => {
+                                  if (!prev.includes(phase)) {
+                                    return [...prev, phase];
+                                  }
+                                  return prev;
+                                });
+                              }
 
                               setPhaseVoters((prevVoters) => {
                                 const updated = {

@@ -34,6 +34,9 @@ const GameOver = ({ winner, roomSessionKey }) => {
     },
   };
 
+  const winnerIcon = isGoodWinner ? "✨" : "💀";
+  const winnerColor = isGoodWinner ? "text-sky-400" : "text-purple-500";
+
   const colors = teamColors[winner] || teamColors.evil;
 
   useEffect(() => {
@@ -86,17 +89,7 @@ const GameOver = ({ winner, roomSessionKey }) => {
                 stiffness: 100,
               }}
             >
-              <h1
-                className={`
-                  text-5xl md:text-7xl font-black tracking-wider
-                  bg-gradient-to-b ${colors.primary}
-                  bg-clip-text text-transparent
-                  drop-shadow-[0_0_30px_rgba(0,0,0,0.8)]
-                  uppercase
-                  ${colors.glow}
-                `}
-                style={{ textShadow: "0 4px 30px rgba(0,0,0,0.5)" }}
-              >
+              <h1 className="text-5xl md:text-7xl font-bold tracking-widest text-white uppercase drop-shadow-lg">
                 {t("gameOver.gameOver")}
               </h1>
             </motion.div>
@@ -127,20 +120,12 @@ const GameOver = ({ winner, roomSessionKey }) => {
                 stiffness: 100,
                 damping: 15,
               }}
-              className={`
-                relative flex flex-col items-center
-                ${colors.glow}
-              `}
+              className="relative flex flex-col items-center"
             >
-              {/* Winner icon with glow */}
+              {/* Winner icon */}
               <motion.div
                 animate={{
                   scale: [1, 1.1, 1],
-                  filter: [
-                    "drop-shadow(0 0 20px rgba(245,158,11,0.5))",
-                    "drop-shadow(0 0 40px rgba(245,158,11,0.8))",
-                    "drop-shadow(0 0 20px rgba(245,158,11,0.5))",
-                  ],
                 }}
                 transition={{
                   duration: 2,
@@ -149,18 +134,12 @@ const GameOver = ({ winner, roomSessionKey }) => {
                 }}
                 className="text-8xl md:text-9xl mb-4"
               >
-                {colors.icon}
+                {winnerIcon}
               </motion.div>
 
               {/* Winner text */}
               <div
-                className={`
-                text-4xl md:text-6xl font-black
-                bg-gradient-to-r ${colors.primary}
-                bg-clip-text text-transparent
-                uppercase tracking-widest
-                drop-shadow-[0_0_20px_rgba(0,0,0,0.8)]
-              `}
+                className={`text-4xl md:text-6xl font-bold uppercase tracking-widest ${winnerColor}`}
               >
                 {winnerText}
               </div>
@@ -170,22 +149,10 @@ const GameOver = ({ winner, roomSessionKey }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-4 text-purple-300/80 text-lg md:text-xl font-medium"
+                className={`mt-4 text-lg md:text-xl ${isGoodWinner ? "text-sky-300" : "text-purple-300"}`}
               >
-                {isGoodWinner
-                  ? "The forces of light have prevailed"
-                  : "Darkness has consumed all"}
+                {isGoodWinner ? t("gameOver.goodText") : t("gameOver.evilText")}
               </motion.p>
-
-              {/* Decorative border */}
-              <div
-                className={`
-                absolute -inset-8 rounded-2xl 
-                border-2 ${colors.border}
-                opacity-30
-                animate-pulse
-              `}
-              />
             </motion.div>
           )}
         </AnimatePresence>
@@ -268,18 +235,19 @@ const FloatingEmbers = ({ winner }) => {
         this.opacity = Math.random() * 0.5 + 0.2;
         this.fadeSpeed = Math.random() * 0.002 + 0.001;
 
-        // Winner-themed colors (gold for good, red for evil)
+        // Sky themed colors for good, purple for evil
         const isGood = winner === "good";
         const colors = isGood
           ? [
-              "rgba(251, 191, 36, ", // Amber
-              "rgba(245, 158, 11, ", // Yellow
-              "rgba(217, 119, 6, ", // Orange
+              "rgba(56, 189, 248, ", // Sky blue
+              "rgba(14, 165, 233, ", // Sky 500
+              "rgba(6, 182, 212, ", // Cyan
+              "rgba(34, 211, 238, ", // Cyan 400
             ]
           : [
-              "rgba(239, 68, 68, ", // Red
-              "rgba(220, 38, 38, ", // Dark red
-              "rgba(185, 28, 28, ", // Deep red
+              "rgba(168, 85, 247, ", // Purple
+              "rgba(139, 92, 246, ", // Violet
+              "rgba(190, 24, 93, ", // Rose
             ];
         this.colorBase = colors[Math.floor(Math.random() * colors.length)];
       }

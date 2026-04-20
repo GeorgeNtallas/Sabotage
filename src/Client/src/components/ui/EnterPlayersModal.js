@@ -4,7 +4,10 @@ import { useTranslation } from "react-i18next";
 
 const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
   const [newPlayer, setNewPlayer] = useState("");
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const scrollRef = useRef(null);
+  const inputRef = useRef(null);
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -13,10 +16,42 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
     }
   }, [players, isOpen]);
 
+  // Reset error when user types (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (showError && newPlayer.length > 0) {
+        setShowError(false);
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [newPlayer, showError]);
+
   const addPlayer = () => {
-    if (newPlayer.trim() && players.length < 10) {
+    const trimmedName = newPlayer.trim().toLowerCase();
+
+    // Check if the name is empty
+    if (!trimmedName) {
+      setErrorMessage(t("oneDevice.enterKnightName"));
+      setShowError(true);
+      return;
+    }
+
+    // Check if the player name already exists (case-insensitive)
+    const existingPlayer = players.find((p) => p.toLowerCase() === trimmedName);
+    if (existingPlayer) {
+      setErrorMessage(`"${newPlayer.trim()}" ${t("oneDevice.exist")} `);
+      setShowError(true);
+      return;
+    }
+
+    if (players.length < 10) {
+      setShowError(false);
       setPlayers([...players, newPlayer.trim()]);
-      setNewPlayer("");
+      // Clear the input and refocus with a small delay to keep keyboard open
+      setTimeout(() => {
+        setNewPlayer("");
+        inputRef.current?.focus();
+      }, 50);
     }
   };
 
@@ -51,7 +86,7 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
 
         <div className="pt-8 pb-4 px-6 border-b border-purple-500/30">
           <h1
-            className="text-3xl font-bold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-violet-400"
+            className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-violet-400"
             style={{ fontFamily: "MedievalSharp" }}
           >
             {t("oneDevice.knightsRoster")}
@@ -61,10 +96,15 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
           </p>
           <p className="text-purple-400 text-center font-bold mt-1">
             {t("oneDevice.current")} {players.length}
+            {players.length == 10 && (
+              <span className="text-red-600 text-center font-bold mt-1">
+                {" MAX"}
+              </span>
+            )}
           </p>
         </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 p-6">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 p-3">
           {players.map((player, index) => (
             <div
               key={index}
@@ -89,17 +129,42 @@ const EnterPlayersModal = ({ isOpen, onClose, players, setPlayers }) => {
         </div>
 
         <div className="flex items-center gap-3 p-6 border-t border-purple-500/30">
-          <input
-            type="text"
-            placeholder={t("oneDevice.enterKnightName")}
-            value={newPlayer}
-            onChange={(e) => setNewPlayer(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && addPlayer()}
-            className="flex-1 p-3 rounded-lg bg-zinc-900/50 border border-purple-500/30 text-purple-100 focus:outline-none focus:border-purple-500/50 focus:shadow-[0_0_10px_rgba(150,50,150,0.3)] placeholder-purple-400/40"
-            style={{ fontFamily: "MedievalSharp" }}
-          />
+          <div className="flex-1 relative">
+            {showError && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-purple-950/95 border border-purple-500/50 rounded-lg text-xs text-purple-200 whitespace-normal w-40 z-50 shadow-lg text-center">
+                <span className="text-red-400 block">{errorMessage}</span>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-purple-500/50"></div>
+              </div>
+            )}
+            <motion.input
+              ref={inputRef}
+              type="text"
+              placeholder={t("oneDevice.enterKnightName")}
+              value={newPlayer}
+              onChange={(e) => setNewPlayer(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && addPlayer()}
+              disabled={players.length >= 10}
+              animate={
+                showError
+                  ? {
+                      borderColor: ["#ef4444", "#dc2626", "#ef4444"],
+                    }
+                  : {
+                      borderColor: [
+                        "rgba(150,50,150,0.3)",
+                        "rgba(150,50,150,0.5)",
+                        "rgba(150,50,150,0.3)",
+                      ],
+                    }
+              }
+              transition={{ duration: 1, repeat: Infinity }}
+              className={`w-full p-3 rounded-lg border-2 text-purple-100 focus:outline-none placeholder-purple-400/40 ${showError ? "bg-red-900/30 border-red-500 shadow-[0_0_25px_rgba(220,38,38,0.9)]" : "bg-zinc-900/50 border-purple-500/30 focus:border-purple-500/50 focus:shadow-[0_0_15px_rgba(150,50,150,0.4)]"}`}
+              style={{ fontFamily: "MedievalSharp" }}
+            />
+          </div>
           <button
             className="bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-black rounded-lg px-6 py-3 font-bold transition shadow-[0_0_15px_rgba(150,50,150,0.5)] disabled:opacity-50 disabled:cursor-not-allowed border border-purple-400"
+            onMouseDown={(e) => e.preventDefault()}
             onClick={addPlayer}
             disabled={players.length >= 10}
             style={{ fontFamily: "MedievalSharp" }}

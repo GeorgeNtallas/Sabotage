@@ -4,7 +4,7 @@ const Notify = ({ message, show }) => {
   if (!show) return null;
 
   return (
-    <div className="fixed top-2 left-1/2 transform -translate-x-1/2 w-[85%] max-w-sm min-w-[320px] z-10 animate-fadeIn">
+    <div className="fixed top-10 left-1/2 transform -translate-x-1/2 w-[85%] max-w-sm min-w-[320px] z-10 animate-fadeIn">
       <div
         className="bg-black/90 backdrop-blur-lg border border-amber-600/50 rounded-lg shadow-[0_0_20px_rgba(200,100,50,0.3)] px-5 py-3 flex items-center justify-center gap-3 relative overflow-hidden"
         style={{

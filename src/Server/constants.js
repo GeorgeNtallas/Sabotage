@@ -108,6 +108,16 @@ const CHARACTERS = {
     team: "evil",
     description: "Unknown to evil. Does not know Evil",
   },
+  Zealot: {
+    name: "Zealot",
+    team: "good",
+    description: "Must vote two times, otherwise evil wins",
+  },
+  Illusionist: {
+    name: "Illusionist",
+    team: "evil",
+    description: "Appears as good to Seer and Seraphina",
+  },
 };
 
 // Game Phases & Results

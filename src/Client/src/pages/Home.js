@@ -13,7 +13,7 @@ function Home() {
   const [roomNamePassword, setroomNamePassword] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [roomName, setRoomName] = useState("");
-  const [activeTab, setActiveTab] = useState("login");
+  const [activeTab, setActiveTab] = useState("quickplay");
   const [gameAction, setGameAction] = useState("join");
   const [isPublic, setIsPublic] = useState(true);
   const [oneDevice, setOneDevice] = useState(false);
@@ -281,25 +281,6 @@ function Home() {
           {/* Tabs - Stone tablet style */}
           <div className="flex mb-4 mt-2 relative">
             <button
-              onClick={() => setActiveTab("login")}
-              className={`flex-1 py-3 px-4 font-bold transition relative overflow-hidden ${
-                activeTab === "login"
-                  ? "text-amber-500"
-                  : "text-stone-400 hover:text-amber-300"
-              }`}
-              style={medievalFontStyle}
-            >
-              {activeTab === "login" && (
-                <span
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600"
-                  style={{
-                    boxShadow: "0 0 10px rgba(255, 150, 50, 0.8)",
-                  }}
-                ></span>
-              )}
-              {t("home.loginButton")}
-            </button>
-            <button
               onClick={() => setActiveTab("quickplay")}
               className={`flex-1 py-3 px-4 font-bold transition relative ${
                 activeTab === "quickplay"
@@ -360,52 +341,6 @@ function Home() {
                 "inset 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(100, 50, 20, 0.2)",
             }}
           >
-            {/* Login Form */}
-            <div
-              className={`transition-all duration-500 absolute inset-0 p-4 ${
-                activeTab === "login"
-                  ? "opacity-100 translate-x-0"
-                  : "opacity-0 translate-x-full pointer-events-none"
-              }`}
-            >
-              <input
-                type="text"
-                placeholder={t("home.email")}
-                className="w-full mb-3 sm:mb-4 p-3 sm:p-4 rounded-sm bg-black/60 border border-amber-800/40 placeholder-amber-600/40 text-amber-100 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm sm:text-base transition"
-                style={medievalFontStyle}
-              />
-              <input
-                type="text"
-                placeholder={t("home.password")}
-                className="w-full p-3 sm:p-4 rounded-sm bg-black/60 border border-amber-800/40 placeholder-amber-600/40 text-amber-100 focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500 text-sm sm:text-base transition"
-                style={medievalFontStyle}
-              />
-
-              {/* Decorative button with fire effect */}
-              <button
-                className="w-full py-3 sm:py-4 bg-gradient-to-r from-red-900 via-red-800 to-amber-900 hover:from-red-800 hover:via-red-700 hover:to-amber-800 transition rounded-sm font-bold border border-amber-700/50 text-amber-100 mt-6 sm:mt-8 text-sm sm:text-base relative overflow-hidden group"
-                style={{
-                  fontFamily: "MedievalSharp",
-                  fontWeight: 1000,
-                  boxShadow: "0 4px 15px rgba(150, 50, 20, 0.4)",
-                }}
-              >
-                {/* Button glow effect */}
-                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></span>
-                {t("home.login")}
-              </button>
-
-              <button
-                className="w-full py-3 sm:py-4 bg-gradient-to-r from-stone-800 via-stone-900 to-stone-800 hover:from-stone-700 hover:via-stone-800 hover:to-stone-700 transition rounded-sm font-bold border border-stone-600/50 text-amber-100 mt-3 sm:mt-5 text-sm sm:text-base"
-                style={{
-                  fontFamily: "MedievalSharp",
-                  fontWeight: 1000,
-                }}
-              >
-                {t("home.signUp")}
-              </button>
-            </div>
-
             {/* Quickplay Form */}
             <div
               className={`transition-all duration-500 absolute inset-0 p-4 ${
@@ -516,7 +451,7 @@ function Home() {
                         setOneDevice(true);
                         setIsPublic(false);
                       }}
-                      className={`flex-1.5 py-2.5 px-2 text-xs sm:text-sm rounded-r-sm font-bold transition border sm:hidden ${
+                      className={`flex-1 py-2.5 px-2 text-xs sm:text-sm rounded-r-sm font-bold transition border sm:hidden ${
                         oneDevice
                           ? "bg-red-900/40 text-amber-400 border-amber-600/50"
                           : "bg-stone-900/80 text-stone-400 hover:text-amber-300 border-stone-700"
@@ -628,7 +563,5 @@ function Home() {
 
 export default Home;
 
-//TODO: Add in-game chat
 //TODO: Fix responsive design for all pages
 //TODO: Implement the login section
-//TODO: Add extra page the players profile

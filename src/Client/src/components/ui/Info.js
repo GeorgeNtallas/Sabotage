@@ -8,6 +8,7 @@ export default function AnimatedWindow({
   gameCharacters,
   phaseVoters = {},
   players = [],
+  disabled = false,
 }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function AnimatedWindow({
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [rulesSection, setRulesSection] = useState("goal");
   const handleToggle = (e) => {
+    if (disabled) return;
     const rect = e.currentTarget.getBoundingClientRect();
     setButtonRect(rect);
     setOpen(!open);
@@ -39,7 +41,12 @@ export default function AnimatedWindow({
       {/* Trigger button */}
       <button
         onClick={handleToggle}
-        className="px-3 py-2 bg-purple-900 hover:bg-purple-800 transition rounded-md font-bold relative z-[40] border border-purple-500/50"
+        disabled={disabled}
+        className={`px-3 py-2 transition rounded-md font-bold relative z-[40] border ${
+          disabled
+            ? "bg-zinc-800/50 border-zinc-700/50 cursor-not-allowed opacity-50"
+            : "bg-purple-900 hover:bg-purple-800 border-purple-500/50"
+        }`}
       >
         {triggerLabel}
       </button>
@@ -74,7 +81,7 @@ export default function AnimatedWindow({
             transition={{ duration: 0.2, ease: "easeInOut" }}
           >
             <div
-              className="w-[90%] max-h ml-5 mt-10  justify-center flex flex-col rounded-2xl shadow-2xl bg-black/95 border border-purple-500/50 overflow-hidden pointer-events-auto"
+              className="w-[80%] max-h ml-10 mt-10 justify-center flex flex-col rounded-2xl shadow-2xl bg-black/95 border border-purple-500/50 overflow-hidden pointer-events-auto"
               style={{
                 background:
                   "linear-gradient(135deg, #1a0e1a 0%, #130d18 25%, #1a0e1a 50%, #130d18 75%, #1a0e1a 100%)",
@@ -115,7 +122,7 @@ export default function AnimatedWindow({
               </div>
 
               {/* Content area */}
-              <div className="flex-1 p-5 text-purple-200">
+              <div className="flex-1 p-6 text-purple-200 overflow-y-auto max-h-[450px]">
                 {activeTab === "option1" && (
                   <div>
                     <h2 className="text-lg text-center font-bold text-purple-400 mb-2">
@@ -123,6 +130,16 @@ export default function AnimatedWindow({
                     </h2>
                     {totalTeamSize && (
                       <div className="space-y-2 flex flex-col items-center mt-4">
+                        {/* Column titles */}
+                        <div className="flex justify-between items-center px-3 mb-1 text-xs text-purple-400 font-semibold w-[94%]">
+                          <span className="w-1/3">{t("info.phase")}</span>
+                          <span className="w-1/3 text-center">
+                            {t("info.players")}
+                          </span>
+                          <span className="w-1/3 text-center">
+                            {t("info.failsNeeded")}
+                          </span>
+                        </div>
                         {[1, 2, 3, 4, 5].map((phase) => {
                           const voters = phaseVoters[phase] || [];
                           const voterNames = voters
@@ -146,28 +163,17 @@ export default function AnimatedWindow({
                           return (
                             <div
                               key={phase}
-                              className="w-[94%] bg-purple-950/50 rounded p-2"
+                              className="flex justify-between items-center w-[94%] bg-purple-950/50 rounded p-2 mb-1"
                             >
-                              <div className="flex justify-between items-center px-3">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold">
-                                    {t("info.phase")} {phase} :
-                                  </span>
-                                  <span className="text-amber-400">
-                                    {totalTeamSize[phase - 1]}{" "}
-                                    {t("info.players")}
-                                  </span>
-                                  <span className="text-red-400 text-xs">
-                                    {failsNeeded} {t("info.failsNeeded")}
-                                    {failsNeeded > 1 ? "s" : ""}
-                                  </span>
-                                </div>
-                              </div>
-                              {voterNames.length > 0 && (
-                                <div className="mt-1 text-xs text-purple-300 text-center">
-                                  {voterNames.join(", ")}
-                                </div>
-                              )}
+                              <span className="w-1/3 font-semibold">
+                                {t("info.phase")} {phase}
+                              </span>
+                              <span className="w-1/3 text-center text-amber-400">
+                                {totalTeamSize[phase - 1]}
+                              </span>
+                              <span className="w-1/3 text-center text-red-400 text-xs">
+                                {failsNeeded}
+                              </span>
                             </div>
                           );
                         })}
@@ -384,6 +390,12 @@ export default function AnimatedWindow({
                           </span>{" "}
                           {t("characters.knights")}
                         </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-blue-400 font-semibold">
+                            Zealot:
+                          </span>{" "}
+                          {t("characters.zealot")}
+                        </p>
                         <h2 className="text-lg font-bold text-red-400 mb-2">
                           {t("characters.evilCharacters")}
                         </h2>
@@ -416,6 +428,12 @@ export default function AnimatedWindow({
                             Thrall:
                           </span>{" "}
                           {t("characters.thrall")}
+                        </p>
+                        <p className="text-sm leading-relaxed mb-2">
+                          <span className="text-red-400 font-semibold">
+                            Illusionist:
+                          </span>{" "}
+                          {t("characters.illusionist")}
                         </p>
                       </div>
                     )}

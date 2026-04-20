@@ -61,22 +61,35 @@
     "success": "Success",
     "fail": "Fail",
     "chooseYourDestiny": "Choose Your Destiny",
-    "questVoteHint": "Choose your destiny carefully!"
+    "questVoteHint": "Choose your destiny carefully!",
+    "noHistory": "No quest history yet"
+  },
+  "exitModal": {
+    "title": "Exit Game?",
+    "message": "Are you sure you want to exit the game?",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "exitAppModal": {
+    "title": "Exit App?",
+    "message": "Are you sure you want to exit the app?",
+    "yes": "Yes",
+    "no": "No"
   },
   "info": {
     "phase": "Phase",
     "phasesInfo": "Phases Info",
     "characters": "Characters",
-    "rulesAndTips": "Rules and Tips",
+    "rulesAndTips": "Rules",
     "numberOfPlayersInEachQuest": "Number of Players in Each Quest",
-    "players": "players vote,",
+    "players": "Players",
     "close": "Close",
     "goal": "Goal",
     "howToPlay": "How to Play",
     "strategyTips": "Strategy Tips",
     "tips": "Tips",
     "allCharacters": "All Characters",
-    "failsNeeded": "fails needed"
+    "failsNeeded": "Fails needed"
   },
   "rules": {
     "goalText": "Players are secretly either Loyal Knights (Good) or Dark Knights of the Underworld (Evil). Good wins by successfully completing three Quests, while Evil wins if three Quests fail (or after the 5th round).",
@@ -104,6 +117,8 @@
     "kaelen": "Unknown to other evil players",
     "shade": "Can assassinate the Seer at the end of the game.",
     "thrall": "These characters aim to sabotage quests and sow distrust among good players",
+    "zealot": "Must vote two times, otherwise evil wins",
+    "illusionist": "Appears as good to the Seer and Seraphina.",
     "descriptions": {
       "Seer": "Knows who the evil players are",
       "Guardian": "Knows who Seer and Seraphina are",
@@ -112,7 +127,9 @@
       "Seraphina": "Appears as Seer to Guardian",
       "Kaelen": "Unknown to evil. Does not know Evil",
       "Shade": "Can kill Seer at the end",
-      "Thrall": "A Dark Knight"
+      "Thrall": "A Dark Knight",
+      "Zealot": "Must vote two times, otherwise evil wins",
+      "Illusionist": "Appears as good to Seer and Seraphina"
     }
   },
   "tips": {
@@ -129,7 +146,10 @@
     "gameOver": "Game Over",
     "goodWins": "Good Wins!",
     "evilWins": "Evil Wins!",
-    "exitToHome": "Exit to Home"
+    "exitToHome": "Exit to Home",
+    "goodText": "The forces of light have prevailed",
+    "evilText": "Darkness has consumed all"
+
   },
   "waitScreen": {
     "waitingForPlayers": "Waiting for players to vote..."
@@ -149,9 +169,10 @@
   },
   "oneDevice": {
     "knightsAssembled": "Knights Assembled",
-    "questSettings": "Quest Settings",
+    "questSettings": "Settings",
     "heroes": "Heroes",
     "rules": "Rules",
+    "language": "Language",
     "modes": "Modes",
     "comingSoon": "Coming soon...",
     "dragUpToReveal": "Drag Up to Reveal",
@@ -168,8 +189,10 @@
     "current": "Current:",
     "enterKnightName": "Enter knight name...",
     "add": "Add",
+    "exist": " already exists!",
     "leaveRoomConfirm": "Leave the room? This will remove you from the game.",
     "team": "Team:",
+    "addPlayers": "Add players",
     "characterDescriptions": {
       "Seer": "Knows who the evil players are",
       "Guardian": "Knows who Seer and Seraphina are",
@@ -178,7 +201,9 @@
       "Seraphina": "Appears as Seer to Guardian",
       "Kaelen": "Unknown to evil. Does not know Evil",
       "Shade": "Can kill Seer at the end",
-      "Thrall": "A Dark Knight"
+      "Thrall": "A Dark Knight",
+      "Zealot": "Must vote two times, otherwise evil wins",
+      "Illusionist": "Appears as good to Seer and Seraphina"
     },
     "visibleRoles": {
       "evil": "EVIL",

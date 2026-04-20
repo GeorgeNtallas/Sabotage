@@ -282,6 +282,7 @@ const initializeRoom = (roomSessionKey) => ({
   voting: null,
   questVoting: null,
   votedPlayers: [],
+  zealotVotes: [],
   final_result: {
     1: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
     2: { votes: { success: 0, fail: 0 }, result: [], voters: [] },
@@ -1302,6 +1303,15 @@ io.on("connection", (socket) => {
           if (!room.questVoting.voters.includes(playerSessionKey))
             room.questVoting.voters.push(playerSessionKey);
 
+          const currentCharacter = room.characters?.[playerSessionKey];
+          if (currentCharacter?.name === "Zealot") {
+            room.zealotVotes = room.zealotVotes || [];
+            const currentPhase = room.phase || 1;
+            if (!room.zealotVotes.includes(currentPhase)) {
+              room.zealotVotes.push(currentPhase);
+            }
+          }
+
           const totalPlayers = Object.keys(room.players).length;
           const votedCount = room.questVoting.voters.length;
 
@@ -1574,9 +1584,32 @@ io.on("connection", (socket) => {
         const goodWins = allResults.filter((r) => r === "success").length;
         const evilWins = allResults.filter((r) => r === "fail").length;
 
-        if (goodWins >= 3 || evilWins >= 3) {
+        const zealotVotes = room.zealotVotes || [];
+        const hasZealot = Object.values(room.characters || {}).some(
+          (c) => c?.name === "Zealot",
+        );
+        const zealotRequirementMet = zealotVotes.length >= 2;
+
+        if (goodWins >= 3) {
+          if (hasZealot && !zealotRequirementMet) {
+            io.to(roomSessionKey).emit("game_over", {
+              result: "evil",
+              goodWins,
+              evilWins,
+            });
+          } else {
+            io.to(roomSessionKey).emit("game_over", {
+              result: "good",
+              goodWins,
+              evilWins,
+            });
+          }
+          return;
+        }
+
+        if (evilWins >= 3) {
           io.to(roomSessionKey).emit("game_over", {
-            result: goodWins >= 3 ? "good" : "evil",
+            result: "evil",
             goodWins,
             evilWins,
           });
